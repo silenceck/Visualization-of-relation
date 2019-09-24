@@ -2,7 +2,7 @@
     <div class="header">        
         <el-row class="header-nav">
             <el-col :span="6" class="logo_container">
-                <img src="../assets/logo.png" class="logo" alt="">
+                <!-- <img src="../assets/logo.png" class="logo" alt=""> -->
             </el-col>
             <el-col :span="3" class="search_container">
                 <el-input v-model="search_data" placeholder="请输入内容" ></el-input>

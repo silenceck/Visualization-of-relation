@@ -1,14 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from './views/Index'
+import Index from './views/Index1'
 import Register from './views/Register'
 import Login from './views/Login'
-import Home from './views/Home'
+import Home from './views/Home1'
 import Info from './views/Info'
 import FundList from './views/FundList'
 import NotFound from './views/404'
-import Header from './components/HeaderNav1'
-
 Vue.use(Router)
 
 const router = new Router({
@@ -17,8 +15,8 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      // redirect: '/index',
-      component:Header,
+      redirect: '/index',
+      // component:Home1,
     },
     {
       path: '/index',

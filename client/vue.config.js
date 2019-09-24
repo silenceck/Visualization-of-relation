@@ -15,15 +15,16 @@ module.exports = {
             config.devtool = 'cheap-module-eval-source-map'
         } else { // 生产环境配置
         }
-        // Object.assign(config, { // 开发生产共同配置
-        //     resolve: {
-        //         alias: {
-        //             '@': path.resolve(__dirname, './src'),
-        //             '@c': path.resolve(__dirname, './src/components'),
-        //             'vue$': 'vue/dist/vue.esm.js'
-        //         }
-        //     }
-        // })
+        Object.assign(config, { // 开发生产共同配置
+            resolve: {
+                alias: {
+                    '@': path.resolve(__dirname, './src'),
+                    '@c': path.resolve(__dirname, './src/components'),
+                    'vue$': 'vue/dist/vue.esm.js',
+                    'jquery': path.resolve(__dirname, '../node_modules/jquery/src/jquery')
+                }
+            }
+        })
     },
     chainWebpack: config => { // webpack链接API，用于生成和修改webapck配置，https://github.com/vuejs/vue-cli/blob/dev/docs/webpack.md
         // if (debug) {
