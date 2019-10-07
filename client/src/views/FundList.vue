@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import Dialog from '../components/Dialog'
+import Dialog from '../components/Dialog.vue'
     export default {
         name: "fundList",
         data(){

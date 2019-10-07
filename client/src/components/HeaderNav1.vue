@@ -3,6 +3,7 @@
         <el-row class="header-nav">
             <el-col :span="6" class="logo_container">
                 <!-- <img src="../assets/logo.png" class="logo" alt=""> -->
+                <div style="color:#ffffff">dsfa</div>
             </el-col>
             <el-col :span="3" class="search_container">
                 <el-input v-model="search_data" placeholder="请输入内容" ></el-input>
@@ -12,13 +13,14 @@
             </el-col>            
             <el-col :span="8" class="nav_container">
                 <el-menu
-                    :default-active="activeIndex2"
+                    :default-active="activeIndex"
                     class="el-menu-demo"
                     mode="horizontal"
                     @select="handleSelect"
                     background-color="#ffffff"
                     text-color="#a6282f"
-                    active-text-color="#a6282f">
+                    active-text-color="#a6282f"
+                    router=true>
                     <!-- <el-menu-item index="0" class="logo" ><img src="../assets/logo.png" alt=""></el-menu-item> -->                        
                     <el-menu-item index="1" class="index1">首页</el-menu-item>
                     <el-menu-item index="2" class="index">构建关系网络</el-menu-item>
@@ -42,7 +44,6 @@ export default {
     data() {
         return {
             activeIndex: '1',
-            activeIndex2: '1'
         };
     },
     methods: {
@@ -70,9 +71,6 @@ export default {
 .search_container >>> .el-input__inner {
     border: 1px solid #a6282f;
 }
-.nav_container {
-    
-}
 .index1.el-menu-item {
     height: 80px;
     line-height: 80px;
@@ -95,6 +93,7 @@ export default {
   min-width: 400px;
 }
 .logo {
+  color:#ffffff;
   height: 50px;
   width: 50px;
   margin-right: 5px;

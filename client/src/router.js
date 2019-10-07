@@ -1,12 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from './views/Index1'
-import Register from './views/Register'
-import Login from './views/Login'
-import Home from './views/Home1'
-import Info from './views/Info'
-import FundList from './views/FundList'
-import NotFound from './views/404'
+import Index from './views/Index1.vue'
+import Register from './views/Register.vue'
+import Login from './views/Login.vue'
+import Home from './views/Home1.vue'
+import Info from './views/Info.vue'
+import FundList from './views/FundList.vue'
+import NotFound from './views/404.vue'
+import CreateChart from './views/CreateChart.vue'
+import Add from './components/Add.vue'
+
 Vue.use(Router)
 
 const router = new Router({
@@ -28,9 +31,13 @@ const router = new Router({
           component:Home,
         },
         {                                     
-          path:'/home',
-          name:'home',
+          path:'/1',
           component:Home,
+        },
+        {                                     
+          path:'/2',
+          name:'create_chart',
+          component:CreateChart,
         },
         {                                     
           path:'/info',
@@ -58,6 +65,11 @@ const router = new Router({
       path: '*',
       name: 'not found',
       component: NotFound
+    },
+    {
+      path: '/test',
+      name: '',
+      component: Add
     },
   ]
 })
