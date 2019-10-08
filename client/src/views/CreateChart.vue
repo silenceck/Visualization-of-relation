@@ -9,8 +9,8 @@
                     <div id="main" class="chart"></div>
                 </el-col>
                 <el-col span='9'>
-                    <a v-link="'/add'">添加</a> |
-                    <a v-link="'/search'">查询</a>
+                    <router-link to="/add">添加</router-link> |
+                    <router-link to="/search">查询</router-link>
                     <div class="add_search">
                         <router-view></router-view>
                     </div>

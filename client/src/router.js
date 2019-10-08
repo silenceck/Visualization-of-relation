@@ -9,6 +9,7 @@ import FundList from './views/FundList.vue'
 import NotFound from './views/404.vue'
 import CreateChart from './views/CreateChart.vue'
 import Add from './components/Add.vue'
+import Search from './components/Search.vue'
 
 Vue.use(Router)
 
@@ -38,6 +39,16 @@ const router = new Router({
           path:'/2',
           name:'create_chart',
           component:CreateChart,
+          children:[
+            {
+              path:'/add',
+              component: Add
+            },
+            {
+              path:'/search',
+              component: Search
+            }
+          ]
         },
         {                                     
           path:'/info',
@@ -69,7 +80,7 @@ const router = new Router({
     {
       path: '/test',
       name: '',
-      component: Add
+      component: Search
     },
   ]
 })

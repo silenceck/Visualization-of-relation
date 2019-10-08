@@ -1,22 +1,38 @@
 <template>
     <div class="add">        
         <div class="nodeAndRelationship">
-            节点1:<el-input v-model="node1" placeholder="请输入节点1标签"></el-input> --- <el-input v-model="relation" placeholder="请输入内容"></el-input> --->
-            节点2:<el-input v-model="node2" placeholder="请输入节点2标签"></el-input>
-            
-            <el-tooltip content="添加属性" placement="bottom" effect="light">
-                <i class="el-icon-plus"></i>
-            </el-tooltip>
+            <el-input v-model="node1_label" placeholder="节点1标签"></el-input> ---- <el-input v-model="relation_label" placeholder="关系"></el-input> --->
+            <el-input v-model="node2_label" placeholder="节点2标签"></el-input>
         </div>
         <div class="propery">
-            <el-tooltip content="添加属性" placement="bottom" effect="light">
+            <!-- <el-tooltip content="增加属性列" placement="bottom" effect="light" @click="add_element">
                 <i class="el-icon-plus"></i>
-            </el-tooltip>
+            </el-tooltip> -->
+            <el-button class="add_btn" @click="add_propery">
+                添加属性列
+            </el-button>
             <div class="table">
-                节点1 <el-input v-model="node1_pro" placeholder="属性名"></el-input>:<el-input v-model="node1" placeholder="属性值"></el-input>
-                关系 <el-input v-model="relation_pro" placeholder="属性名"></el-input>:<el-input v-model="node1" placeholder="属性值"></el-input>
-                节点2 <el-input v-model="node2_pro" placeholder="属性名"></el-input>:<el-input v-model="node1" placeholder="属性值"></el-input>
-
+                <div class="node1">
+                    节点一 
+                    <span class="n1_pro" v-for='i in node1' :key="i.name+`node1`+iter_num">
+                        <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input>  &#12288;
+                    </span>
+                </div>
+                <div class="relation">
+                    关系&#12288; 
+                    <span class="res_pro" v-for='i in relation' :key="i.name+`relation`+iter_num">
+                        <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input>  &#12288;
+                    </span>
+                </div>
+                <div class="node2">
+                    节点二 
+                    <span class="n2_pro" v-for='i in node2' :key="i.name+`node2`+iter_num">
+                        <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input> &#12288;
+                    </span>
+                </div>
+                <el-button class="add_btn" @click="add_element">
+                    添加元素
+                </el-button>
             </div>
         </div>
 
@@ -26,61 +42,81 @@
 export default {
     data() {
         return {
-            activeIndex: '1',
+            iter_num: 1,
+            node1_label:'',
+            relation_label:'',
+            node2_label:'',
+            node1: [
+                {
+                    name: "",
+                    value: "",
+                }
+            ],
+            relation: [
+                {
+                    name: "",
+                    value: "",
+                }
+            ],
+            node2: [
+                {
+                    name: "",
+                    value: "",
+                }
+            ],
+            
         };
     },
     methods: {
         handleSelect(key, keyPath) {
             console.log(key, keyPath);  
+        },
+        add_propery(){
+            if (this.iter_num < 7) {
+                this.iter_num += 1;
+                this.node1.push({
+                    name: "",
+                    value: "",
+                });
+                this.relation.push({
+                    name: "",
+                    value: "",
+                });
+                this.node2.push({
+                    name: "",
+                    value: "",
+                });
+            }           
+        },
+        delete_element(){
+
         }
     }
 }
 </script>
 
 <style scoped>
-.el-menu-demo {
-    height: 80px;
+.el-input {
+    width: 100px;
 }
-.search_container {   
-    height: 80px;
-    line-height: 80px;
-    font-size: 18px;
+.nodeAndRelationship  {
+    margin-top: 2px;
 }
-.search_container .el-button {
-    margin-left: 4px;
-    background: #a6282f;
-    border: 1px solid #a6282f;
+.add_btn {
+    margin-top: 10px;
 }
-.search_container >>> .el-input__inner {
-    border: 1px solid #a6282f;
+.table {
+    margin-top: 10px;
 }
-.index1.el-menu-item {
-    height: 80px;
-    line-height: 80px;
-    font-size: 18px;
+.node1 {
+    margin-top: 10px;
+}
+.relation {
+    margin-top: 10px;
+}
+.node2 {
+    margin-top: 10px;
+}
 
-}
-.index.el-menu-item {
-    height: 80px;
-    line-height: 80px;
-    font-size: 18px;
 
-}
-.index2.el-menu-item {
-    border-color: #ffffff;
-    line-height: 80px;
-    font-size: 18px;
-}
-.logo-container {
-  line-height: 60px;
-  min-width: 400px;
-}
-.logo {
-  color:#ffffff;
-  height: 50px;
-  width: 50px;
-  margin-right: 5px;
-  vertical-align: middle;
-  display: inline-block;
-}
 </style>
