@@ -1,17 +1,14 @@
 <template>
     <div class="home">
         <div class="container">
-            <el-row>
-                <i class="el-icon-plus"></i>
-                <i class="el-icon-search"></i>
-                 
-                <el-col span='15'> 
+            <el-row :gutter="20" class="row">              
+                <el-col :span='12' class="col1"> 
                     <div id="main" class="chart"></div>
                 </el-col>
-                <el-col span='9'>
-                    <router-link to="/add">添加</router-link> |
-                    <router-link to="/search">查询</router-link>
-                    <div class="add_search">
+                <el-col :span='12' class="col2">
+                    <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
+                    <router-link to="/search"><i class="el-icon-search"></i></router-link>
+                    <div class="add_search" >
                         <router-view></router-view>
                     </div>
                     
@@ -435,16 +432,22 @@ export default {
 }
 </script>
 <style scoped>
+.row {
+    top: 100px;
+}
+.add_search {
+    margin-top: 80px;
+    padding-left: 10%;
+}
 .chart {
-    position: absolute;
+    /* position: absolute; */
     left: 15%;
-    top: 200px;
     height: 680px;
     width: 800px;
     border: 2px solid #a6282f;
 }
 .el-icon-plus {
-    margin-left: 50%;
+    margin-left: 30%;
     margin-top: 30px;
     color: #a6282f;
 }

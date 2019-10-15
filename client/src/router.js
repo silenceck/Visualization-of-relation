@@ -41,6 +41,10 @@ const router = new Router({
           component:CreateChart,
           children:[
             {
+              path:'',
+              component: Add
+            },
+            {
               path:'/add',
               component: Add
             },

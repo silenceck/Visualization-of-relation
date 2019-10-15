@@ -1,8 +1,26 @@
 <template>
     <div class="home">
         <div class="container">
-            <div class="title">护理领域</div>
-            <div id="main" class="chart"></div>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                </el-col>
+                <el-col :span="12">
+                    <div class="title" @click="resetData">护理领域</div>
+                    <div id="main" class="chart"></div>
+                </el-col>
+                <el-col :span="6">
+                    <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>卡片名称</span>
+                        <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+                    </div>
+                    <div v-for="o in 4" :key="o" class="text item">
+                        {{'列表内容 ' + o }}
+                    </div>
+                    </el-card>
+                </el-col>
+            </el-row>
+
             <!-- <el-button @click="reduceChartData">减少数据</el-button> -->
         </div>
     </div>
@@ -347,7 +365,13 @@ export default {
                 {id: "247", name: null, source: "76", target: "64", lineStyle: {}},
                 {id: "248", name: null, source: "76", target: "65", lineStyle: {}},
                 {id: "249", name: null, source: "76", target: "66", lineStyle: {}},
-            ]
+            ],
+            seleted_node: { 
+
+            },
+            seleted_link: {
+
+            }
         }
     },
     mounted: function() {
@@ -424,6 +448,58 @@ export default {
                 ]
             };
             myChart.setOption(option);
+            const that = this;
+            myChart.on('click', {dataType: 'node'},function (params) {               
+                const id = params.data.id;
+                // console.log(nodes)
+                const links = that.links.filter( link => { return link.source === id || link.target === id });
+                let seleted_node = new Set();
+                for(let link in links) {
+                    console.log(link)
+                    seleted_node.add(links[link].source);
+                    seleted_node.add(links[link].target); 
+                }
+                const nodes = that.nodes.filter( node => { return seleted_node.has(node.id) })
+                const option = {
+                    series : [
+                        {         
+                            data: nodes,
+                            links: links,
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+            }); 
+            // myChart.on('mousemove', function (params) {
+            //     if (params.componentType === 'markPoint') {
+            //         // 点击到了 markPoint 上
+            //         if (params.seriesIndex === 5) {
+            //             // 点击到了 index 为 5 的 series 的 markPoint 上。
+            //         }
+            //     }
+            //     else if (params.componentType === 'series') {
+            //         if (params.seriesType === 'graph') {
+            //             if (params.dataType === 'edge') {
+            //                 // 点击到了 graph 的 edge（边）上。
+            //                 // myChart.setOption({
+            //                 //     series: [
+            //                 //         {
+            //                 //             lineStyle: {
+            //                 //                 color: '#000', // 鼠标移到edge上 edge color 变黑
+            //                 //                 width: 5,
+            //                 //             },
+            //                 //         }
+            //                 //     ]
+            //                 // })
+                            
+            //             }
+            //             else {
+            //                 // 点击到了 graph 的 node（节点）上。
+            //                 // console.log(params)
+            //             }
+            //         }
+            //     }
+            // });
             // }, 'xml');
         },
         updateChart: function() {
@@ -454,7 +530,23 @@ export default {
                 {id: "10", name: "Labarre", itemStyle: null, symbolSize: 2.6666666666666665, x: -89.34107},
             ];
             this.updateChart()
+        },
+        showSelectedData: function(node) {
+
+        },
+        resetData: function(){
+            let myChart = this.$echarts.init(document.getElementById('main'));
+            const option = {
+                series : [
+                    {         
+                        data: this.nodes,
+                        links: this.links,
+                    }
+                ]
+            };
+            myChart.setOption(option);
         }
+
     }
 }
 </script>
