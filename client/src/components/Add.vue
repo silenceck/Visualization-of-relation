@@ -90,7 +90,14 @@ export default {
         },
         delete_element(){
 
+        },
+        add_element: function(){
+            if(node1_label !== null)
+                {
+                    
+                }
         }
+
     }
 }
 </script>

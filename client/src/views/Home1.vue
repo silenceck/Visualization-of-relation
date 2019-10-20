@@ -3,19 +3,26 @@
         <div class="container">
             <el-row :gutter="20">
                 <el-col :span="6">
+                    <el-tree
+                        :data="data"
+                        :props="defaultProps"
+                        accordion
+                        @node-click="handleNodeClick"
+                        class="sidebar">
+                    </el-tree>
                 </el-col>
-                <el-col :span="12">
+                <el-col :span="9">
                     <div class="title" @click="resetData">护理领域</div>
                     <div id="main" class="chart"></div>
                 </el-col>
-                <el-col :span="6">
+                <el-col :span="9" class="card">
                     <el-card class="box-card">
                     <div slot="header" class="clearfix">
-                        <span>卡片名称</span>
+                        <span>{{click_node.name}}</span>
                         <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
                     </div>
                     <div v-for="o in 4" :key="o" class="text item">
-                        {{'列表内容 ' + o }}
+                        <!-- {{'列表内容 ' + o }} -->
                     </div>
                     </el-card>
                 </el-col>
@@ -31,6 +38,45 @@ export default {
     name: 'home1',
     data(){
         return {
+            data: [{
+                    label: '护理领域',
+                    children: [{
+                        label: '二级 1-1',
+                        children: [{
+                        label: '三级 1-1-1'
+                        }]
+                    }]
+                }, {
+                    label: '一级 2',
+                    children: [{
+                        label: '二级 2-1',
+                        children: [{
+                        label: '三级 2-1-1'
+                        }]
+                }, {
+                    label: '二级 2-2',
+                    children: [{
+                    label: '三级 2-2-1'
+                    }]
+                }]
+                }, {
+                    label: '一级 3',
+                    children: [{
+                        label: '二级 3-1',
+                        children: [{
+                        label: '三级 3-1-1'
+                        }]
+                }, {
+                    label: '二级 3-2',
+                    children: [{
+                    label: '三级 3-2-1'
+                    }]
+                }]
+            }],
+            defaultProps: {
+                children: 'children',
+                label: 'label'
+            },
             nodes: [
                 {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
                 {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
@@ -371,6 +417,9 @@ export default {
             },
             seleted_link: {
 
+            },
+            click_node: {
+
             }
         }
     },
@@ -431,7 +480,7 @@ export default {
                         data: this.nodes,
                         links: this.links,
                         categories: categories,
-                        roam: true,
+                        roam: false,
                         label: {
                             normal: {
                                 position: 'right',
@@ -451,11 +500,10 @@ export default {
             const that = this;
             myChart.on('click', {dataType: 'node'},function (params) {               
                 const id = params.data.id;
-                // console.log(nodes)
                 const links = that.links.filter( link => { return link.source === id || link.target === id });
+                that.click_node = that.nodes.filter( node => { return node.id === id })[0];
                 let seleted_node = new Set();
                 for(let link in links) {
-                    console.log(link)
                     seleted_node.add(links[link].source);
                     seleted_node.add(links[link].target); 
                 }
@@ -515,7 +563,6 @@ export default {
             myChart.setOption(option);
         },
         reduceChartData: function() {
-            console.log('asdfas')
             this.nodes = [
                 {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
                 {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
@@ -545,6 +592,9 @@ export default {
                 ]
             };
             myChart.setOption(option);
+        },
+        handleNodeClick: function(data) {
+            console.log(data);
         }
 
     }
@@ -554,10 +604,13 @@ export default {
 <style scoped>
 .chart {
     position: absolute;
-    left: 30%;
-    top: 250px;
+    /* left: 30%; */
+    top: 100px;
     height: 680px;
     width: 800px;
+}
+.sidebar {
+    left: 80px;
 }
 .container {
   width: 100%;
@@ -569,10 +622,18 @@ export default {
   top: 100px;
   text-align: center;
   font-size: 30px;
+  width: 800px;
 }
 .lead {
   margin-top: 50px;
   font-size: 22px;
+}
+.card {
+    left: 80px;
+}
+.box-card {
+    
+    width: 480px;
 }
 </style>
 

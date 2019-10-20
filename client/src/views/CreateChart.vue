@@ -420,7 +420,8 @@ export default {
                             }
                         },
                         force: {
-                            repulsion: 100
+                            repulsion: 100,
+                            gravity: 0.3,
                         }
                     }
                 ]
