@@ -42,6 +42,7 @@
 export default {
     data() {
         return {
+            id: 1,
             iter_num: 1,
             node1_label:'',
             relation_label:'',
@@ -69,10 +70,10 @@ export default {
     },
     methods: {
         handleSelect(key, keyPath) {
-            console.log(key, keyPath);  
+            // console.log(key, keyPath);  
         },
         add_propery(){
-            if (this.iter_num < 7) {
+            if (this.iter_num < 3) {
                 this.iter_num += 1;
                 this.node1.push({
                     name: "",
@@ -92,10 +93,28 @@ export default {
 
         },
         add_element: function(){
-            if(node1_label !== null)
-                {
-                    
+            if(this.node1_label !== null){
+                const node = {
+                    label: this.node1_label,
+                    id: this.id,
                 }
+                for(let i of this.node1){
+                    const name = i.name;
+                    const value = i.value;
+                    node[name] = value;
+                }
+                this.id = this.id + 1;
+                this.$store.dispatch('addNode', node);
+                // console.log(this.$store.getters.newChart);
+            }
+            
+            // for(let i in this.node1){
+
+            // }
+            // if(node2_label !== null){
+            //     this.node2_label = node2_label;
+            // }
+            
         }
 
     }
