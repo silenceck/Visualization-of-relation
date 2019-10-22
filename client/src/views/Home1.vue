@@ -28,7 +28,8 @@
                 </el-col>
             </el-row>
 
-            <!-- <el-button @click="reduceChartData">减少数据</el-button> -->
+            <!-- <el-button @click="reduceChartData">减少数据</el-button>
+            <el-button @click="testChartData">添加连接</el-button> -->
         </div>
     </div>
 </template>
@@ -552,30 +553,43 @@ export default {
         },
         updateChart: function() {
             let myChart = this.$echarts.init(document.getElementById('main'));
+            const testNode = [
+                { id:'0', name:'0'},
+                { id:'1', name:'1'},
+                { id:'2', name:'2'},
+            ];
+            const testLink = [
+                {id:'0', name:'0',source:'1', target:'0'},
+                
+                {id:'1', name:'2',source:'2', target:'0'},
+                {id:'2', name:'1',source:'2', target:'1'},
+            ];
             const option = {
                 series : [
                     {         
-                        data: this.nodes,
-                        links: this.links,
+                        // data: this.nodes,
+                        // links: this.links,
+                        data: testNode,
+                        links: testLink,
                     }
                 ]
             };
             myChart.setOption(option);
         },
         reduceChartData: function() {
-            this.nodes = [
-                {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
-                {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
-                {id: "2", name: "MlleBaptistine", itemStyle: null, symbolSize: 6.323809333333333, x: -212.76357},
-                {id: "3", name: "MmeMagloire", itemStyle: null, symbolSize: 6.323809333333333, x: -242.82404},
-                {id: "4", name: "CountessDeLo", itemStyle: null, symbolSize: 2.6666666666666665, x: -379.30386},
-                {id: "5", name: "Geborand", itemStyle: null, symbolSize: 2.6666666666666665, x: -417.26337},
-                {id: "6", name: "Champtercier", itemStyle: null, symbolSize: 2.6666666666666665, x: -332.6012},
-                {id: "7", name: "Cravatte", itemStyle: null, symbolSize: 2.6666666666666665, x: -382.69568},
-                {id: "8", name: "Count", itemStyle: null, symbolSize: 2.6666666666666665, x: -320.384},
-                {id: "9", name: "OldMan", itemStyle: null, symbolSize: 2.6666666666666665, x: -344.39832},
-                {id: "10", name: "Labarre", itemStyle: null, symbolSize: 2.6666666666666665, x: -89.34107},
-            ];
+            // this.nodes = [
+            //     {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
+            //     {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
+            //     {id: "2", name: "MlleBaptistine", itemStyle: null, symbolSize: 6.323809333333333, x: -212.76357},
+            //     {id: "3", name: "MmeMagloire", itemStyle: null, symbolSize: 6.323809333333333, x: -242.82404},
+            //     {id: "4", name: "CountessDeLo", itemStyle: null, symbolSize: 2.6666666666666665, x: -379.30386},
+            //     {id: "5", name: "Geborand", itemStyle: null, symbolSize: 2.6666666666666665, x: -417.26337},
+            //     {id: "6", name: "Champtercier", itemStyle: null, symbolSize: 2.6666666666666665, x: -332.6012},
+            //     {id: "7", name: "Cravatte", itemStyle: null, symbolSize: 2.6666666666666665, x: -382.69568},
+            //     {id: "8", name: "Count", itemStyle: null, symbolSize: 2.6666666666666665, x: -320.384},
+            //     {id: "9", name: "OldMan", itemStyle: null, symbolSize: 2.6666666666666665, x: -344.39832},
+            //     {id: "10", name: "Labarre", itemStyle: null, symbolSize: 2.6666666666666665, x: -89.34107},
+            // ];
             this.updateChart()
         },
         showSelectedData: function(node) {
@@ -588,6 +602,23 @@ export default {
                     {         
                         data: this.nodes,
                         links: this.links,
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        },
+        testChartData: function(){
+            let myChart = this.$echarts.init(document.getElementById('main'));
+            const testLink = [
+                {id:'1', name:'1',source:'1', target:'2',lineStyle: {}}
+            ];
+            const option = {
+                series : [
+                    {         
+                        // data: this.nodes,
+                        // links: this.links,
+                        // data: testNode,
+                        links: testLink,
                     }
                 ]
             };

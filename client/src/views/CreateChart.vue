@@ -1,9 +1,9 @@
 <template>
     <div class="home">
         <div class="container">
-            <el-row :gutter="20" class="row">              
-                <el-col :span='12' class="col1"> 
-                    <div id="main" class="chart"></div>
+            <el-row :gutter="20" class="row">               
+                <el-col :span='12' class="col1">  
+                    <div id="main" class="chart"></div> 
                 </el-col>
                 <el-col :span='12' class="col2">
                     <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
@@ -11,6 +11,11 @@
                     <div class="add_search" >
                         <router-view></router-view>
                     </div>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20">
+                <el-col :span="12">
+                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span></div>
                 </el-col>
             </el-row>
             
@@ -24,6 +29,7 @@ export default {
         return {
             // nodes: [],
             // links: [],
+            showinfo: {}
         }
     },
     mounted: function(){
@@ -435,16 +441,46 @@ export default {
                 ]
             };
             myChart.setOption(option);
+            const that = this;
+            myChart.on('click', function (params) {
+                if (params.componentType === 'markPoint') {
+                    // 点击到了 markPoint 上
+                    if (params.seriesIndex === 5) {
+                        // 点击到了 index 为 5 的 series 的 markPoint 上。
+                    }
+                }
+                else if (params.componentType === 'series') {
+                    if (params.seriesType === 'graph') {
+                        if (params.dataType === 'edge') {
+                            that.showinfo = params.data;
+                            delete that.showinfo.emphasis;
+                        }
+                        else {
+                            that.showinfo = params.data;
+                            delete that.showinfo.emphasis;
+                        }
+                    }
+                }
+            });
             // }, 'xml');
         },
     },
     watch: {
         nodes: function(val, oldVal){
-            console.log('new: ', val, ', old: ', oldVal);
             let myChart = this.$echarts.init(document.getElementById('main'));
             const option = {
                 series: {
+                    type: 'graph',
                     data: this.nodes,
+                }
+            }
+            myChart.setOption(option);
+        },
+        links: function(val, oldVal){
+            let myChart = this.$echarts.init(document.getElementById('main'));
+            const option = {
+                series: {
+                    type: 'graph',
                     links: this.links,
                 }
             }
@@ -463,10 +499,18 @@ export default {
 }
 .chart {
     /* position: absolute; */
-    left: 15%;
+    margin-left: 144px;
     height: 680px;
     width: 800px;
     border: 2px solid #a6282f;
+}
+.showinfo {
+    margin-top: 100px;
+    margin-left: 144px;
+    width: 800px;
+    height: 20px;
+    border: 2px solid #a6282f;
+    border-top: 0px;
 }
 .el-icon-plus {
     margin-left: 30%;

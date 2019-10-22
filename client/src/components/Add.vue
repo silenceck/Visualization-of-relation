@@ -14,19 +14,19 @@
             <div class="table">
                 <div class="node1">
                     节点一 
-                    <span class="n1_pro" v-for='i in node1' :key="i.name+`node1`+iter_num">
+                    <span class="n1_pro" v-for='i in node1' :key="i.key+`node1`">
                         <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input>  &#12288;
                     </span>
                 </div>
                 <div class="relation">
                     关系&#12288; 
-                    <span class="res_pro" v-for='i in relation' :key="i.name+`relation`+iter_num">
+                    <span class="res_pro" v-for='i in relation' :key="i.key+`relation`">
                         <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input>  &#12288;
                     </span>
                 </div>
                 <div class="node2">
                     节点二 
-                    <span class="n2_pro" v-for='i in node2' :key="i.name+`node2`+iter_num">
+                    <span class="n2_pro" v-for='i in node2' :key="i.key+`node2`">
                         <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input> &#12288;
                     </span>
                 </div>
@@ -42,7 +42,8 @@
 export default {
     data() {
         return {
-            id: 1,
+            node_id: 0,
+            link_id: 0,
             iter_num: 1,
             node1_label:'',
             relation_label:'',
@@ -51,18 +52,21 @@ export default {
                 {
                     name: "",
                     value: "",
+                    key: 1,
                 }
             ],
             relation: [
                 {
                     name: "",
                     value: "",
+                    key: 1,
                 }
             ],
             node2: [
                 {
                     name: "",
                     value: "",
+                    key: 1,
                 }
             ],
             
@@ -78,14 +82,17 @@ export default {
                 this.node1.push({
                     name: "",
                     value: "",
+                    key: this.iter_num,
                 });
                 this.relation.push({
                     name: "",
                     value: "",
+                    key: this.iter_num,
                 });
                 this.node2.push({
                     name: "",
                     value: "",
+                    key: this.iter_num,
                 });
             }           
         },
@@ -93,21 +100,30 @@ export default {
 
         },
         add_element: function(){
-            if(this.node1_label !== null){
+            if(this.node1_label !== "" && this.relation_label === ""){
                 const node = {
                     label: this.node1_label,
-                    id: this.id,
+                    id: String(this.node_id),
                 }
                 for(let i of this.node1){
                     const name = i.name;
                     const value = i.value;
                     node[name] = value;
                 }
-                this.id = this.id + 1;
+                this.node_id = this.node_id + 1;
                 this.$store.dispatch('addNode', node);
                 // console.log(this.$store.getters.newChart);
             }
-            
+            if(this.relation_label !== "" && this.node1_label !== "" && this.node2_label !== ""){
+                const link = {
+                    id: String(this.link_id),
+                    name: this.relation_label,
+                    source: (this.node1_label),
+                    target: (this.node2_label),
+                }
+                this.link_id = this.link_id + 1;
+                this.$store.dispatch('addLink', link);
+            }
             // for(let i in this.node1){
 
             // }
