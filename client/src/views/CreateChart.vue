@@ -407,7 +407,7 @@ export default {
             const option = {
                 title: {
                     // text: 'Les Miserables',
-                    subtext: 'Default layout',
+                    // subtext: 'Default layout',
                     top: 'bottom',
                     left: 'right'
                 },
@@ -503,6 +503,7 @@ export default {
     height: 680px;
     width: 800px;
     border: 2px solid #a6282f;
+    border-bottom: 1px solid rgb(220, 223, 230);
 }
 .showinfo {
     margin-top: 100px;
