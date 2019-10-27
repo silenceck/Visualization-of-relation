@@ -6,6 +6,7 @@
                     <div id="main" class="chart"></div> 
                 </el-col>
                 <el-col :span='12' class="col2">
+                    &#12288;&#12288;&#12288;&#12288;
                     <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
                     <router-link to="/search"><i class="el-icon-search"></i></router-link>
                     <div class="add_search" >
@@ -15,7 +16,7 @@
             </el-row>
             <el-row :gutter="20">
                 <el-col :span="12">
-                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span></div>
+                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
                 </el-col>
             </el-row>
             
@@ -29,7 +30,7 @@ export default {
         return {
             // nodes: [],
             // links: [],
-            showinfo: {}
+            showinfo: null,
         }
     },
     mounted: function(){
@@ -41,7 +42,7 @@ export default {
         },
         links(){
             return this.$store.getters.newChart.links
-        }
+        },
     },
     methods: {
         getChartData: function(){
@@ -453,10 +454,12 @@ export default {
                     if (params.seriesType === 'graph') {
                         if (params.dataType === 'edge') {
                             that.showinfo = params.data;
+                            that.showinfo.type = 'link';
                             delete that.showinfo.emphasis;
                         }
                         else {
                             that.showinfo = params.data;
+                            that.showinfo.type = 'node';
                             delete that.showinfo.emphasis;
                         }
                     }
@@ -464,6 +467,15 @@ export default {
             });
             // }, 'xml');
         },
+        delete_element: function(showinfo){
+            if(showinfo.type == 'node'){
+                this.$store.dispatch('deleteNode', showinfo);
+                this.showinfo = null;
+            }else{
+                this.$store.dispatch('deleteLink', showinfo);
+                this.showinfo = null;
+            }
+        }
     },
     watch: {
         nodes: function(val, oldVal){
@@ -505,11 +517,19 @@ export default {
     border: 2px solid #a6282f;
     border-bottom: 1px solid rgb(220, 223, 230);
 }
+.update {
+    text-align: right;
+}
+.btn {
+    display: inline-block;
+    text-align: right;
+}
 .showinfo {
     margin-top: 100px;
     margin-left: 144px;
+    padding-top: 1px;
     width: 800px;
-    height: 20px;
+    height: 40px;
     border: 2px solid #a6282f;
     border-top: 0px;
 }

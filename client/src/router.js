@@ -9,6 +9,7 @@ import FundList from './views/FundList.vue'
 import NotFound from './views/404.vue'
 import CreateChart from './views/CreateChart.vue'
 import Add from './components/Add.vue'
+import ADD1 from './components/ADD1.vue'
 import Search from './components/Search.vue'
 
 Vue.use(Router)
@@ -84,7 +85,7 @@ const router = new Router({
     {
       path: '/test',
       name: '',
-      component: Search
+      component: ADD1,
     },
   ]
 })
