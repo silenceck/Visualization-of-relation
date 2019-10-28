@@ -25,11 +25,14 @@
             </el-row>
         <div class="btn">
             &#12288;
-            <el-button class="add_btn" @click="add_element">
+            <el-button class="add_btn" v-show="updateLable === false" @click="add_element" >
                 添加元素
             </el-button>
-            <el-button class="add_btn" @click="add_propery">
+            <el-button class="add_btn" v-show="updateLable === false" @click="add_propery">
                 添加属性列
+            </el-button>
+            <el-button class="add_btn" v-show="updateLable === true" @click="update_element" >
+                更新元素
             </el-button>
         </div>
         </div>
@@ -38,6 +41,10 @@
 </template>
 <script>
 export default {
+    props: [
+      'showinfo',
+      'updateLable',
+    ],
     data() {
         return {
             node_id: 0,
@@ -67,7 +74,7 @@ export default {
         handleSelect(key, keyPath) {
             // console.log(key, keyPath);  
         },
-        add_propery(){
+        add_propery: function(){
             if (this.iter_num < 3) {
                 this.iter_num += 1;
                 this.node.push({
@@ -127,7 +134,7 @@ export default {
                 this.$store.dispatch('addLink', link);
                 this.source_id = '';
                 this.relation_label = '';
-                this.target = '';
+                this.target_id = '';
                 for(let i of this.relation){
                     i.name = '';
                     i.value = '';
@@ -140,8 +147,97 @@ export default {
             //     this.node2_label = node2_label;
             // }
             
-        }
+        },
+        update_element: function(){
+            if(this.showinfo){
+                if(this.showinfo.type === "node"){    
+                    for(let item of this.$store.getters.newChart.nodes){
+                        if(item.id === this.showinfo.id){
+                            let info = {};
+                            info.type = this.showinfo.type;
+                            info.id = this.showinfo.id;
+                            for(let i in this.node){
+                                info[this.node[i].name] = this.node[i].value;
+                            }
+                            this.$store.dispatch('updateNode', info);
+                            this.$emit('update', this.$store.getters.newChart.nodes, info); // 由于数组中的对象属性的变化watch检测不到,使用emit从子组件向父组件传递数据
+                            this.node = [
+                                {
+                                    name: "",
+                                    value: "",
+                                    key: 1,
+                                }
+                            ];
+                            this.node_label = '';
+                        }
+                    }                                  
+                }else{
+                    for(let item of this.$store.getters.newChart.links){
+                        if(item.id === this.showinfo.id){
+                            let info = {};
+                            info.type = this.showinfo.type;
+                            info.id = this.showinfo.id;
+                            info.source = this.showinfo.source;
+                            info.target = this.showinfo.target;
+                            for(let i in this.relation){
+                                info[this.relation[i].name] = this.relation[i].value;
+                            }
+                            this.$store.dispatch('updateLink', info);
+                            this.$emit('update', this.$store.getters.newChart.links, info); // 由于数组中的对象属性的变化watch检测不到,使用emit从子组件向父组件传递数据
+                            this.relation = [
+                                {
+                                    name: "",
+                                    value: "",
+                                    key: 1,
+                                }
+                            ];
+                            this.source_id = '';
+                            this.relation_label = '';
+                            this.target_id = '';
+                        }
+                    } 
+                }
+            }
+        },
+    },
+    watch: {
+        updateLable: function(val, oldVal){
+           if(val === true){
+               this.iter_num = 1;
+               if(this.showinfo){
+                if(this.showinfo.type === "node"){
+                    this.node_label = this.showinfo.label;
+                    this.node = [];
+                    for(let key in this.showinfo){
+                        this.iter_num += 1;
+                        this.node.push({
+                            name: key,
+                            value: this.showinfo[key],
+                            key: this.iter_num
+                        })
+                    }
+                }else{
+                    console.log(this.showinfo);
+                    this.source_id = this.showinfo.source;
+                    this.relation_label = this.showinfo.name;
+                    this.target_id = this.showinfo.target;
+                    this.relation = [];
+                    for(let key in this.showinfo){
+                        if(key !== 'source' && key !== 'target' && key !== 'name'){
+                            this.iter_num += 1;
+                            this.relation.push({
+                                name: key,
+                                value: this.showinfo[key],
+                                key: this.iter_num
+                            })
+                        }
+                    }
+                }
+            }
+           }else{
 
+           } 
+        }
     }
 }
 </script>

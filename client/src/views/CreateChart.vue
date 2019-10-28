@@ -10,13 +10,13 @@
                     <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
                     <router-link to="/search"><i class="el-icon-search"></i></router-link>
                     <div class="add_search" >
-                        <router-view></router-view>
+                        <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive"></router-view>
                     </div>
                 </el-col>
             </el-row>
             <el-row :gutter="20">
                 <el-col :span="12">
-                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
+                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="update_element(showinfo)">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
                 </el-col>
             </el-row>
             
@@ -31,6 +31,7 @@ export default {
             // nodes: [],
             // links: [],
             showinfo: null,
+            updateLable: false,
         }
     },
     mounted: function(){
@@ -475,29 +476,68 @@ export default {
                 this.$store.dispatch('deleteLink', showinfo);
                 this.showinfo = null;
             }
+        },
+        update_element: function(showinfo){
+            this.updateLable = true;
+        },
+        receive: function(elements, showinfo){
+            if(showinfo.type === 'node'){
+                this.nodes = elements;
+                this.showinfo = showinfo;
+                let myChart = this.$echarts.init(document.getElementById('main'));
+                const option = {
+                    series: {
+                        type: 'graph',
+                        data: this.nodes,
+                    }
+                }
+                myChart.setOption(option);
+                this.updateLable = false; 
+            }else {
+                this.links = elements;
+                console.log(showinfo);
+                this.showinfo = showinfo;
+                let myChart = this.$echarts.init(document.getElementById('main'));
+                const option = {
+                    series: {
+                        type: 'graph',
+                        links: this.links,
+                    }
+                }
+                myChart.setOption(option);
+                this.updateLable = false;
+            }
+            
         }
     },
     watch: {
-        nodes: function(val, oldVal){
-            let myChart = this.$echarts.init(document.getElementById('main'));
-            const option = {
-                series: {
-                    type: 'graph',
-                    data: this.nodes,
+        nodes: {
+            handler: function(val, oldVal){
+                let myChart = this.$echarts.init(document.getElementById('main'));
+                const option = {
+                    series: {
+                        type: 'graph',
+                        data: this.nodes,
+                    }
                 }
-            }
-            myChart.setOption(option);
+                myChart.setOption(option);
+            },
+            deep: true,
         },
-        links: function(val, oldVal){
-            let myChart = this.$echarts.init(document.getElementById('main'));
-            const option = {
-                series: {
-                    type: 'graph',
-                    links: this.links,
+        links: {
+            handler: function(val, oldVal){
+                let myChart = this.$echarts.init(document.getElementById('main'));
+                const option = {
+                    series: {
+                        type: 'graph',
+                        links: this.links,
+                    }
                 }
-            }
-            myChart.setOption(option);
-        }
+                myChart.setOption(option);
+            },
+            deep: true,
+        },
+        
     }
 }
 </script>

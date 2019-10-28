@@ -11,6 +11,8 @@ const types = {
   ADD_EDGE: "ADD_EDGE",
   DELETE_NODE: "DELETE_NODE",
   DELETE_EDGE: "DELETE_EDGE",
+  UPDATE_NODE: "UPDATE_NODE",
+  UPDATE_EDGE: "UPDATE_EDGE",
 }
 const state = {
   isAuthenticated: false,
@@ -58,6 +60,26 @@ const mutations = {
     });
     else state.links = []
   },
+  [types.UPDATE_NODE](state, info) {
+    if (info) {
+      for(let i in state.newChart.nodes){
+        if(state.newChart.nodes[i].id === info.id){
+          state.newChart.nodes[i] = info;          
+        }
+      }
+    }
+    else state.nodes = []
+  },
+  [types.UPDATE_EDGE](state, info) {
+    if (info) {
+      for(let i in state.newChart.links){
+        if(state.newChart.links[i].id === info.id){
+          state.newChart.links[i] = info;          
+        }
+      }
+    }
+    else state.links = []
+  },
 }
 const actions = {
   setAuthenticated: ({commit}, isAuthenticated) => {
@@ -84,6 +106,12 @@ const actions = {
   },
   deleteLink: ({commit}, info) => {
     commit(types.DELETE_EDGE, info)
+  },
+  updateNode: ({commit}, info) => {
+    commit(types.UPDATE_NODE, info)
+  },
+  updateLink: ({commit}, info) => {
+    commit(types.UPDATE_EDGE, info)
   },
 
 }
