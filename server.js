@@ -51,6 +51,14 @@ const port = process.env.PORT || 5000;
 //   driver.close()
 // })
 
+// run python shell 
+let PythonShell = require('python-shell');
+
+PythonShell.runString('x=1+1;print(x)', null, function (err) {
+    if (err) throw err;
+    console.log('finished');
+});
+
 const Neode = require('neode');
 
 const instance = new Neode(uri, username, password);
