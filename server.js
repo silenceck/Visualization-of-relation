@@ -5,6 +5,7 @@ const passport = require('passport');
 const neo4j_driver = require('neo4j-driver')
 const users = require('./routers/api/users');
 const profiles = require('./routers/api/profiles');
+const texts = require('./routers/api/texts');
 const app = express();
 
 // DB config
@@ -27,37 +28,20 @@ require('./config/passport')(passport);
 
 const port = process.env.PORT || 5000;
 
-// Neo4j connection
-// var neo4j = neo4j_driver.v1;
-// const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
-// const session = driver.session()
 
-// const resultPromise = session.writeTransaction(tx =>
-//   tx.run(
-//     'CREATE (a:Greeting) SET a.message = $message RETURN a.message + ", from node " + id(a)',
-//     { message: 'hello, world' }
-//   )
-// )
 
-// resultPromise.then(result => {
-//   session.close()
-
-//   const singleRecord = result.records[0]
-//   const greeting = singleRecord.get(0)
-
-//   console.log(greeting)
-
-//   // on application exit:
-//   driver.close()
-// })
-
-// run python shell 
-let PythonShell = require('python-shell');
-
-PythonShell.runString('x=1+1;print(x)', null, function (err) {
-    if (err) throw err;
-    console.log('finished');
-});
+// let {PythonShell} = require('python-shell');
+// let pyshell = new PythonShell('C:/Users/会议室/PycharmProjects/relation_extraction/v1.1.py');
+// pyshell.send(JSON.stringify({ key1: 'alcohol', key2: 'depression', text: 'Indeed, individuals prenatally exposed to alcohol have an increased risk of developing anxiety and depression.' }));
+// pyshell.on('message', function (message) {
+//   console.log(message);
+// });
+// pyshell.end(function (err,code,signal) {
+//   if (err) throw err;
+//   console.log('The exit code was: ' + code);
+//   console.log('The exit signal was: ' + signal);
+//   console.log('finished');
+// });
 
 const Neode = require('neode');
 
@@ -106,7 +90,7 @@ app.get('/', (req, res) => {
 })
 app.use('/api/users', users);
 app.use('/api/profiles', profiles);
-
+app.use('/api/texts', texts);
 app.listen(port, () => {
     console.log(`Server listening at port ${port}`);
 })

@@ -10,7 +10,7 @@ Content-Type: application/json
     "name": "chengkun",
     "email": "14555153792@qq.com",
     "password": "123456",
-    "identity": "employee"
+    "identity": "employee",
 }
 
 ### login 
@@ -43,3 +43,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkM2YwNGYyN
     "cash": "123456",
     "remark": "很好"
 }
+
+
+### text
+
+POST http://localhost:5000/api/texts/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "key1": "alcohol",
+    "key2": "depression",
+    "text": "Indeed, individuals prenatally exposed to alcohol have an increased risk of developing anxiety and depression."
+}
+

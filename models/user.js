@@ -18,10 +18,6 @@ const UserSchema = new Schema({
     avatar: {
         type: String,
     },
-    gender: {
-        type: Boolean,
-        required: true
-    },
     identity: {
         type: String,
         required: true,
@@ -32,7 +28,6 @@ const UserSchema = new Schema({
     },
     lastLoginTime:{
         type: Date,
-        required: true
     }
 })
 
