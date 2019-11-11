@@ -6,6 +6,7 @@ const neo4j_driver = require('neo4j-driver')
 const users = require('./routers/api/users');
 const profiles = require('./routers/api/profiles');
 const texts = require('./routers/api/texts');
+const networks = require('./routers/api/networks');
 const app = express();
 
 // DB config
@@ -30,18 +31,19 @@ const port = process.env.PORT || 5000;
 
 
 
-// let {PythonShell} = require('python-shell');
-// let pyshell = new PythonShell('C:/Users/会议室/PycharmProjects/relation_extraction/v1.1.py');
+let {PythonShell} = require('python-shell');
+let pyshell = new PythonShell('python/test.py', { mode: 'text '});
 // pyshell.send(JSON.stringify({ key1: 'alcohol', key2: 'depression', text: 'Indeed, individuals prenatally exposed to alcohol have an increased risk of developing anxiety and depression.' }));
-// pyshell.on('message', function (message) {
-//   console.log(message);
-// });
-// pyshell.end(function (err,code,signal) {
-//   if (err) throw err;
-//   console.log('The exit code was: ' + code);
-//   console.log('The exit signal was: ' + signal);
-//   console.log('finished');
-// });
+pyshell.send('hello');
+pyshell.on('message', function (message) {
+  console.log(message);
+});
+pyshell.end(function (err,code,signal) {
+  if (err) throw err;
+  console.log('The exit code was: ' + code);
+  console.log('The exit signal was: ' + signal);
+  console.log('finished');
+});
 
 const Neode = require('neode');
 
@@ -91,6 +93,8 @@ app.get('/', (req, res) => {
 app.use('/api/users', users);
 app.use('/api/profiles', profiles);
 app.use('/api/texts', texts);
+app.use('/api/networks', networks);
+
 app.listen(port, () => {
     console.log(`Server listening at port ${port}`);
 })

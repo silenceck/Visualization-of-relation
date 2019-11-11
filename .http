@@ -56,3 +56,8 @@ Content-Type: application/json
     "text": "Indeed, individuals prenatally exposed to alcohol have an increased risk of developing anxiety and depression."
 }
 
+
+### network
+
+GET  http://localhost:5000/api/networks/test HTTP/1.1
+
