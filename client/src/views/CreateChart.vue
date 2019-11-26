@@ -30,8 +30,8 @@ export default {
         return {
             // nodes: [],
             // links: [],
-            showinfo: null,
-            updateLable: false,
+            showinfo: null, // transmit showinfo to Child components namely Add.vue
+            updateLable: false, // transmit showinfo to Child components namely Add.vue
         }
     },
     mounted: function(){
@@ -495,7 +495,6 @@ export default {
                 this.updateLable = false; 
             }else {
                 this.links = elements;
-                console.log(showinfo);
                 this.showinfo = showinfo;
                 let myChart = this.$echarts.init(document.getElementById('main'));
                 const option = {

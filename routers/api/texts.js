@@ -15,13 +15,44 @@ router.post('/', (req, res) => {
       result.push(message)
     });
     pyshell.end(function (err,code,signal) {
-      if (err) return res.status(400).json("错误");;
+      if (err) return res.status(400).json("错误");
       console.log('The exit code was: ' + code);
       console.log('The exit signal was: ' + signal);
       console.log('finished');
       res.json(result);
     });
     
+})
+
+router.get('/', (req, res) => {
+    const key1 = req.query.key1;
+    const key2 = req.query.key2;
+
+    console.log(JSON.parse(key1));
+    // let pyshell = new PythonShell(path);
+    // pyshell.send(JSON.stringify({ key1: key1, key2: key2}));
+    // pyshell.on('message', function (message) {
+    //   result.push(message)
+    // });
+    // pyshell.end(function (err,code,signal) {
+    //   if (err) return res.status(400).json("错误");
+    //   console.log('The exit code was: ' + code);
+    //   console.log('The exit signal was: ' + signal);
+    //   console.log('finished');
+    //   res.json(result);
+    // });
+    res.json({
+      relation: 1,
+      data: [
+        'Risky paternal alcohol us.',
+        'Risky paternal alcohol us.',
+        'Risky paternal alcohol us.',
+        'Risky paternal alcohol us.',
+      ]
+    })
+
+
+
 })
 
 module.exports = router;

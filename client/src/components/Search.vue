@@ -22,7 +22,7 @@
                     <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input> &#12288;
                 </span>
             </div>
-            <el-button class="add_btn" @click="add_element">
+            <el-button class="add_btn" @click="search">
                 查询元素
             </el-button>
         </div>
@@ -37,29 +37,49 @@ export default {
             node1_label:'',
             relation_label:'',
             node2_label:'',
-            node1: [
-                {
+            node1: [],
+            relation: [],
+            node2: [],
+        }
+    },
+    watch: {
+        node1_label: function(val, oldVal){
+            if(val !== '' && oldVal === ''){
+                this.node1.push({
                     name: "",
                     value: "",
-                }
-            ],
-            relation: [
-                {
+                });
+            }
+            if(val === ''){
+                this.node1 = [];
+            }
+        },
+        node2_label: function (val, oldVal) {
+            if (val !== '' && oldVal === '') {
+                this.node2.push({
                     name: "",
                     value: "",
-                }
-            ],
-            node2: [
-                {
+                });
+            }
+            if(val === ''){
+                this.node2 = [];
+            }
+        },
+        relation_label: function(val, oldVal){
+            if (val !== '' && oldVal === '') {
+                this.relation.push({
                     name: "",
                     value: "",
-                }
-            ],
+                });
+            }
+            if(val === ''){
+                this.relation = [];
+            }
         }
     },
     methods: {
         add_propery(){
-            if (this.iter_num < 7) {
+            if (this.iter_num < 3) {
                 this.iter_num += 1;
                 if (this.node1_label !== '') {
                     this.node1.push({
@@ -81,6 +101,45 @@ export default {
                 }
             }           
         },
+        search(){
+            if(this.relation_label !== '' && this.node1_label !== '' && this.node2_label !== ''){
+                // const data = {
+                //     label: {
+                //         node1: this.node1_label,
+                //         node2: this.node2_label,
+                //         relation: this.relation_label,
+                //     },
+                //     propery: {
+                //         node1: this.node1,
+                //         node2: this.node2,
+                //         relation: this.relation,
+                //     }
+                // }
+                const data = {
+                    label: {
+                        node1: 'Person',
+                        node2: 'Person',
+                        relation: '',
+                    },
+                    propery: {
+                        node1: {
+                            name: 'MmeDeR'
+                        },
+                        node2: {
+                            name: 'Myriel'
+                        },
+                        relation: '',
+                    }
+                }
+                const str = JSON.stringify(data);
+                this.$http.get(`/api/networks/v1/query/?data=${str}`)
+                .then(res => {
+                    console.log(res.data);
+                })
+            }else{
+                this.$message.error('输入框不能为空！！！');
+            }
+        }
     }
 }
 </script>

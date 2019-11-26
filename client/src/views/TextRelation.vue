@@ -19,7 +19,7 @@
 
 <script>
 export default {
-    name: "info",
+    name: "textRelation",
     data(){
         return{
             textarea: '',
@@ -34,49 +34,6 @@ export default {
     },
     methods: {
         getChartData: function(){
-            // let myChart = this.$echarts.init(document.getElementById('main'));
-            // var categories = [];
-            // for (var i = 0; i < 9; i++) {
-            //     categories[i] = {
-            //         name: '类目' + i
-            //     };
-            // }         
-            // this.nodes.forEach(function (node) {
-            //     node.itemStyle = null;
-            //     node.symbolSize = 10;
-            //     node.value = node.symbolSize;
-            //     node.x = node.y = null;
-            //     node.draggable = true;
-            // });
-            // const option = {
-            //     title: {
-            //         top: 'bottom',
-            //         left: 'right'
-            //     },
-            //     tooltip: {},
-                
-            //     animation: false,
-            //     series : [
-            //         {
-            //             type: 'graph',
-            //             layout: 'force',
-            //             data: [],
-            //             links: [],
-            //             categories: categories,
-            //             roam: true,
-            //             label: {
-            //                 normal: {
-            //                     position: 'right'
-            //                 }
-            //             },
-            //             force: {
-            //                 repulsion: 100,
-            //                 gravity: 0.3,
-            //             }
-            //         }
-            //     ]
-            // };
-            // myChart.setOption(option);
         },
         submit: function() {
             if(this.key1 !== '' && this.key2 !== '' && this.text !== ''){
