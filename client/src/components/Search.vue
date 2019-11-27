@@ -102,39 +102,59 @@ export default {
             }           
         },
         search(){
-            if(this.relation_label !== '' && this.node1_label !== '' && this.node2_label !== ''){
-                // const data = {
-                //     label: {
-                //         node1: this.node1_label,
-                //         node2: this.node2_label,
-                //         relation: this.relation_label,
-                //     },
-                //     propery: {
-                //         node1: this.node1,
-                //         node2: this.node2,
-                //         relation: this.relation,
-                //     }
-                // }
+            if(this.relation_label !== '' || this.node1_label !== '' || this.node2_label !== ''){
+                const node1Propery = {};
+                const node2Propery = {};
+                const relationPropery = {};
+                for(let item of this.node1){
+                    if(item.name !== '')
+                        node1Propery[item.name] = item.value;
+                }
+                for(let item of this.node2){
+                    if(item.name !== '')
+                        node2Propery[item.name] = item.value;
+                }
+                for(let item of this.relation){
+                    if(item.name !== '')
+                        relationPropery[item.name] = item.value;
+                }
                 const data = {
                     label: {
-                        node1: 'Person',
-                        node2: 'Person',
-                        relation: '',
+                        node1: this.node1_label,
+                        node2: this.node2_label,
+                        relation: this.relation_label,
                     },
                     propery: {
-                        node1: {
-                            name: 'MmeDeR'
-                        },
-                        node2: {
-                            name: 'Myriel'
-                        },
-                        relation: '',
+                        node1: node1Propery,
+                        node2: node2Propery,
+                        relation: relationPropery,
                     }
                 }
+                // const data = {
+                //     label: {
+                //         node1: 'Person',
+                //         node2: 'Person',
+                //         relation: '',
+                //     },
+                //     propery: {
+                //         node1: {
+                //             name: 'MmeDeR'
+                //         },
+                //         node2: {
+                //             name: 'Myriel'
+                //         },
+                //         relation: '',
+                //     }
+                // }
                 const str = JSON.stringify(data);
                 this.$http.get(`/api/networks/v1/query/?data=${str}`)
                 .then(res => {
-                    console.log(res.data);
+                    const data = {
+                        nodes: res.data.data.nodes,
+                        links: res.data.data.links,
+                    }
+                    this.$store.dispatch('setNewChart', data);
+                    // this.$emit('search', data);
                 })
             }else{
                 this.$message.error('输入框不能为空！！！');

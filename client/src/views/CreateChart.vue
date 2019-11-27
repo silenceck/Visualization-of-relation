@@ -10,7 +10,7 @@
                     <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
                     <router-link to="/search"><i class="el-icon-search"></i></router-link>
                     <div class="add_search" >
-                        <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive"></router-view>
+                        <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive" v-on:search="searchData"></router-view>
                     </div>
                 </el-col>
             </el-row>
@@ -48,13 +48,6 @@ export default {
     methods: {
         getChartData: function(){
             let myChart = this.$echarts.init(document.getElementById('main'));
-            const PATH = '/les-miserables.gexf';
-            myChart.showLoading();
-            // this.$http.get(PATH, function (xml) {
-            myChart.hideLoading();
-            // console.log('dataTool:', this.$dataTool)
-            // var graph = this.$dataTool.parse(xml);
-            // console.log(graph)
             var categories = [];
             for (var i = 0; i < 9; i++) {
                 categories[i] = {
@@ -62,85 +55,7 @@ export default {
                 };
             }
             this.nodes = [];
-            // this.nodes = [
-            //     {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
-            //     {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
-            //     {id: "2", name: "MlleBaptistine", itemStyle: null, symbolSize: 6.323809333333333, x: -212.76357},
-            //     {id: "3", name: "MmeMagloire", itemStyle: null, symbolSize: 6.323809333333333, x: -242.82404},
-            //     {id: "4", name: "CountessDeLo", itemStyle: null, symbolSize: 2.6666666666666665, x: -379.30386},
-            //     {id: "5", name: "Geborand", itemStyle: null, symbolSize: 2.6666666666666665, x: -417.26337},
-            //     {id: "6", name: "Champtercier", itemStyle: null, symbolSize: 2.6666666666666665, x: -332.6012},
-            //     {id: "7", name: "Cravatte", itemStyle: null, symbolSize: 2.6666666666666665, x: -382.69568},
-            //     {id: "8", name: "Count", itemStyle: null, symbolSize: 2.6666666666666665, x: -320.384},
-            //     {id: "9", name: "OldMan", itemStyle: null, symbolSize: 2.6666666666666665, x: -344.39832},
-            //     {id: "10", name: "Labarre", itemStyle: null, symbolSize: 2.6666666666666665, x: -89.34107},
-            //     {id: "11", name: "Valjean", itemStyle: null, symbolSize: 66.66666666666667, x: -87.93029},
-            //     {id: "12", name: "Marguerite", itemStyle: null, symbolSize: 4.495239333333333, x: -339.77908},
-            //     {id: "13", name: "MmeDeR", itemStyle: null, symbolSize: 2.6666666666666665, x: -194.31313},
-            //     {id: "14", name: "Isabeau", itemStyle: null, symbolSize: 2.6666666666666665, x: -158.05168},
-            //     {id: "15", name: "Gervais", itemStyle: null, symbolSize: 2.6666666666666665, x: -127.701546},
-            //     {id: "16", name: "Tholomyes", itemStyle: null, symbolSize: 17.295237333333333, x: -385.2226},
-            //     {id: "17", name: "Listolier", itemStyle: null, symbolSize: 13.638097333333334, x: -516.55884},
-            //     {id: "18", name: "Fameuil", itemStyle: null, symbolSize: 13.638097333333334, x: -464.79382},
-            //     {id: "19", name: "Blacheville", itemStyle: null, symbolSize: 13.638097333333334, x: -515.1624},
-            //     {id: "20", name: "Favourite", itemStyle: null, symbolSize: 13.638097333333334, x: -408.12122},
-            //     {id: "21", name: "Dahlia", itemStyle: null, symbolSize: 13.638097333333334, x: -456.44113},
-            //     {id: "22", name: "Zephine", itemStyle: null, symbolSize: 13.638097333333334, x: -459.1107},
-            //     {id: "23", name: "Fantine", itemStyle: null, symbolSize: 28.266666666666666, x: -313.42786},
-            //     {id: "24", name: "MmeThenardier", itemStyle: null, symbolSize: 20.95238266666667, x: 4.6313396},
-            //     {id: "25", name: "Thenardier", itemStyle: null, symbolSize: 30.095235333333335, x: 82.80825},
-            //     {id: "26", name: "Cosette", itemStyle: null, symbolSize: 20.95238266666667, x: 78.64646},
-            //     {id: "27", name: "Javert", itemStyle: null, symbolSize: 31.923806666666668, x: -81.46074},
-            //     {id: "28", name: "Fauchelevent", itemStyle: null, symbolSize: 8.152382000000001, x: -225.73984},
-            //     {id: "29", name: "Bamatabois", itemStyle: null, symbolSize: 15.466666666666667, x: -385.6842},
-            //     {id: "30", name: "Perpetue", itemStyle: null, symbolSize: 4.495239333333333, x: -403.92447},
-            //     {id: "31", name: "Simplice", itemStyle: null, symbolSize: 8.152382000000001, x: -281.4253},
-            //     {id: "32", name: "Scaufflaire", itemStyle: null, symbolSize: 2.6666666666666665, x: -122.41348},
-            //     {id: "33", name: "Woman1", itemStyle: null, symbolSize: 4.495239333333333, x: -234.6001},
-            //     {id: "34", name: "Judge", itemStyle: null, symbolSize: 11.809524666666666, x: -387.84915},
-            //     {id: "35", name: "Champmathieu", itemStyle: null, symbolSize: 11.809524666666666, x: -338.2307},
-            //     {id: "36", name: "Brevet", itemStyle: null, symbolSize: 11.809524666666666, x: -453.26874},
-            //     {id: "37", name: "Chenildieu", itemStyle: null, symbolSize: 11.809524666666666, x: -386.44904},
-            //     {id: "38", name: "Cochepaille", itemStyle: null, symbolSize: 11.809524666666666, x: -446.7876},
-            //     {id: "39", name: "Pontmercy", itemStyle: null, symbolSize: 6.323809333333333, x: 336.49738},
-            //     {id: "40", name: "Boulatruelle", itemStyle: null, symbolSize: 2.6666666666666665, x: 29.187843},
-            //     {id: "41", name: "Eponine", itemStyle: null, symbolSize: 20.95238266666667, x: 238.36697},
-            //     {id: "42", name: "Anzelma", itemStyle: null, symbolSize: 6.323809333333333, x: 189.69513},
-            //     {id: "43", name: "Woman2", itemStyle: null, symbolSize: 6.323809333333333, x: -187.00418},
-            //     {id: "44", name: "MotherInnocent", itemStyle: null, symbolSize: 4.495239333333333, x: -252.99521},
-            //     {id: "45", name: "Gribier", itemStyle: null, symbolSize: 2.6666666666666665, x: -296.07935},
-            //     {id: "46", name: "Jondrette", itemStyle: null, symbolSize: 2.6666666666666665, x: 550.3201},
-            //     {id: "47", name: "MmeBurgon", itemStyle: null, symbolSize: 4.495239333333333, x: 488.13535},
-            //     {id: "48", name: "Gavroche", itemStyle: null, symbolSize: 41.06667066666667, x: 387.89572},
-            //     {id: "49", name: "Gillenormand", itemStyle: null, symbolSize: 13.638097333333334, x: 126.4831},
-            //     {id: "50", name: "Magnon", itemStyle: null, symbolSize: 4.495239333333333, x: 127.07365},
-            //     {id: "51", name: "MlleGillenormand", itemStyle: null, symbolSize: 13.638097333333334, x: 162.63559},
-            //     {id: "52", name: "MmePontmercy", itemStyle: null, symbolSize: 4.495239333333333, x: 353.66415},
-            //     {id: "53", name: "MlleVaubois", itemStyle: null, symbolSize: 2.6666666666666665, x: 165.43939},
-            //     {id: "54", name: "LtGillenormand", itemStyle: null, symbolSize: 8.152382000000001, x: 137.69348},
-            //     {id: "55", name: "Marius", itemStyle: null, symbolSize: 35.58095333333333, x: 206.44687},
-            //     {id: "56", name: "BaronessT", itemStyle: null, symbolSize: 4.495239333333333, x: 194.82993},
-            //     {id: "57", name: "Mabeuf", itemStyle: null, symbolSize: 20.95238266666667, x: 597.6618},
-            //     {id: "58", name: "Enjolras", itemStyle: null, symbolSize: 28.266666666666666, x: 355.78366},
-            //     {id: "59", name: "Combeferre", itemStyle: null, symbolSize: 20.95238266666667, x: 515.2961},
-            //     {id: "60", name: "Prouvaire", itemStyle: null, symbolSize: 17.295237333333333, x: 614.29285},
-            //     {id: "61", name: "Feuilly", itemStyle: null, symbolSize: 20.95238266666667, x: 550.1917},
-            //     {id: "62", name: "Courfeyrac", itemStyle: null, symbolSize: 24.609526666666667, x: 436.17184},
-            //     {id: "63", name: "Bahorel", itemStyle: null, symbolSize: 22.780953333333333, x: 602.55225},
-            //     {id: "64", name: "Bossuet", itemStyle: null, symbolSize: 24.609526666666667, x: 455.81955},
-            //     {id: "65", name: "Joly", itemStyle: null, symbolSize: 22.780953333333333, x: 516.40784},
-            //     {id: "66", name: "Grantaire", itemStyle: null, symbolSize: 19.12381, x: 646.4313},
-            //     {id: "67", name: "MotherPlutarch", itemStyle: null, symbolSize: 2.6666666666666665, x: 668.9568},
-            //     {id: "68", name: "Gueulemer", itemStyle: null, symbolSize: 19.12381, x: 78.4799},
-            //     {id: "69", name: "Babet", itemStyle: null, symbolSize: 19.12381, x: 150.35959},
-            //     {id: "70", name: "Claquesous", itemStyle: null, symbolSize: 19.12381, x: 137.3717},
-            //     {id: "71", name: "Montparnasse", itemStyle: null, symbolSize: 17.295237333333333, x: 234.87747},
-            //     {id: "72", name: "Toussaint", itemStyle: null, symbolSize: 6.323809333333333, x: 40.942253},
-            //     {id: "73", name: "Child1", itemStyle: null, symbolSize: 4.495239333333333, x: 437.939},
-            //     {id: "74", name: "Child2", itemStyle: null, symbolSize: 4.495239333333333, x: 466.04922},
-            //     {id: "75", name: "Brujon", itemStyle: null, symbolSize: 13.638097333333334, x: 238.79364},
-            //     {id: "76", name: "MmeHucheloup", itemStyle: null, symbolSize: 13.638097333333334, x: 712.18353},
-            // ],
+            
             this.links = [
                 {id: "0", name: null, source: "1", target: "0", lineStyle: {}},
                 {id: "1", name: null, source: "2", target: "0", lineStyle: {}},
@@ -466,7 +381,6 @@ export default {
                     }
                 }
             });
-            // }, 'xml');
         },
         delete_element: function(showinfo){
             if(showinfo.type == 'node'){
@@ -482,31 +396,48 @@ export default {
         },
         receive: function(elements, showinfo){
             if(showinfo.type === 'node'){
-                this.nodes = elements;
+                // this.nodes = elements;
                 this.showinfo = showinfo;
-                let myChart = this.$echarts.init(document.getElementById('main'));
-                const option = {
-                    series: {
-                        type: 'graph',
-                        data: this.nodes,
-                    }
-                }
-                myChart.setOption(option);
+                // let myChart = this.$echarts.init(document.getElementById('main'));
+                // const option = {
+                //     series: {
+                //         type: 'graph',
+                //         data: this.nodes,
+                //     }
+                // }
+                // myChart.setOption(option);
                 this.updateLable = false; 
             }else {
-                this.links = elements;
+                // this.links = elements;
                 this.showinfo = showinfo;
-                let myChart = this.$echarts.init(document.getElementById('main'));
-                const option = {
-                    series: {
-                        type: 'graph',
-                        links: this.links,
-                    }
-                }
-                myChart.setOption(option);
+                // let myChart = this.$echarts.init(document.getElementById('main'));
+                // const option = {
+                //     series: {
+                //         type: 'graph',
+                //         links: this.links,
+                //     }
+                // }
+                // myChart.setOption(option);
                 this.updateLable = false;
             }
             
+        },
+        searchData: function(chartData){
+            // this.nodes = [
+            //     {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
+            //     {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
+            // ]
+            // this.links = chartData.links;
+            // let myChart = this.$echarts.init(document.getElementById('main'));
+            // const option = {
+            //     series: {
+            //         type: 'graph',
+            //         data: this.nodes,
+            //         // links: this.links,
+            //     }
+            // }
+            // console.log(myChart);
+            // myChart.setOption(option);
         }
     },
     watch: {

@@ -177,25 +177,35 @@ router.get('/v1/query', (req, res) => {
         if(label.node1 !== '' && label.node2 !== ''){
             instance.cypher(`match (a: ${label.node1} ${node1Propery})-[r:${label.relation} ${relationPropery}]->(b: ${label.node2} ${node2Propery}) return a,r,b`, {
             }).then(result => {
-                const record = result.records.get(0)['_fields'];
-                let fromNode = record.get(0).properties;
-                fromNode.label = record.get(0).labels[0];
-                let toNode = record.get(2).properties;
-                toNode.label = record.get(2).labels[0];
-                let link = record.get(1).properties;
-                link.type = record.get(1).type;
-                link.source = fromNode.id;
-                link.target = toNode.id;
-                nodes.add(fromNode);
-                nodes.add(toNode);
-                links.add(link);
-                res.json({
-                    data: {
-                        paths: [],
-                        nodes: deteleObject(Array.from(nodes)), // set转数组 + 去除数组中的重复对象
-                        links: deteleObject(Array.from(links)),
-                    }
-                });
+                if(result.records.length !== 0){
+                    const record = result.records[0]['_fields'];
+                    let fromNode = record[0].properties;
+                    fromNode.label = record[0].labels[0];
+                    let toNode = record[2].properties;
+                    toNode.label = record[2].labels[0];
+                    let link = record[1].properties;
+                    link.type = record[1].type;
+                    link.source = fromNode.id;
+                    link.target = toNode.id;
+                    nodes.add(fromNode);
+                    nodes.add(toNode);
+                    links.add(link);
+                    res.json({
+                        data: {
+                            paths: [],
+                            nodes: deteleObject(Array.from(nodes)), // set转数组 + 去除数组中的重复对象
+                            links: deteleObject(Array.from(links)),
+                        }
+                    });
+                }else {
+                    res.json({
+                        data: {
+                            paths: [],
+                            nodes: [],
+                            links: [],
+                        }
+                    })
+                }
             })
         }else if(label.node1 !== ''){
             instance.cypher(`match (a: ${label.node1} ${node1Propery})-[r:${label.relation} ${relationPropery}]->(b) return a,r,b`, {
@@ -222,8 +232,33 @@ router.get('/v1/query', (req, res) => {
                     }
                 });
             })
-        }else{
+        }else if(label.node2 !== ''){
             instance.cypher(`match (a)-[r:${label.relation} ${relationPropery}]->(b: ${label.node2} ${node2Propery}) return a,r,b`, {
+            }).then(result => {
+                let paths = [];
+                for(let item of result.records){
+                    let fromNode = item['_fields'][0].properties;
+                    fromNode.label = item['_fields'][0].labels[0];
+                    let toNode = item['_fields'][2].properties;
+                    toNode.label = item['_fields'][2].labels[0];
+                    let link = item['_fields'][1].properties;
+                    link.type = item['_fields'][1].type;
+                    link.source = fromNode.id;
+                    link.target = toNode.id;
+                    nodes.add(fromNode);
+                    nodes.add(toNode);
+                    links.add(link);
+                }
+                res.json({
+                    data: {
+                        paths: paths,
+                        nodes: deteleObject(Array.from(nodes)), // set转数组
+                        links: deteleObject(Array.from(links)),
+                    }
+                });
+            })
+        }else{
+            instance.cypher(`match (a)-[r:${label.relation} ${relationPropery}]->(b) return a,r,b`, {
             }).then(result => {
                 let paths = [];
                 for(let item of result.records){
