@@ -11,6 +11,14 @@ const NetworkSchema = new Schema({
         type: String,
         required: true
     },
+    numOfNodes: {
+        type: Number,
+        required: true,
+    },
+    numOfLinks: {
+        type: Number,
+        required: true,
+    },
     time: {
         type: Date,
         required: true

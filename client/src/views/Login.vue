@@ -2,14 +2,11 @@
     <div class="login">
         <section class="form_container">
             <div class="manage_tip">
-                <span class="title"> 后台管理系统</span>
+                <span class="title"> 系统登录</span>
                 <el-form :model="loginUser" :rules="rules" ref="loginForm" label-width="80px" class="loginForm">
-                    
                     <el-form-item label="邮箱" prop="email">
                         <el-input  v-model="loginUser.email" placeholder="请输入邮箱"></el-input>
                     </el-form-item>
-               
-                    
                     <el-form-item label="密码" prop="password">
                         <el-input type="password" v-model="loginUser.password" placeholder="请输入密码"></el-input>
                     </el-form-item>
@@ -105,7 +102,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background: url(../assets/bg.jpg) no-repeat center center;
+  background: url(../assets/bg2.jpg) no-repeat center center;
   background-size: 100% 100%;
 }
 .form_container {
@@ -113,7 +110,7 @@ export default {
   height: 210px;
   position: absolute;
   top: 10%;
-  left: 34%;
+  left: 40%;
   padding: 25px;
   border-radius: 5px;
   text-align: center;

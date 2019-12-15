@@ -1,5 +1,8 @@
 <template>
-    <div class="add">        
+    <div class="add">     
+        <div class="field">
+            <el-input v-model="field" placeholder="field"></el-input>
+        </div>   
         <div class="propery">
             <el-row :gutter="24">
                 <el-col class="node" :span="8">
@@ -34,6 +37,9 @@
             <el-button class="add_btn" v-show="updateLable === true" @click="update_element" >
                 更新元素
             </el-button>
+            <el-button class="add_btn" v-show="updateLable === false" @click="add_network" >
+                生成网络
+            </el-button>
         </div>
         </div>
 
@@ -47,6 +53,7 @@ export default {
     ],
     data() {
         return {
+            field: '',
             node_id: 0,
             link_id: 0,
             iter_num: 1,
@@ -69,6 +76,16 @@ export default {
                 }
             ],            
         };
+    },
+    mounted: function(){
+        const field = this.$route.query.field;
+        if(field !== null){
+            this.$http.get(`/api/networks/${field}`)
+            .then(res => {
+                const newChart = res.data;
+                this.$store.dispatch('setNewChart', newChart);
+            })
+        }
     },
     methods: {
         handleSelect(key, keyPath) {
@@ -113,10 +130,10 @@ export default {
                     i.value = '';
                 }
             }
-            if(this.relation_label !== "" && this.source_id !== "" && this.target !== ""){
+            if(this.relation_label !== "" && this.source_id !== "" && this.target_id !== ""){
                 const link = {
                     id: String(this.link_id),
-                    name: this.relation_label,
+                    label: this.relation_label,
                     source: this.source_id,
                     target: this.target_id,
                 }
@@ -140,13 +157,6 @@ export default {
                     i.value = '';
                 }
             }
-            // for(let i in this.node1){
-
-            // }
-            // if(node2_label !== null){
-            //     this.node2_label = node2_label;
-            // }
-            
         },
         update_element: function(){
             if(this.showinfo){
@@ -199,6 +209,69 @@ export default {
                 }
             }
         },
+        add_network: function(){
+            const isAuthenticated = this.$store.getters.isAuthenticated;
+            if(isAuthenticated){
+                const chartData = this.$store.getters.newChart;
+                let nodes = chartData.nodes;
+                let links = chartData.links;
+                let newNodes = {};
+                let newLinks = {};
+                for(let node of nodes){
+                    node.field = this.field;
+                    if(node.label in newNodes){
+                        const label = node.label;
+                        newNodes[label].push(node);
+                    }else{
+                        const label = node.label;
+                        newNodes[label] = [node];
+                    }
+                }
+                for(let link of links){
+                    link.field = this.field;
+                    if(link.label in newLinks){
+                        const temp = {};
+                        temp.id = link.id;
+                        temp.source = link.source;
+                        temp.target = link.target;
+                        const label = link.label;
+                        delete link.source;
+                        delete link.target;
+                        temp.propery = link;
+                        newLinks[label].push(temp);
+                    }else{
+                        const temp = {};
+                        temp.id = link.id;
+                        temp.source = link.source;
+                        temp.target = link.target;
+                        const label = link.label;
+                        delete link.source;
+                        delete link.target;
+                        temp.propery = link;
+                        newLinks[label] = [temp];
+                    }
+                }
+                const data = {
+                    user: this.$store.getters.user,
+                    field: this.field,
+                    nodes: newNodes,
+                    links: newLinks,
+                }
+                this.$http.post('/api/networks/', data)
+                .then(res => {
+                    this.$message({
+                        message: "网络生成成功",
+                        type: "success"
+                    })
+                })
+            }else{
+                this.$message({
+                    message: '用户未登录！！！',
+                    type: 'warning'
+                });
+                this.$router.push('/login');
+            }
+        }
     },
     watch: {
         updateLable: function(val, oldVal){
@@ -243,6 +316,9 @@ export default {
 </script>
 
 <style scoped>
+.field {
+    margin-left: 250px;
+}
 .el-input {
     margin-top: 10px;
     width: 100px;

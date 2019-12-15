@@ -56,8 +56,7 @@ Content-Type: application/json
     "text": "Indeed, individuals prenatally exposed to alcohol have an increased risk of developing anxiety and depression."
 }
 
-### 关键词爬虫
-GET http://localhost:5000/api/texts/?key1=smoke&key2=cancer HTTP/1.1
+### 关键词爬虫 GET http://localhost:5000/api/texts/?key1=smoke&key2=cancer HTTP/1.1
 
 
 ### Network
@@ -66,7 +65,13 @@ GET http://localhost:5000/api/texts/?key1=smoke&key2=cancer HTTP/1.1
 
 GET  http://localhost:5000/api/networks/test HTTP/1.1
 
+### true add 
+POST  http://localhost:5000/api/networks/ HTTP/1.1
+
 
 ### query
 
 GET  http://localhost:5000/api/networks/v1/query HTTP/1.1
+
+### query specfied username
+GET  http://localhost:5000/api/networks/v1/silenc HTTP/1.1

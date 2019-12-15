@@ -1,4 +1,4 @@
-function deteleObject(obj) {
+export function deteleObject(obj) {
     var uniques = [];
     var stringify = {};
     for (var i = 0; i < obj.length; i++) {

@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import Cookies from 'js-cookie'
+import defaultSettings from '@/settings'
 
+const { showSettings, fixedHeader, sidebarLogo } = defaultSettings
 Vue.use(Vuex)
 
 const types = {
@@ -21,11 +24,25 @@ const state = {
     nodes: [],
     links: []
   },
+  sidebar: {
+    opened: true,
+    withoutAnimation: false
+  },
+  device: 'desktop',
+  showSettings: showSettings,
+  fixedHeader: fixedHeader,
+  sidebarLogo: sidebarLogo,
+  name: 'ck',
+  avatar: ''
 }
 const getters = {
   isAuthenticated: state => state.isAuthenticated,
   user: state => state.user,
   newChart: state => state.newChart,
+  sidebar: state => state.sidebar,
+  device: state => state.device,
+  avatar: state => state.avatar,
+  name: state => state.name
 }
 const mutations = {
   [types.SET_AUTHENTICATED](state, isAuthenticated) {
@@ -80,6 +97,29 @@ const mutations = {
     }
     else state.links = []
   },
+  // 
+  TOGGLE_SIDEBAR: state => {
+    state.sidebar.opened = !state.sidebar.opened
+    state.sidebar.withoutAnimation = false
+    if (state.sidebar.opened) {
+      Cookies.set('sidebarStatus', 1)
+    } else {
+      Cookies.set('sidebarStatus', 0)
+    }
+  },
+  CLOSE_SIDEBAR: (state, withoutAnimation) => {
+    Cookies.set('sidebarStatus', 0)
+    state.sidebar.opened = false
+    state.sidebar.withoutAnimation = withoutAnimation
+  },
+  TOGGLE_DEVICE: (state, device) => {
+    state.device = device
+  },
+  CHANGE_SETTING: (state, { key, value }) => {
+    if (state.hasOwnProperty(key)) {
+      state[key] = value
+    }
+  }
 }
 const actions = {
   setAuthenticated: ({commit}, isAuthenticated) => {
@@ -113,6 +153,18 @@ const actions = {
   updateLink: ({commit}, info) => {
     commit(types.UPDATE_EDGE, info)
   },
+  toggleSideBar({ commit }) {
+    commit('TOGGLE_SIDEBAR')
+  },
+  closeSideBar({ commit }, { withoutAnimation }) {
+    commit('CLOSE_SIDEBAR', withoutAnimation)
+  },
+  toggleDevice({ commit }, device) {
+    commit('TOGGLE_DEVICE', device)
+  },
+  changeSetting({ commit }, data) {
+    commit('CHANGE_SETTING', data)
+  }
 
 }
 export default new Vuex.Store({

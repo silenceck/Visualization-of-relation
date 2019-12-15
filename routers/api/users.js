@@ -3,7 +3,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const gravatar = require('gravatar');
 const router = express.Router();
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require('../../models/User');
 const secret = require('../../config/store').secretOrKey;
@@ -25,7 +25,9 @@ router.post('/register', (req, res) => {
                     email: data.email,
                     avatar: avatar,
                     identity: data.identity,
-                    password: data.password
+                    password: data.password,
+                    date: new Date(),
+                    lastLoginTime: null,
                 })
                 bcrypt.genSalt(10, function(err, salt) {
                     bcrypt.hash(newUser.password, salt, function(err, hash) {
@@ -34,7 +36,6 @@ router.post('/register', (req, res) => {
                         newUser.save()
                             .then(user => res.json(user))
                             .catch(err => console.log(err))
-
                     });
                 });
             }
@@ -57,7 +58,8 @@ router.post('/login', (req, res) => {
                             id: user.id, 
                             name: user.name,
                             avatar: user.avatar,
-                            identity: user.identity
+                            identity: user.identity,
+                            email: user.email,
                         };
                         jwt.sign(rule, secret, {expiresIn: 3600}, (err, token) => {
                             if(err) throw err;
@@ -87,6 +89,23 @@ router.get('/current', passport.authenticate('jwt', { session: false }), (req, r
         email: req.user.email,
         identity: req.user.identity
     }) 
+})
+
+
+/**
+ * $route POST /api/users/edit/:id
+ * @desc update user's info 
+ * @access Private
+ */
+router.post('/edit/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const data = req.body;
+    const propery = {};
+    propery[data.name] = data.value;
+    User.findOneAndUpdate(
+        {_id: req.params.id},
+        {$set: propery},
+        {new: true}
+    ).then(user => res.json(user))
 })
 
 module.exports = router;

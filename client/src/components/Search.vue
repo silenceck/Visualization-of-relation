@@ -118,34 +118,34 @@ export default {
                     if(item.name !== '')
                         relationPropery[item.name] = item.value;
                 }
-                const data = {
-                    label: {
-                        node1: this.node1_label,
-                        node2: this.node2_label,
-                        relation: this.relation_label,
-                    },
-                    propery: {
-                        node1: node1Propery,
-                        node2: node2Propery,
-                        relation: relationPropery,
-                    }
-                }
                 // const data = {
                 //     label: {
-                //         node1: 'Person',
-                //         node2: 'Person',
-                //         relation: '',
+                //         node1: this.node1_label,
+                //         node2: this.node2_label,
+                //         relation: this.relation_label,
                 //     },
                 //     propery: {
-                //         node1: {
-                //             name: 'MmeDeR'
-                //         },
-                //         node2: {
-                //             name: 'Myriel'
-                //         },
-                //         relation: '',
+                //         node1: node1Propery,
+                //         node2: node2Propery,
+                //         relation: relationPropery,
                 //     }
                 // }
+                const data = {
+                    label: {
+                        node1: 'Person',
+                        node2: '',
+                        relation: '',
+                    },
+                    propery: {
+                        node1: {
+                            // name: 'MmeDeR'
+                        },
+                        node2: {
+                            // name: 'Myriel'
+                        },
+                        relation: {},
+                    }
+                }
                 const str = JSON.stringify(data);
                 this.$http.get(`/api/networks/v1/query/?data=${str}`)
                 .then(res => {
@@ -153,8 +153,12 @@ export default {
                         nodes: res.data.data.nodes,
                         links: res.data.data.links,
                     }
+                    console.log(data);
                     this.$store.dispatch('setNewChart', data);
-                    // this.$emit('search', data);
+                    this.node1_label = '';
+                    this.node2_label = '';
+                    this.relation_label = '';
+                    this.$emit('search');
                 })
             }else{
                 this.$message.error('输入框不能为空！！！');

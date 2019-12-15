@@ -2,7 +2,7 @@
     <div class="register">
         <section class="form_container">
             <div class="manage_tip">
-                <span class="title"> 后台管理系统</span>
+                <span class="title"> 系统注册</span>
                 <el-form :model="registerUser" :rules="rules" ref="registerForm" label-width="80px" class="registerForm">
                     
                     <el-form-item label="用户名" prop="name">
@@ -21,7 +21,7 @@
                     <el-form-item label="选择身份" prop="identity">
                         <el-select v-model="registerUser.identity" placeholder="请选择">
                             <el-option label="管理员" value="manager"> </el-option>
-                            <el-option label="员工" value="employee"> </el-option>
+                            <el-option label="用户" value="employee"> </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item>
@@ -133,7 +133,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background: url(../assets/bg.jpg) no-repeat center center;
+  background: url(../assets/bg1.jpg) no-repeat center center;
   background-size: 100% 100%;
 }
 .form_container {
@@ -141,7 +141,7 @@ export default {
   height: 210px;
   position: absolute;
   top: 10%;
-  left: 34%;
+  left: 40%;
   padding: 25px;
   border-radius: 5px;
   text-align: center;

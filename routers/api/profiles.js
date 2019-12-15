@@ -41,7 +41,6 @@ router.post('/', passport.authenticate('jwt', {session: false}), (req, res) => {
 router.get('/', passport.authenticate('jwt', {session: false}), (req, res) => {
     Profile.find()
         .then(profiles => {
-            console.log("profiles:", profiles)
             if(!profiles) res.status(404).json("不存在profile");
             res.json(profiles);
         })
@@ -68,8 +67,6 @@ router.get('/:id', passport.authenticate('jwt', {session: false}), (req, res) =>
         .catch(err => {
             res.status(404).json(err);
         });
-
-    
 })
 
 /**

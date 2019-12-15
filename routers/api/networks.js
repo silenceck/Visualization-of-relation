@@ -5,7 +5,9 @@ const uri = require('../../config/store').neo4j.URL;
 const username = require('../../config/store').neo4j.USER;
 const password = require('../../config/store').neo4j.PASSWORD;
 const instance = new Neode(uri, username, password);
+const Network = require('../../models/Network');
 
+// 去除数组中的重复对象, set中相同的对象但是内存地址并不同
 function deteleObject(obj) {
     var uniques = [];
     var stringify = {};
@@ -28,7 +30,23 @@ function deteleObject(obj) {
     return uniques;
 }
 
+// 需要去除json字符串中key的双引号
+function deleteQuotationMark(obj) {
+    let propery = JSON.stringify(obj);
+    if(propery.indexOf(",") == -1){
+        propery = propery.replace(/{"/gi, '{').replace(/":/gi, ':');
+    }else{
+        propery = propery.replace(/{"/gi, '{').replace(/,"/gi, ',').replace(/":/gi, ':');
+    }
+    return propery;
+}
 
+
+/**
+ * @route get /api/networks/:field
+ * @description 获取指定field的network
+ * @access public
+ */
 router.get('/:field', (req, res) =>{
     const field = req.params.field;
     let nodes = [];
@@ -68,49 +86,18 @@ router.get('/:field', (req, res) =>{
 });
 
 
+/**
+ * @route get /api/networks/v1/query
+ * @description according to different query conditions to search nodes and links 
+ * @access public
+ */
 router.get('/v1/query', (req, res) => {
-    // const condition = {
-    //     label: {
-    //         node1: 'Person',
-    //         node2: '',
-    //         relation: 'IS_FRIENDS_WITH',
-    //     },
-    //     propery: {
-    //         node1: {
-    //             name: 'Fameuil',
-    //             field: 'test',
-    //         },
-    //         node2: {
-    //             name: 'Tholomyes',
-    //             field: 'test',
-    //         },
-    //         relation: {
-    //             field: 'test',
-    //         },
-    //     }
-    // }
     const condition = JSON.parse(req.query.data);
     const label = condition.label;
     const propery = condition.propery;
-    let node1Propery = JSON.stringify(propery.node1);
-    let node2Propery = JSON.stringify(propery.node2);
-    let relationPropery = JSON.stringify(propery.relation);
-    // 由于cypher查询语句不能直接接收json字符串，需要去除json字符串中key的双引号
-    if(node1Propery.indexOf(",") == -1){
-        node1Propery = node1Propery.replace(/{"/gi, '{').replace(/":/gi, ':');
-    }else{
-        node1Propery = node1Propery.replace(/{"/gi, '{').replace(/,"/gi, ',').replace(/":/gi, ':');
-    }
-    if(node2Propery.indexOf(",") == -1){
-        node2Propery = node2Propery.replace(/{"/gi, '{').replace(/":/gi, ':');
-    }else{
-        node2Propery = node2Propery.replace(/{"/gi, '{').replace(/,"/gi, ',').replace(/":/gi, ':');
-    }
-    if(relationPropery.indexOf(",") == -1){
-        relationPropery = relationPropery.replace(/{"/gi, '{').replace(/":/gi, ':');
-    }else{
-        relationPropery = relationPropery.replace(/{"/gi, '{').replace(/,"/gi, ',').replace(/":/gi, ':');
-    }
+    let node1Propery = deleteQuotationMark(propery.node1);
+    let node2Propery = deleteQuotationMark(propery.node2);
+    let relationPropery = deleteQuotationMark(propery.relation);
     let nodes = new Set();
     let links = new Set();
     if(label.relation === ''){
@@ -137,15 +124,46 @@ router.get('/v1/query', (req, res) => {
                 res.json({
                     data: {
                         paths: paths,
-                        nodes: deteleObject(Array.from(nodes)), // set转数组 + 去除数组中的重复对象
+                        nodes: deteleObject(Array.from(nodes)), 
                         links: deteleObject(Array.from(links)),
                     }
                 });
             })
-        }else if(label.node1 !== '' || label.node2 !== ''){
-            const nodeLabel = label.node1 !== ''?label.node1:label.node2;
-            const propery = label.node1 !== ''?node1Propery:node2Propery;
+        }else if(label.node1 !== ''){
+            const nodeLabel = label.node1;
+            const propery = node1Propery;
             instance.cypher(`MATCH p=(a:${nodeLabel} ${propery})-[]->(b) RETURN p`)
+            .then(result => {
+                let paths = [];
+                // res.json(result.records);
+                for(let item of result.records){
+                    paths.push(item['_fields'][0]);
+                    for(let segment of item['_fields'][0]['segments']){
+                        let fromNode = segment.start.properties;
+                        fromNode.label = segment.start.labels[0];
+                        let toNode = segment.end.properties;
+                        toNode.label = segment.end.labels[0];
+                        nodes.add(fromNode);
+                        nodes.add(toNode);
+                        let link = segment.relationship.properties;
+                        link.type = segment.relationship.type;
+                        link.source = fromNode.id;
+                        link.target = toNode.id;
+                        links.add(link);
+                    }
+                }
+                res.json({
+                    data: {
+                        paths: paths,
+                        nodes: deteleObject(Array.from(nodes)), // set转数组
+                        links: deteleObject(Array.from(links)),
+                    }
+                });
+            })
+        }else{
+            const nodeLabel = label.node2;
+            const propery = node2Propery;
+            instance.cypher(`MATCH p=(a)-[]->(b:${nodeLabel} ${propery}) RETURN p`)
             .then(result => {
                 let paths = [];
                 for(let item of result.records){
@@ -286,4 +304,110 @@ router.get('/v1/query', (req, res) => {
     }
 })
 
+
+/**
+ * @route get /api/networks/
+ * @description 添加network
+ * @access private
+ */
+router.post('/', (req, res) => {
+    const data = req.body;
+    const nodes = data.nodes;
+    const links = data.links;
+    const user = data.user;
+    const field = data.field; 
+    Network.findOne({field: field})
+        .then(network => {
+            if(network){
+                res.status(400).json(`${field}领域已存在`);
+            }else{
+                // nodes and links are classified by the label of node and link.
+                const linksSize = Object.getOwnPropertyNames(links).length;    
+                const nodesSize = Object.getOwnPropertyNames(nodes).length;
+
+                let Num = 1;
+                for(let key in nodes){
+                    instance.cypher(`UNWIND $nodes AS properties CREATE (n:${key}) SET n = properties RETURN n`, {nodes: nodes[key] })
+                    .then(result =>{
+                        if(Num !== nodesSize + linksSize){
+                            Num = Num + 1;
+                        }else{
+                            res.json({
+                                message: "success"
+                            })
+                        }
+                    })
+                    .catch(err => {
+                        res.status(404).json(err);
+                    })
+                }
+                for(let key in links){
+                    instance.cypher(`UNWIND $links AS link MATCH (a {id:link.source}) MATCH (b{id:link.target }) MERGE (a)-[:${key} {id: link.id}]->(b) `,
+                        { links: links[key]})
+                    .then(result =>{
+                        if(Num !== nodesSize + linksSize){
+                            Num = Num + 1;
+                        }else{
+                            const network = new Network({
+                                username: user.name,
+                                field: field,
+                                numOfNodes: nodesSize,
+                                numOfLinks: linksSize,
+                            })
+                            network.save().then().catch(err => {
+                                res.status(404).json(err);
+                            })
+                            res.json({
+                                message: "success"
+                            })
+                        }
+                    })
+                    .catch(err => {
+                        res.status(404).json(err);
+                    })
+                }
+
+                // set properies of relationships
+                for(let key in links){
+                    for(let item of links[key]){
+                        instance.cypher(`MATCH (a)-[n:${key}{id:$id}]-(b)  SET n = $props RETURN n.name`, {
+                            id: item.id,
+                            props: item.propery
+                        })
+                        .then(result =>{
+                        })
+                        .catch(err => {
+                            res.status(404).json(err);
+                        })
+                    }
+                }
+                        }
+                    })
+                
+})
+
+
+/**
+ * @route get /api/networks/v1/:username
+ * @description find some items whose name property is username
+ * @access private
+ */
+router.get('/v1/:username', (req, res) => {
+    const username = req.params.username;
+    // const network = new Network({
+    //     username: username,
+    //     field: 'test',
+    //     numOfNodes: 77,
+    //     numOfLinks: 254,
+    //     time: new Date(),
+    // })
+    // network.save().then().catch(err => {
+    //     console.log(err);
+    // });
+    Network.find({username: username})
+    .then(networks => {
+        res.json({networks: networks})
+    });
+    
+})
 module.exports = router;

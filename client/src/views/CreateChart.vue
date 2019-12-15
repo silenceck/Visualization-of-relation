@@ -19,7 +19,6 @@
                     <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="update_element(showinfo)">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
                 </el-col>
             </el-row>
-            
         </div>
     </div>
 </template>
@@ -28,10 +27,8 @@ export default {
     name: 'create_chart',
     data() {
         return {
-            // nodes: [],
-            // links: [],
             showinfo: null, // transmit showinfo to Child components namely Add.vue
-            updateLable: false, // transmit showinfo to Child components namely Add.vue
+            updateLable: false, // transmit showinfo to Child components namely Add.vue 
         }
     },
     mounted: function(){
@@ -396,48 +393,18 @@ export default {
         },
         receive: function(elements, showinfo){
             if(showinfo.type === 'node'){
-                // this.nodes = elements;
                 this.showinfo = showinfo;
-                // let myChart = this.$echarts.init(document.getElementById('main'));
-                // const option = {
-                //     series: {
-                //         type: 'graph',
-                //         data: this.nodes,
-                //     }
-                // }
-                // myChart.setOption(option);
                 this.updateLable = false; 
             }else {
-                // this.links = elements;
                 this.showinfo = showinfo;
-                // let myChart = this.$echarts.init(document.getElementById('main'));
-                // const option = {
-                //     series: {
-                //         type: 'graph',
-                //         links: this.links,
-                //     }
-                // }
-                // myChart.setOption(option);
                 this.updateLable = false;
             }
             
         },
-        searchData: function(chartData){
-            // this.nodes = [
-            //     {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
-            //     {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
-            // ]
-            // this.links = chartData.links;
-            // let myChart = this.$echarts.init(document.getElementById('main'));
-            // const option = {
-            //     series: {
-            //         type: 'graph',
-            //         data: this.nodes,
-            //         // links: this.links,
-            //     }
-            // }
-            // console.log(myChart);
-            // myChart.setOption(option);
+        searchData: function(){
+            if(this.showinfo !== null){
+                this.showinfo = null;
+            }
         }
     },
     watch: {

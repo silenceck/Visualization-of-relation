@@ -11,7 +11,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\creeper.js"
+            "program": "${workspaceFolder}\\import_data_into_neo4j.js"
         }
     ]
 }
