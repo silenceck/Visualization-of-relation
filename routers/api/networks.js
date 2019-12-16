@@ -307,7 +307,7 @@ router.get('/v1/query', (req, res) => {
 
 /**
  * @route get /api/networks/
- * @description 添加network
+ * @description add new network
  * @access private
  */
 router.post('/', (req, res) => {
@@ -316,15 +316,15 @@ router.post('/', (req, res) => {
     const links = data.links;
     const user = data.user;
     const field = data.field; 
+    const isEdit = data.isEdit;
     Network.findOne({field: field})
         .then(network => {
-            if(network){
+            if(network && !isEdit){  // 
                 res.status(400).json(`${field}领域已存在`);
             }else{
                 // nodes and links are classified by the label of node and link.
                 const linksSize = Object.getOwnPropertyNames(links).length;    
                 const nodesSize = Object.getOwnPropertyNames(nodes).length;
-
                 let Num = 1;
                 for(let key in nodes){
                     instance.cypher(`UNWIND $nodes AS properties CREATE (n:${key}) SET n = properties RETURN n`, {nodes: nodes[key] })
@@ -409,5 +409,24 @@ router.get('/v1/:username', (req, res) => {
         res.json({networks: networks})
     });
     
+})
+
+
+/**
+ * @route delete /api/networks/:id
+ * @description find some items whose name property is username
+ * @access private
+ */
+router.delete('/:id', (req, res) => {
+    const id = req.params.id;
+    Network.deleteOne({
+        _id: id
+    }).then(result => {
+        res.json({
+            message: "success"
+        })
+    }).catch(err => {
+        console.log(err);
+    })
 })
 module.exports = router;

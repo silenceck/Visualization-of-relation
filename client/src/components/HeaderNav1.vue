@@ -172,4 +172,9 @@ export default {
       }
     }
 }
+
+.avatar-wrapper {
+    font-size: 20px;
+    cursor: pointer;
+}
 </style>

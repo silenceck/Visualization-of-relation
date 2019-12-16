@@ -10,6 +10,7 @@
             <el-input v-model="key2"  class="key2" placeholder="keyword2" :style="keyword2Style"></el-input> 
             <el-button @click="submit" class="btn">确定</el-button>
             <el-button @click="reset" class="btn1">重置</el-button>
+            <el-button @click="save" class="btn1">保存</el-button>
         </div>            
         <div class="text">
              <el-table
@@ -119,6 +120,18 @@ export default {
                 this.ifshow = false;
             }
             this.sentences = [];
+        },
+        save: function() {
+            const text = {
+                key1: this.key1,
+                key2: this.key2,
+                relation: this.relation_label,
+                sens: this.sens,
+            }
+            this.$http.post('/api/texts/v1/', text)
+                .then(res => {
+                    console.log(res.data);
+                })
         }
     }
 }

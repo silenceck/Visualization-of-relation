@@ -87,7 +87,7 @@ export default {
                 const networks = res.data.networks;
                 this.allTableData = networks;
                 this.filterTableData = networks;
-                this.setPaginations()
+                this.setPaginations();
             });
         },
         setPaginations () {
@@ -122,13 +122,25 @@ export default {
             this.$router.push({path:'/2',query: {field: row.field}});
         },
         handleDelete(index, row){
-            
+            const id = row._id;
+            this.$http.delete(`/api/networks/${id}`)
+            .then(res => {
+                this.allTableData = this.allTableData.filter(item => {
+                    return item._id !== id
+                });
+                this.filterTableData = this.filterTableData.filter(item => {
+                    return item._id !== id
+                });
+                this.setPaginations();
+            })
         }
     }
 }
 </script>
 
 <style scoped>
-
+.pagination {
+    margin-left: 5px;
+}
 </style>
 

@@ -5,14 +5,9 @@
             style="width: 100%;"
             max-height="600">
                 <el-table-column
-                    prop="text"
+                    prop="content"
                     label="文本"
                     width="400">
-                </el-table-column>
-                <el-table-column
-                    prop="date"
-                    label="创建时间"
-                    width="180">
                 </el-table-column>
                 <el-table-column
                     prop="keyword1"
@@ -27,6 +22,11 @@
                 <el-table-column
                     prop="keyword2"
                     label="关键词2"
+                    width="180">
+                </el-table-column>
+                <el-table-column
+                    prop="time"
+                    label="创建时间"
                     width="180">
                 </el-table-column>
         </el-table>
@@ -56,110 +56,8 @@ export default {
     data(){
         return {
             tableData: [],
-            allTableData: [
-                {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                },
-                {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }
-            ],
-            filterTableData: [
-                {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                },
-                {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }, {
-                    date: '2016-05-02',
-                    text: 'Moderate alcohol intake was associated with greater likelihood of becoming depression-free and a lower likelihood of becoming depressed at 2.5-years follow-up.',
-                    keyword1: '10',
-                    relation: '3',
-                    keyword2: '11',
-                }
-            ],
+            allTableData: [],
+            filterTableData: [],
             paginations: {
                 page_index: 1, // 当前位于哪一页
                 total: 0, // 总数
@@ -170,9 +68,19 @@ export default {
         }
     },
     mounted: function(){
-        this.setPaginations();
+        this.getTexts();
     },
     methods: {
+        getTexts: function(){
+            const username = this.$store.getters.user.name;
+            this.$http.get(`/api/texts/v1/${username}`)
+            .then(res => {
+                const texts = res.data.texts;
+                this.allTableData = texts;
+                this.filterTableData = texts;
+                this.setPaginations();
+            });
+        },
         setPaginations () {
             this.paginations.total = this.allTableData.length
             this.paginations.page_index = 1

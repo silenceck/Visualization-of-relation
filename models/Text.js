@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const TextSchema = new Schema({
     username: {
         type: String,
-        required: "admin"
+        default: "admin"
     },
     content: {
         type: String,
@@ -25,7 +25,7 @@ const TextSchema = new Schema({
     },
     time: {
         type: Date,
-        required: true
+        default: new Date(),
     }
 })
 

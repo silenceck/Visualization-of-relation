@@ -74,15 +74,21 @@ export default {
                     value: "",
                     key: 1,
                 }
-            ],            
+            ],
+            nodes: [],  // newly added nodes
+            links: [],  // newly added links
+            isEdit: false,  // whether it is jumping from the edit page 
         };
     },
     mounted: function(){
         const field = this.$route.query.field;
         if(field !== null){
+            this.isEdit = true;
             this.$http.get(`/api/networks/${field}`)
             .then(res => {
                 const newChart = res.data;
+                this.node_id = newChart.nodes.length;
+                this.link_id = newChart.links.length;
                 this.$store.dispatch('setNewChart', newChart);
             })
         }
@@ -124,6 +130,7 @@ export default {
                 }
                 this.node_id = this.node_id + 1;
                 this.$store.dispatch('addNode', node);
+                this.nodes.push(node);
                 this.node_label = '';
                 for(let i of this.node){
                     i.name = '';
@@ -149,6 +156,7 @@ export default {
                 }
                 this.link_id = this.link_id + 1;
                 this.$store.dispatch('addLink', link);
+                this.links.push(link);
                 this.source_id = '';
                 this.relation_label = '';
                 this.target_id = '';
@@ -215,6 +223,11 @@ export default {
                 const chartData = this.$store.getters.newChart;
                 let nodes = chartData.nodes;
                 let links = chartData.links;
+                const field = this.$route.query.field;
+                if(field !== null){
+                    nodes = this.nodes;
+                    links = this.links;
+                }
                 let newNodes = {};
                 let newLinks = {};
                 for(let node of nodes){
@@ -256,6 +269,7 @@ export default {
                     field: this.field,
                     nodes: newNodes,
                     links: newLinks,
+                    isEdit: this.isEdit,
                 }
                 this.$http.post('/api/networks/', data)
                 .then(res => {
@@ -263,7 +277,10 @@ export default {
                         message: "网络生成成功",
                         type: "success"
                     })
-                })
+                });
+                this.nodes = [];
+                this.links = [];
+                this.isEdit = false;
             }else{
                 this.$message({
                     message: '用户未登录！！！',

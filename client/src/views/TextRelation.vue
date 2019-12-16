@@ -13,7 +13,6 @@
             <el-button @click="submit">确定</el-button>
         </div>
         <div id="main" class="chart"></div>
-
     </div>
 </template>
 
