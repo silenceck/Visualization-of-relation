@@ -53,7 +53,7 @@ Content-Type: application/json
 {
     "key1": "alcohol",
     "key2": "depression",
-    "text": "Indeed, individuals prenatally exposed to alcohol have an increased risk of developing anxiety and depression."
+    "text": "Hazardous users of alcohol and smokers had 3.1 respectively 3.0 times higher risk for depression (p = 0.001 respectively 0.003)."
 }
 
 ### 关键词爬虫 GET http://localhost:5000/api/texts/?key1=smoke&key2=cancer HTTP/1.1

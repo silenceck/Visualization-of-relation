@@ -75,6 +75,7 @@ export default {
             const username = this.$store.getters.user.name;
             this.$http.get(`/api/texts/v1/${username}`)
             .then(res => {
+                console.log(res.data);
                 const texts = res.data.texts;
                 this.allTableData = texts;
                 this.filterTableData = texts;
