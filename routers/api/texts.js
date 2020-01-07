@@ -21,7 +21,7 @@ router.post('/', (req, res) => {
       result.push(message);
     });
     pyshell.end(function (err,code,signal) {
-      if (err) return res.status(400).json("错误");
+      if (err) return res.status(500).json(err);
       console.log('The exit code was: ' + code);
       console.log('The exit signal was: ' + signal);
       console.log('finished');

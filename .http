@@ -53,7 +53,7 @@ Content-Type: application/json
 {
     "key1": "alcohol",
     "key2": "depression",
-    "text": "Hazardous users of alcohol and smokers had 3.1 respectively 3.0 times higher risk for depression (p = 0.001 respectively 0.003)."
+    "text": "Mental health problems including PTSD, anxiety and depression, as well as anger, functional impairment and being single were all related to greater alcohol misuse. Hazardous users of alcohol and smokers had 3.1 respectively 3.0 times higher risk for depression (p = 0.001 respectively 0.003). Life satisfaction and happiness were associated with a lower risk of depression, while hazardous alcohol drinking and poor sleep quality were related to a higher risk of depression. Our data revealed that depression proneness confers vulnerability to alcohol, emulating patterns of alcohol dependence seen in human addicts, and that depression resilience to a large extent protects from the development of AUD-like phenotypes."
 }
 
 ### 关键词爬虫 GET http://localhost:5000/api/texts/?key1=smoke&key2=cancer HTTP/1.1

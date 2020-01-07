@@ -28,7 +28,7 @@ export default {
     data() {
         return {
             showinfo: null, // transmit showinfo to Child components namely Add.vue
-            updateLable: false, // transmit showinfo to Child components namely Add.vue 
+            updateLable: false, // transmit updateLable to Child components namely Add.vue 
         }
     },
     mounted: function(){
