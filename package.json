@@ -35,10 +35,14 @@
     "mongoose": "^5.6.5",
     "neo4j-driver": "^1.7.6",
     "neode": "^0.3.3",
+    "node-xlsx": "^0.15.0",
     "nodemon": "^1.19.2",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "python-shell": "^1.0.8",
     "superagent": "^5.1.0"
+  },
+  "devDependencies": {
+    "exceljs": "^3.5.0"
   }
 }

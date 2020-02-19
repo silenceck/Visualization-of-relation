@@ -82,6 +82,7 @@ export default {
     },
     mounted: function(){
         const field = this.$route.query.field;
+        console.log(field);
         if(field !== null){
             this.isEdit = true;
             this.$http.get(`/api/networks/${field}`)
@@ -92,6 +93,7 @@ export default {
                 this.$store.dispatch('setNewChart', newChart);
             })
         }
+        
     },
     methods: {
         handleSelect(key, keyPath) {

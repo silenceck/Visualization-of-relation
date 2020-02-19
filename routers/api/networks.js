@@ -429,4 +429,27 @@ router.delete('/:id', (req, res) => {
         console.log(err);
     })
 })
+
+
+/**
+ * @route delete /api/networks/name
+ * @description find all nodes' name
+ * @access public
+ */
+router.get('/nodes/name', (req, res) => {
+    instance.cypher(`MATCH (a) WHERE a.field = 'Nursing' RETURN a.name`, {
+    }).then(result => {
+        const data = [];
+        const recodes = result.records;
+        if(recodes.length !== 0){
+            for(let item of recodes){
+                data.push(item['_fields'][0])
+            }
+        }
+        res.json({
+            data: data
+        })
+    })
+    
+})
 module.exports = router;

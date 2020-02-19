@@ -129,7 +129,7 @@ export default {
                     },
                     series: [
                         {
-                            name: '面积模式',
+                            name: 'relation type',
                             type: 'pie',
                             radius: [30, 110],
                             center: ['50%', '50%'],
@@ -171,14 +171,16 @@ export default {
                         exist_relation: 3,
                         no_relation: 0,
                     }
+                    let num = 1;
                     const relation_data = [];
                     for(let type in sens){
                         for(let i in sens[type]){
                             tmp.push({
-                                label: Number(i)+1,
+                                label: num,
                                 text: sens[type][i],
                                 relation: relation_type[type]
                             })
+                            num = num + 1;
                         }
                         if(sens[type].length !== 0){
                             const relation_num = {};
@@ -195,7 +197,6 @@ export default {
                             relation_data.push(relation_num);
                         }
                     }
-                    console.log(relation_data);
                     this.sentences = tmp;
                     switch(label){
                         case 0:
@@ -381,7 +382,7 @@ export default {
     width: 50%;
     margin-top: 10px;
     margin-left: 25%;
-    margin-bottom: 10px;
+    margin-bottom: 40px;
 }
 .pagination {
     margin-left: 5%;

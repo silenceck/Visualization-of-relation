@@ -1,8 +1,8 @@
 <template>
     <div class="index">
-        <HeaderNav></HeaderNav>
+        <HeaderNav @passKeyword='getKeyword'></HeaderNav>
         <div class="rightContainer">
-          <router-view></router-view>
+          <router-view :keyword="keyword"></router-view>
         </div>
     </div>
 </template>
@@ -11,8 +11,19 @@
 import HeaderNav from '../components/HeaderNav1.vue'
 export default {
     name: 'index1',
+    data() {
+      return {
+        keyword: '', //search content
+      }
+    },
     components: { 
         HeaderNav,
+    },
+    methods: {
+      getKeyword(keyword){
+        console.log('index:', keyword);
+        this.keyword = keyword;
+      }
     }
 }
 </script>

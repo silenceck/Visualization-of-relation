@@ -6,10 +6,18 @@
                 <div style="color:#ffffff">dsfa</div>
             </el-col>
             <el-col :span="3" class="search_container">
-                <el-input v-model="searchData" placeholder="请输入内容" ></el-input>
+                <!-- <el-input v-model="searchData" placeholder="请输入内容" ></el-input> -->
+                <el-autocomplete
+                    class="inline-input"
+                    v-model="searchData"
+                    :fetch-suggestions="querySearch"
+                    placeholder="请输入内容"
+                    :trigger-on-focus="false"
+                    @select="handleSelect">
+                </el-autocomplete>
             </el-col>
             <el-col :span="2" class="search_container">
-                <el-button type="primary" icon="el-icon-search">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
             </el-col>            
             <el-col :span="5" class="nav_container">
                 <el-menu
@@ -66,6 +74,7 @@ export default {
         return {
             activeIndex: '1',
             searchData: '',
+            keywordData: null,
             // isLogin: false,
             // username: null,
         };
@@ -75,9 +84,39 @@ export default {
             return this.$store.getters.user.name;
         }
     },
+    mounted(){
+        this.getAllNodesName();
+    },
     methods: {
         handleSelect(key, keyPath) {
             // console.log(key, keyPath);  
+        },
+        search(){
+            this.$emit('passKeyword', this.searchData);
+        },
+        getAllNodesName: function (){
+            // only find all nodes in Nursing field, you can find other field by changing the network.js
+            let data = [];
+            this.$http.get('api/networks/nodes/name')
+            .then(res => {
+                let nodesData = []; 
+                const data = res.data.data.sort(function(a,b){return a.localeCompare(b)});
+                for(let item of data) {
+                    nodesData.push({value:item})
+                }
+                this.keywordData = nodesData;
+            })
+        },
+        querySearch(queryString, cb) {
+            var keywordData = this.keywordData;
+            var results = queryString ? keywordData.filter(this.createFilter(queryString)) : keywordData;
+            // 调用 callback 返回建议列表的数据
+            cb(results);
+        },
+        createFilter(queryString) {
+            return (keywordData) => {
+            return (keywordData.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            };
         },
         logout(){
 

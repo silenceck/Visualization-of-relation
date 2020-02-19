@@ -3,13 +3,18 @@
         <div class="container">
             <el-row :gutter="20">
                 <el-col :span="6">
-                    <el-tree
+                    <el-scrollbar style="height:100%">
+                        <el-tree
                         :data="data"
+                        node-key="id"
                         :props="defaultProps"
                         accordion
                         @node-click="handleNodeClick"
+                        :render-content="renderContent"
+                        ref="tree"
                         class="sidebar">
                     </el-tree>
+                    </el-scrollbar>
                 </el-col>
                 <el-col :span="9">
                     <div class="title" @click="resetData">护理领域</div>
@@ -21,13 +26,28 @@
                         <span>{{click_node.name}}</span>
                         <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
                     </div>
-                    <div v-for="o in 4" :key="o" class="text item">
-                        <!-- {{'列表内容 ' + o }} -->
+                    <div v-for="(value, name, index) in click_node" :key="index" class="text item">
+                         <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable'" >
+                              <span v-bind:style="{ fontWeight:'bold' }">{{name + ':' }}</span> {{value }} 
+                         </div> 
+                         
                     </div>
+                    <!-- <div  class="text item">
+                         {{'field:' + click_node.field }}
+                    </div>
+                    <div  class="text item">
+                         {{'type:' + click_node.label }}
+                    </div>
+                    <div  class="text item">
+                         {{'definition:' + click_node.definition }}
+                    </div>
+                    
+                    <div  class="text item">
+                         {{'activities:' + click_node.activities }}
+                    </div> -->
                     </el-card>
                 </el-col>
             </el-row>
-
             <!-- <el-button @click="reduceChartData">减少数据</el-button>
             <el-button @click="testChartData">添加连接</el-button> -->
         </div>
@@ -37,45 +57,247 @@
 import $ from 'jquery'
 export default {
     name: 'home1',
+    props: [
+        'keyword',
+    ],
     data(){
         return {
             data: [{
-                    label: '护理领域',
-                    children: [{
-                        label: '二级 1-1',
-                        children: [{
-                        label: '三级 1-1-1'
-                        }]
-                    }]
+                    id: 1,
+                    label: 'Nursing',
+                    children: [
+                        {
+                            id: 2,
+                            label: 'Intervention',
+                            children: [
+                                {
+                                    id: 'A2',
+                                    label: 'A',
+                                    children: [],
+                                },
+                                {
+                                    id: 'B2',
+                                    label: 'B',
+                                    children: [],
+                                },
+                                {
+                                    id: 'C2',
+                                    label: 'C',
+                                    children: [],
+                                },
+                                {
+                                    id: 'D2',
+                                    label: 'D',
+                                    children: [],
+                                },
+                                {
+                                    id: 'E2',
+                                    label: 'E',
+                                    children: [],
+                                },
+                                {
+                                    id: 'F2',
+                                    label: 'F',
+                                    children: [],
+                                },
+                                {
+                                    id: 'G2',
+                                    label: 'G',
+                                    children: [],
+                                },
+                                {
+                                    id: 'H2',
+                                    label: 'H',
+                                    children: [],
+                                },
+                                {
+                                    id: 'J2',
+                                    label: 'J',
+                                    children: [],
+                                },{
+                                    id: 'K2',
+                                    label: 'K',
+                                    children: [],
+                                },
+                                {
+                                    id: 'L2',
+                                    label: 'L',
+                                    children: [],
+                                },
+                                {
+                                    id: 'M2',
+                                    label: 'M',
+                                    children: [],
+                                },
+                                {
+                                    id: 'N2',
+                                    label: 'N',
+                                    children: [],
+                                },
+                                {
+                                    id: 'P2',
+                                    label: 'P',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Q2',
+                                    label: 'Q',
+                                    children: [],
+                                },
+                                {
+                                    id: 'R2',
+                                    label: 'R',
+                                    children: [],
+                                },
+                                {
+                                    id: 'S2',
+                                    label: 'S',
+                                    children: [],
+                                },
+                                {
+                                    id: 'T2',
+                                    label: 'T',
+                                    children: [],
+                                },
+                                {
+                                    id: 'W2',
+                                    label: 'W',
+                                    children: [],
+                                },
+                                {
+                                    id: 'X2',
+                                    label: 'X',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Y2',
+                                    label: 'Y',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Z2',
+                                    label: 'Z',
+                                    children: [],
+                                },
+                            ],
+                        },
+                        {
+                            id: 3,
+                            label: 'Outcome',
+                            children: [
+                                {
+                                    id: 'A3',
+                                    label: 'A',
+                                    children: [],
+                                },
+                                {
+                                    id: 'B3',
+                                    label: 'B',
+                                    children: [],
+                                },
+                                {
+                                    id: 'C3',
+                                    label: 'C',
+                                    children: [],
+                                },
+                                {
+                                    id: 'D3',
+                                    label: 'D',
+                                    children: [],
+                                },
+                                {
+                                    id: 'E3',
+                                    label: 'E',
+                                    children: [],
+                                },
+                                {
+                                    id: 'F3',
+                                    label: 'F',
+                                    children: [],
+                                },
+                                {
+                                    id: 'G3',
+                                    label: 'G',
+                                    children: [],
+                                },
+                                {
+                                    id: 'H3',
+                                    label: 'H',
+                                    children: [],
+                                },
+                                {
+                                    id: 'J3',
+                                    label: 'J',
+                                    children: [],
+                                },{
+                                    id: 'K3',
+                                    label: 'K',
+                                    children: [],
+                                },
+                                {
+                                    id: 'L3',
+                                    label: 'L',
+                                    children: [],
+                                },
+                                {
+                                    id: 'M3',
+                                    label: 'M',
+                                    children: [],
+                                },
+                                {
+                                    id: 'N3',
+                                    label: 'N',
+                                    children: [],
+                                },
+                                {
+                                    id: 'P3',
+                                    label: 'P',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Q3',
+                                    label: 'Q',
+                                    children: [],
+                                },
+                                {
+                                    id: 'R3',
+                                    label: 'R',
+                                    children: [],
+                                },
+                                {
+                                    id: 'S3',
+                                    label: 'S',
+                                    children: [],
+                                },
+                                {
+                                    id: 'T3',
+                                    label: 'T',
+                                    children: [],
+                                },
+                                {
+                                    id: 'W3',
+                                    label: 'W',
+                                    children: [],
+                                },
+                                {
+                                    id: 'X3',
+                                    label: 'X',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Y3',
+                                    label: 'Y',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Z3',
+                                    label: 'Z',
+                                    children: [],
+                                },
+                            ],
+                        }
+                    ]
                 }, 
-                // {
-                //     label: '一级 2',
-                //     children: [{
-                //         label: '二级 2-1',
-                //         children: [{
-                //         label: '三级 2-1-1'
-                //         }]
-                // }, {
-                //     label: '二级 2-2',
-                //     children: [{
-                //     label: '三级 2-2-1'
-                //     }]
-                // }]
-                // }, {
-                //     label: '一级 3',
-                //     children: [{
-                //         label: '二级 3-1',
-                //         children: [{
-                //         label: '三级 3-1-1'
-                //         }]
-                // }, {
-                //     label: '二级 3-2',
-                //     children: [{
-                //     label: '三级 3-2-1'
-                //     }]
-                // }
-                // ]
-            // }
             ],
             defaultProps: {
                 children: 'children',
@@ -416,6 +638,8 @@ export default {
                 // {id: "248", name: null, source: "76", target: "65", lineStyle: {}},
                 // {id: "249", name: null, source: "76", target: "66", lineStyle: {}},
             ],
+            partNodes: [],
+            partLinks: [],
             seleted_node: { 
 
             },
@@ -427,70 +651,102 @@ export default {
             }
         }
     },
-    mounted: function() {
-        // this.getChartData();
+    beforeMount: function() {
+        this.getChartData();
     },
     methods: {
         getChartData: function(){
-            this.$http.get('api/networks/test')
+            this.$http.get('api/networks/Nursing')
             .then(res => {
                 this.nodes = res.data.nodes;
                 this.links = res.data.links;
+                let outcomeNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
+                let InterventionNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
+                for(let node of this.nodes){
+                    // console.log(node.name)
+                    const char = node.name.trim()[0];
+                    char = char.toUpperCase();
+                    if(node.lable === 'Intervention'){
+                        if(!InterventionNodes[char]){
+                            break;
+                        }
+                        InterventionNodes[char].push({label:node.name});
+                    }else if(node.lable === 'Outcome') {
+                        if(!outcomeNodes[char]){
+                            break;
+                        }
+                        outcomeNodes[char].push({label:node.name});
+                    }
+                }
+                for(let key in InterventionNodes){
+                    InterventionNodes[key] = InterventionNodes[key].sort(function(a,b){return a['label'].localeCompare(b['label'])}); // in alphabetical order
+                    this.$refs.tree.updateKeyChildren(key+'2', InterventionNodes[key]);
+                }
+                for(let key in outcomeNodes){
+                    outcomeNodes[key] = outcomeNodes[key].sort(function(a,b){return a['label'].localeCompare(b['label'])});
+                    this.$refs.tree.updateKeyChildren(key+'3', outcomeNodes[key]);
+                }
                 let myChart = this.$echarts.init(document.getElementById('main'));
-                const PATH = '/les-miserables.gexf';
-                myChart.showLoading();
-                // this.$http.get(PATH, function (xml) {
-                myChart.hideLoading();
-                // console.log('dataTool:', this.$dataTool)
-                // var graph = this.$dataTool.parse(xml);
-                // console.log(graph)
                 var categories = [];
-                for (var i = 0; i < 9; i++) {
+                var types = ['Intervention', 'Outcome'];
+                for (var i = 0; i < types.length; i++) {
                     categories[i] = {
-                        name: '类目' + i
+                        name: types[i],
                     };
                 }
                 this.nodes.forEach(function (node) {
                     node.itemStyle = null;
-                    
-                    node.symbolSize = 15;
-                    
-                    node.category = Math.random()*9 ;
+                    node.symbolSize = Math.random()*40 + 1;
+                    node.label = {
+                        normal: {
+                            // show: node.name.length > 10
+                            show: false
+                        }
+                    };
+                    node.category = types.findIndex((element) => element === node.lable);
                 });
+                // Because the number of nodes is large, we select part of the nodes to show
+                this.partLinks = this.links.slice(0, 50);
+                let ids = [];
+                for(let item of this.partLinks){
+                    if(!ids.find(element => element === item.source)){
+                        ids.push(item.source);
+                    }
+                    if(!ids.find(element => element === item.target)){
+                        ids.push(item.target);
+                    }
+                }
+                this.partNodes = this.nodes.filter(element =>  ids.indexOf(element.id) !== -1);
                 const option = {
                     title: {
-                        text: 'Les Miserables',
-                        subtext: 'Circular layout',
                         top: 'bottom',
                         left: 'right'
                     },
+                    legend: [{
+                        data: categories.map(function (a) {
+                            return a.name;
+                        })
+                    }],
                     tooltip: {},
-                    // legend: [{
-                    //     // selectedMode: 'single',
-                    //     data: categories.map(function (a) {
-                    //         return a.name;
-                    //     })
-                    // }],
                     animationDurationUpdate: 1500,
                     animationEasingUpdate: 'quinticInOut',
                     series : [
                         {
-                            name: 'Les Miserables',
                             type: 'graph',
                             layout: 'circular',
                             circular: {
                                 rotateLabel: true
                             },
-                            data: this.nodes,
-                            links: this.links,
+                            data: this.partNodes,
+                            links: this.partLinks,
                             categories: categories,
                             roam: false,
-                            label: {
-                                normal: {
-                                    position: 'right',
-                                    formatter: '{b}'
-                                }
-                            },
+                            // label: {
+                            //     normal: {
+                            //         position: 'right',
+                            //         formatter: '{b}'
+                            //     }
+                            // },
                             lineStyle: {
                                 normal: {
                                     color: 'source',
@@ -504,8 +760,10 @@ export default {
                 const that = this;
                 myChart.on('click', {dataType: 'node'},function (params) {               
                     const id = params.data.id;
+                    // console.log('id:', id);
                     const links = that.links.filter( link => { return link.source === id || link.target === id });
                     that.click_node = that.nodes.filter( node => { return node.id === id })[0];
+                    console.log(that.click_node)
                     let seleted_node = new Set();
                     for(let link in links) {
                         seleted_node.add(links[link].source);
@@ -522,10 +780,7 @@ export default {
                     };
                     myChart.setOption(option);
                 });
-
             })
-             
-            
         },
         updateChart: function() {
             let myChart = this.$echarts.init(document.getElementById('main'));
@@ -536,7 +791,6 @@ export default {
             ];
             const testLink = [
                 {id:'0', name:'0',source:'1', target:'0'},
-                
                 {id:'1', name:'2',source:'2', target:'0'},
                 {id:'2', name:'1',source:'2', target:'1'},
             ];
@@ -553,19 +807,6 @@ export default {
             myChart.setOption(option);
         },
         reduceChartData: function() {
-            // this.nodes = [
-            //     {id: "0", name: "Myriel", itemStyle: null, symbolSize: 19.12381, x: -266.82776},
-            //     {id: "1", name: "Napoleon", itemStyle: null, symbolSize: 2.6666666666666665, x: -418.08344},
-            //     {id: "2", name: "MlleBaptistine", itemStyle: null, symbolSize: 6.323809333333333, x: -212.76357},
-            //     {id: "3", name: "MmeMagloire", itemStyle: null, symbolSize: 6.323809333333333, x: -242.82404},
-            //     {id: "4", name: "CountessDeLo", itemStyle: null, symbolSize: 2.6666666666666665, x: -379.30386},
-            //     {id: "5", name: "Geborand", itemStyle: null, symbolSize: 2.6666666666666665, x: -417.26337},
-            //     {id: "6", name: "Champtercier", itemStyle: null, symbolSize: 2.6666666666666665, x: -332.6012},
-            //     {id: "7", name: "Cravatte", itemStyle: null, symbolSize: 2.6666666666666665, x: -382.69568},
-            //     {id: "8", name: "Count", itemStyle: null, symbolSize: 2.6666666666666665, x: -320.384},
-            //     {id: "9", name: "OldMan", itemStyle: null, symbolSize: 2.6666666666666665, x: -344.39832},
-            //     {id: "10", name: "Labarre", itemStyle: null, symbolSize: 2.6666666666666665, x: -89.34107},
-            // ];
             this.updateChart()
         },
         showSelectedData: function(node) {
@@ -576,8 +817,8 @@ export default {
             const option = {
                 series : [
                     {         
-                        data: this.nodes,
-                        links: this.links,
+                        data: this.partNodes,
+                        links: this.partLinks,
                     }
                 ]
             };
@@ -591,9 +832,6 @@ export default {
             const option = {
                 series : [
                     {         
-                        // data: this.nodes,
-                        // links: this.links,
-                        // data: testNode,
                         links: testLink,
                     }
                 ]
@@ -601,9 +839,44 @@ export default {
             myChart.setOption(option);
         },
         handleNodeClick: function(data) {
-            console.log(data);
+            const label = data.label;
+            const id = this.nodes.find(item => item.name === label).id;
+            let myChart = this.$echarts.init(document.getElementById('main'));
+            const links = this.links.filter( link => { return link.source === id || link.target === id });
+            this.click_node = this.nodes.filter( node => { return node.id === id })[0];
+            let seleted_node = new Set();
+            for(let link in links) {
+                seleted_node.add(links[link].source);
+                seleted_node.add(links[link].target); 
+            }
+            const nodes = this.nodes.filter( node => { return seleted_node.has(node.id) })
+            // console.log('id:', id, 'node:', nodes, 'links:', links);
+            const option = {
+                series : [
+                    {         
+                        data: nodes,
+                        links: links,
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        },
+        renderContent(h, { node, data, store }) {
+            return (
+            <span class="custom-tree-node">
+                <span>{node.label}</span>
+            </span>);
         }
 
+    },
+    watch: {
+        keyword(val, oldVal){
+            console.log('home:', val);
+            if(val !== ''){
+                
+                this.handleNodeClick({label: val});
+            }
+        }
     }
 }
 </script>
@@ -623,10 +896,10 @@ export default {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  padding-top: 100px;
+  padding-top: 60px;
 }
 .title {
-  top: 100px;
+  top: 20px;
   text-align: center;
   font-size: 30px;
   width: 800px;

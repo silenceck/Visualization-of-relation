@@ -68,6 +68,8 @@ GET  http://localhost:5000/api/networks/test HTTP/1.1
 ### true add 
 POST  http://localhost:5000/api/networks/ HTTP/1.1
 
+### find all nodes' name
+GET  http://localhost:5000/api/networks/nodes/name HTTP/1.1
 
 ### query
 

@@ -16,7 +16,7 @@
             </el-row>
             <el-row :gutter="20">
                 <el-col :span="12">
-                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> {{key}}:{{val}}&#12288; </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="update_element(showinfo)">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
+                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;{{key}}:{{val}} </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="update_element(showinfo)">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
                 </el-col>
             </el-row>
         </div>
@@ -399,7 +399,6 @@ export default {
                 this.showinfo = showinfo;
                 this.updateLable = false;
             }
-            
         },
         searchData: function(){
             if(this.showinfo !== null){
@@ -435,6 +434,7 @@ export default {
             deep: true,
         },
         
+        
     }
 }
 </script>
@@ -465,6 +465,7 @@ export default {
     margin-top: 100px;
     margin-left: 144px;
     padding-top: 1px;
+    /* padding-left: 1px; */
     width: 800px;
     height: 40px;
     border: 2px solid #a6282f;
