@@ -2,54 +2,39 @@
     <div class="home">
         <div class="container">
             <el-row :gutter="20">
-                <el-col :span="6">
-                    <el-scrollbar style="height:100%">
-                        <el-tree
-                        :data="data"
-                        node-key="id"
-                        :props="defaultProps"
-                        accordion
-                        @node-click="handleNodeClick"
-                        :render-content="renderContent"
-                        ref="tree"
-                        class="sidebar">
-                    </el-tree>
+                <el-col :span="6" class="tree">
+                    <el-scrollbar style="height:800px;" wrapStyle="overflow-x:hidden;">
+                        <el-tree 
+                            :data="data"
+                            node-key="id"
+                            :props="defaultProps"
+                            accordion
+                            @node-click="handleNodeClick"
+                            :render-content="renderContent"
+                            ref="tree"
+                            class="sidebar">
+                        </el-tree>
                     </el-scrollbar>
                 </el-col>
                 <el-col :span="9">
-                    <div class="title" @click="resetData">护理领域</div>
+                    <div class="title" @click="resetData" v-bind:style="{cursor:'pointer' }">护理领域</div>
                     <div id="main" class="chart"></div>
                 </el-col>
                 <el-col :span="9" class="card">
-                    <el-card class="box-card" shadow="never">
-                    <div slot="header" class="clearfix">
-                        <span>{{click_node.name}}</span>
-                        <!-- <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button> -->
-                    </div>
-                    <div v-for="(value, name, index) in click_node" :key="index" class="text item">
-                         <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable'" >
-                              <span v-bind:style="{ fontWeight:'bold' }">{{name + ':' }}</span> {{value }} 
-                         </div> 
-                         
-                    </div>
-                    <!-- <div  class="text item">
-                         {{'field:' + click_node.field }}
-                    </div>
-                    <div  class="text item">
-                         {{'type:' + click_node.label }}
-                    </div>
-                    <div  class="text item">
-                         {{'definition:' + click_node.definition }}
-                    </div>
-                    
-                    <div  class="text item">
-                         {{'activities:' + click_node.activities }}
-                    </div> -->
-                    </el-card>
+                    <el-scrollbar style="height:800px;" wrapStyle="overflow-x:hidden;">
+                        <el-card class="box-card" shadow="never">
+                        <div slot="header" class="clearfix">
+                            <span>{{click_node.name}}</span>
+                        </div>
+                        <div v-for="(value, name, index) in click_node" :key="index" class="text item">
+                            <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable'" >
+                                <span v-bind:style="{ fontWeight:'bold' }">{{name + ':' }}</span> {{value }} 
+                            </div>                         
+                        </div>
+                        </el-card>
+                    </el-scrollbar>
                 </el-col>
             </el-row>
-            <!-- <el-button @click="reduceChartData">减少数据</el-button>
-            <el-button @click="testChartData">添加连接</el-button> -->
         </div>
     </div>
 </template>
@@ -760,10 +745,8 @@ export default {
                 const that = this;
                 myChart.on('click', {dataType: 'node'},function (params) {               
                     const id = params.data.id;
-                    // console.log('id:', id);
                     const links = that.links.filter( link => { return link.source === id || link.target === id });
                     that.click_node = that.nodes.filter( node => { return node.id === id })[0];
-                    console.log(that.click_node)
                     let seleted_node = new Set();
                     for(let link in links) {
                         seleted_node.add(links[link].source);
@@ -881,16 +864,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chart {
     position: absolute;
     /* left: 30%; */
     top: 100px;
     height: 680px;
     width: 800px;
-}
-.sidebar {
-    left: 80px;
 }
 .container {
   width: 100%;
@@ -912,8 +892,21 @@ export default {
     left: 80px;
 }
 .box-card {
-    
     width: 480px;
+    height: 800px;
 }
+// .el-tree>.el-tree-node{display:inline-block;}
+// .el-tree {
+//     min-width: 100%;
+//     display:inline-block;
+// }
+.el-tree {
+    min-width: 100%;
+    display: inline-block !important;
+}
+.el-scrollbar {
+    height: 100%;
+}
+
 </style>
 

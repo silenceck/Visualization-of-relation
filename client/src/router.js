@@ -10,7 +10,6 @@ import FundList from './views/FundList.vue'
 import NotFound from './views/404.vue'
 import CreateChart from './views/CreateChart.vue'
 import TextRelation from './views/TextRelation.vue'
-import PubmedCreeper from './views/PubmedCreeper.vue'
 import Add from './components/Add.vue'
 import Search from './components/Search.vue'
 import Profile from './views/Profile.vue'
@@ -63,7 +62,7 @@ const router = new Router({
           },
         {                                     
             path:'/3',
-            component:PubmedCreeper,
+            component:TextRelation,
         },
         { 
             path: '/profile',

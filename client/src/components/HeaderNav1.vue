@@ -17,7 +17,7 @@
                 </el-autocomplete>
             </el-col>
             <el-col :span="2" class="search_container">
-                <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="search" >搜索</el-button>
             </el-col>            
             <el-col :span="5" class="nav_container">
                 <el-menu
@@ -43,8 +43,8 @@
                 </el-menu>
             </el-col>
             <el-col :span="8">
-                <div v-if="username === null" class="login"><router-link to="/login">登录</router-link></div>
-                <div v-if="username !== null" class="username">
+                <div v-if="username === null" class="login" ><span @click="login" v-bind:style="{cursor:'pointer', marginRight:'30px' }" >登录</span></div>
+                <div v-else class="username">
                     <div class="right-menu">
                         <el-dropdown class="avatar-container" trigger="click">
                             <div class="avatar-wrapper">
@@ -52,11 +52,9 @@
                             <i class="el-icon-caret-bottom" />
                             </div>
                             <el-dropdown-menu slot="dropdown" class="user-dropdown">
-                            <router-link to="/profile">
-                                <el-dropdown-item>
-                                    个人中心
-                                </el-dropdown-item>
-                            </router-link>
+                            <el-dropdown-item >
+                                <span @click="info">个人中心</span>
+                            </el-dropdown-item>
                             <el-dropdown-item divided>
                                 <span style="display:block;" @click="logout">退出</span>
                             </el-dropdown-item>
@@ -75,13 +73,15 @@ export default {
             activeIndex: '1',
             searchData: '',
             keywordData: null,
-            // isLogin: false,
-            // username: null,
         };
     },
     computed:{
         username(){
-            return this.$store.getters.user.name;
+            if(this.$store.getters.user.name) {
+                return this.$store.getters.user.name;
+            } else {
+                return null;
+            }
         }
     },
     mounted(){
@@ -89,7 +89,6 @@ export default {
     },
     methods: {
         handleSelect(key, keyPath) {
-            // console.log(key, keyPath);  
         },
         search(){
             this.$emit('passKeyword', this.searchData);
@@ -118,8 +117,17 @@ export default {
             return (keywordData.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
             };
         },
+        login() {
+            this.$router.push('/login');
+        },
         logout(){
-
+            localStorage.removeItem("eleToken");
+            this.$store.dispatch("clearCurrentState");
+            this.$router.push('/index')
+            this.username = null;
+        },
+        info() {
+            this.$router.push('/profile');
         }
     }
 }
@@ -175,7 +183,8 @@ export default {
     height: 80px;
     line-height: 80px;
     font-size: 18px;
-    text-align: center;
+    text-align: right;
+    margin-right: 5px;
     color: #a6282f;
 }
 .username {
@@ -187,8 +196,8 @@ export default {
 .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
-
+    line-height: 80px;
+    margin-right: 30px;
     &:focus {
       outline: none;
     }

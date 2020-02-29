@@ -14,7 +14,8 @@ const path = 'C:/Users/会议室/PycharmProjects/relation_extraction/v1.1.py'
  */
 router.post('/', (req, res) => {
     const data = req.body;
-    result = [];
+    let result = [];
+    // res.json(result);
     let pyshell = new PythonShell(path);
     pyshell.send(JSON.stringify({ key1: data.key1, key2: data.key2, text: data.text }));
     pyshell.on('message', function (message) {
@@ -25,7 +26,9 @@ router.post('/', (req, res) => {
       console.log('The exit code was: ' + code);
       console.log('The exit signal was: ' + signal);
       console.log('finished');
-      res.json(result);
+      res.json({
+          data: result
+      });
     })
 })
 
