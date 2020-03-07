@@ -6,19 +6,19 @@
             </el-button>
             <div class="node1">
                 节点一 <el-input v-model="node1_label" placeholder="节点1标签"></el-input> &#12288;
-                <span class="n1_pro" v-for='i in node1' :key="i.name+`node1`+iter_num">
+                <span class="n1_pro" v-for='i in node1' :key="i.key+`node1`">
                     <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input>  &#12288;
                 </span>
             </div> 
             <div class="relation">
                 关系&#12288; <el-input v-model="relation_label" placeholder="关系"></el-input> &#12288;
-                <span class="res_pro" v-for='i in relation' :key="i.name+`relation`+iter_num">
+                <span class="res_pro" v-for='i in relation' :key="i.key+`relation`">
                     <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input>  &#12288;
                 </span>
             </div>
             <div class="node2">
                 节点二 <el-input v-model="node2_label" placeholder="节点2标签"></el-input> &#12288;
-                <span class="n2_pro" v-for='i in node2' :key="i.name+`node2`+iter_num">
+                <span class="n2_pro" v-for='i in node2' :key="i.key+`node2`">
                     <el-input v-model="i.name" placeholder="属性名"></el-input> : <el-input v-model="i.value" placeholder="属性值"></el-input> &#12288;
                 </span>
             </div>
@@ -85,27 +85,31 @@ export default {
                     this.node1.push({
                         name: "",
                         value: "",
+                        key: this.iter_num
                     });
                 }
                 if (this.relation_label !== '') {
                     this.relation.push({
                         name: "",
                         value: "",
+                        key: this.iter_num
                     });
                 }              
                 if (this.node2_label !== '') {
                     this.node2.push({
                         name: "",
                         value: "",
+                        key: this.iter_num
                     });
                 }
             }           
         },
         search(){
+            const field = this.$store.getters.field;
             if(this.relation_label !== '' || this.node1_label !== '' || this.node2_label !== ''){
-                const node1Propery = {};
-                const node2Propery = {};
-                const relationPropery = {};
+                const node1Propery = {field: field};
+                const node2Propery = {field: field};
+                const relationPropery = {field: field};
                 for(let item of this.node1){
                     if(item.name !== '')
                         node1Propery[item.name] = item.value;
@@ -113,37 +117,22 @@ export default {
                 for(let item of this.node2){
                     if(item.name !== '')
                         node2Propery[item.name] = item.value;
+
                 }
                 for(let item of this.relation){
                     if(item.name !== '')
                         relationPropery[item.name] = item.value;
                 }
-                // const data = {
-                //     label: {
-                //         node1: this.node1_label,
-                //         node2: this.node2_label,
-                //         relation: this.relation_label,
-                //     },
-                //     propery: {
-                //         node1: node1Propery,
-                //         node2: node2Propery,
-                //         relation: relationPropery,
-                //     }
-                // }
                 const data = {
                     label: {
-                        node1: 'Person',
-                        node2: '',
-                        relation: '',
+                        node1: this.node1_label,
+                        node2: this.node2_label,
+                        relation: this.relation_label,
                     },
                     propery: {
-                        node1: {
-                            // name: 'MmeDeR'
-                        },
-                        node2: {
-                            // name: 'Myriel'
-                        },
-                        relation: {},
+                        node1: node1Propery,
+                        node2: node2Propery,
+                        relation: relationPropery,
                     }
                 }
                 const str = JSON.stringify(data);
@@ -153,12 +142,12 @@ export default {
                         nodes: res.data.data.nodes,
                         links: res.data.data.links,
                     }
-                    console.log(data);
-                    this.$store.dispatch('setNewChart', data);
+                    console.log('searchData:', data);
+                    // this.$store.dispatch('setNewChart', data);
                     this.node1_label = '';
                     this.node2_label = '';
                     this.relation_label = '';
-                    this.$emit('search');
+                    this.$emit('search', data);
                 })
             }else{
                 this.$message.error('输入框不能为空！！！');

@@ -1,9 +1,11 @@
 <template>
     <div class="index">
-        <HeaderNav @passKeyword='getKeyword'></HeaderNav>
-        <div class="rightContainer">
-          <router-view :keyword="keyword"></router-view>
-        </div>
+        <el-scrollbar style="height:100%;" wrapStyle="overflow-x:hidden;">
+          <HeaderNav @passKeyword='getKeyword'></HeaderNav>
+            <div class="rightContainer">
+              <router-view :keyword="keyword"></router-view>
+            </div>
+        </el-scrollbar>
     </div>
 </template>
 
@@ -34,6 +36,7 @@ export default {
   height: 100%;
   overflow: hidden;
 }
+
 /* .rightContainer{
   position: relative;
   top:0;

@@ -81,8 +81,8 @@ export default {
     },
     methods: {
         getNetwork: function(){
-            const username = this.$store.getters.user.name;
-            this.$http.get(`/api/networks/v1/${username}`)
+            const id = this.$store.getters.user.id;
+            this.$http.get(`/api/networks/v1/${id}`)
             .then(res => {
                 const networks = res.data.networks;
                 this.allTableData = networks;

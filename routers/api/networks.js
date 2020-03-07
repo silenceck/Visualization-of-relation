@@ -6,6 +6,7 @@ const username = require('../../config/store').neo4j.USER;
 const password = require('../../config/store').neo4j.PASSWORD;
 const instance = new Neode(uri, username, password);
 const Network = require('../../models/Network');
+const passport = require('passport');
 
 // 去除数组中的重复对象, set中相同的对象但是内存地址并不同
 function deteleObject(obj) {
@@ -55,23 +56,31 @@ router.get('/:field', (req, res) =>{
         for(let item of result.records){
             const singleRecord = item;
             let node = singleRecord.get(0).properties;
-            node.lable = singleRecord.get(0).labels[0];
+            if(field === 'Nursing') {
+                node.lable = singleRecord.get(0).labels[0];
+            }
             nodes.push(node);
         } 
         return res
     }).then(result => {
         let links = [];
-        instance.cypher('MATCH (n)-[r {field:$field}]->(m) RETURN n,r,m', {field: field})
+        instance.cypher('MATCH (n {field:$field})-[r {field:$field}]->(m {field:$field}) RETURN n,r,m', {field: field})
         .then(result => { 
             for(let item of result.records){
                 let link = {};
                 const node1 = item.get(0);
                 const relation = item.get(1);
                 const node2 = item.get(2);
-                link.field = relation.properties.field;
-                link.type = relation.properties.type;
-                link.source = node1.properties.id;
-                link.target = node2.properties.id;
+                if (field === 'Nursing' || field === 'test') {
+                    link.field = relation.properties.field;
+                    link.label = relation.properties.label;
+                    link.type = relation.properties.type;
+                    link.id = relation.properties.id;
+                    link.source = node1.properties.id;
+                    link.target = node2.properties.id;
+                }else {
+                    link = relation.properties;
+                }
                 links.push(link);
             } 
             res.json({
@@ -132,7 +141,7 @@ router.get('/v1/query', (req, res) => {
         }else if(label.node1 !== ''){
             const nodeLabel = label.node1;
             const propery = node1Propery;
-            instance.cypher(`MATCH p=(a:${nodeLabel} ${propery})-[]->(b) RETURN p`)
+            instance.cypher(`MATCH p=(a:${nodeLabel} ${propery})-[]->(b) RETURN p`) //
             .then(result => {
                 let paths = [];
                 // res.json(result.records);
@@ -306,7 +315,7 @@ router.get('/v1/query', (req, res) => {
 
 
 /**
- * @route get /api/networks/
+ * @route post /api/networks/
  * @description add new network
  * @access private
  */
@@ -321,68 +330,124 @@ router.post('/', (req, res) => {
         .then(network => {
             if(network && !isEdit){  // 
                 res.status(400).json(`${field}领域已存在`);
-            }else{
+            }else {
+                console.log('isEdit:', isEdit);
+                if(isEdit) {
+                    // edit the existed network 
+                    instance.cypher(`MATCH (p1)-[r {field: $field}]-(p2)  DELETE r`, {field: field})
+                    .then(result =>{
+                        
+                    })
+                    .catch(err => {
+                        res.status(404).json(err);
+                    })
+                    instance.cypher(`MATCH(p {field: $field}) DETACH DELETE p`, {field: field})
+                    .then(result =>{
+                        
+                    })
+                    .catch(err => {
+                        res.status(404).json(err);
+                    })
+                    Network.findOneAndRemove({field: field})
+                    .then(network => {
+                        console.log('删除成功');
+                    })
+                    .catch(err => {
+                        res.status(404).json(err);
+                    });
+                }
                 // nodes and links are classified by the label of node and link.
                 const linksSize = Object.getOwnPropertyNames(links).length;    
                 const nodesSize = Object.getOwnPropertyNames(nodes).length;
-                let Num = 1;
+                let nodesNum = 0; 
+                for(let key in nodes){
+                    let item = nodes[key];
+                    nodesNum += item.length; 
+                }
+                let linksNum = 0; 
+                for(let key in links){
+                    let item = links[key];
+                    linksNum += item.length; 
+                }
+                let Num = 0;
+                console.log('nodeNum, linkNum:', nodesNum, linksNum);
                 for(let key in nodes){
                     instance.cypher(`UNWIND $nodes AS properties CREATE (n:${key}) SET n = properties RETURN n`, {nodes: nodes[key] })
                     .then(result =>{
-                        if(Num !== nodesSize + linksSize){
-                            Num = Num + 1;
-                        }else{
-                            res.json({
-                                message: "success"
-                            })
+                        Num = Num + 1;
+                        console.log("addnode Num:", Num);
+                        if(Num === nodesSize){
+                            if(linksSize === 0) {
+                                const network = new Network({
+                                    username: user.id,
+                                    field: field,
+                                    numOfNodes: nodesNum,
+                                    numOfLinks: linksNum,
+                                    time: new Date(),
+                                })
+                                network.save().then(network => {
+                                    res.json({
+                                        message: "success"
+                                    })
+                                }).catch(err => {
+                                    res.status(404).json(err);
+                                })
+                            }else {
+                                for(let key in links){
+                                    instance.cypher(`UNWIND $links AS link MATCH (a { id: link.source, field: $field }) MATCH (b {id: link.target, field: $field }) MERGE (a)-[:${key} {id: link.id}]->(b)`,
+                                        { links: links[key], field: field})
+                                    .then(result =>{
+                                        Num = Num + 1;
+                                        console.log("addlink Num:", Num);
+                                        if(Num === nodesSize + linksSize){
+                                            for(let key in links){
+                                                for(let item of links[key]){
+                                                    instance.cypher(`MATCH (a)-[n:${key}{id:$id}]-(b)  SET n = $props RETURN n.name`, {
+                                                        id: item.id,
+                                                        props: item.propery
+                                                    })
+                                                    .then(result =>{
+                                                    })
+                                                    .catch(err => {
+                                                        res.status(404).json(err);
+                                                    })
+                                                }
+                                            }
+                                            console.log('key:', key);
+                                            const network = new Network({
+                                                username: user.id,
+                                                field: field,
+                                                numOfNodes: nodesNum,
+                                                numOfLinks: linksNum,
+                                                time: new Date(),
+                                            })
+                                            network.save().then(network => {
+                                                res.json({
+                                                    message: "success"
+                                                })
+                                            }).catch(err => {
+                                                res.status(404).json(err);
+                                            })
+                                            
+                                        }
+                                    })
+                                    .catch(err => {
+                                        res.status(404).json(err);
+                                    })
+                                }
+                                // set properies of relationships
+                                
+                            }
                         }
                     })
                     .catch(err => {
                         res.status(404).json(err);
                     })
                 }
-                for(let key in links){
-                    instance.cypher(`UNWIND $links AS link MATCH (a {id:link.source}) MATCH (b{id:link.target }) MERGE (a)-[:${key} {id: link.id}]->(b) `,
-                        { links: links[key]})
-                    .then(result =>{
-                        if(Num !== nodesSize + linksSize){
-                            Num = Num + 1;
-                        }else{
-                            const network = new Network({
-                                username: user.name,
-                                field: field,
-                                numOfNodes: nodesSize,
-                                numOfLinks: linksSize,
-                            })
-                            network.save().then().catch(err => {
-                                res.status(404).json(err);
-                            })
-                            res.json({
-                                message: "success"
-                            })
-                        }
-                    })
-                    .catch(err => {
-                        res.status(404).json(err);
-                    })
-                }
-
-                // set properies of relationships
-                for(let key in links){
-                    for(let item of links[key]){
-                        instance.cypher(`MATCH (a)-[n:${key}{id:$id}]-(b)  SET n = $props RETURN n.name`, {
-                            id: item.id,
-                            props: item.propery
-                        })
-                        .then(result =>{
-                        })
-                        .catch(err => {
-                            res.status(404).json(err);
-                        })
-                    }
-                }
-                        }
-                    })
+                
+                
+            }
+        })
                 
 })
 
@@ -392,8 +457,8 @@ router.post('/', (req, res) => {
  * @description find some items whose name property is username
  * @access private
  */
-router.get('/v1/:username', (req, res) => {
-    const username = req.params.username;
+router.get('/v1/:id', (req, res) => {
+    const id = req.params.id;
     // const network = new Network({
     //     username: username,
     //     field: 'test',
@@ -404,7 +469,8 @@ router.get('/v1/:username', (req, res) => {
     // network.save().then().catch(err => {
     //     console.log(err);
     // });
-    Network.find({username: username})
+    // Network.find()
+    Network.find()
     .then(networks => {
         res.json({networks: networks})
     });
@@ -414,7 +480,7 @@ router.get('/v1/:username', (req, res) => {
 
 /**
  * @route delete /api/networks/:id
- * @description find some items whose name property is username
+ * @description delte one network assigned by id 
  * @access private
  */
 router.delete('/:id', (req, res) => {
@@ -432,7 +498,7 @@ router.delete('/:id', (req, res) => {
 
 
 /**
- * @route delete /api/networks/name
+ * @route get /api/networks/name
  * @description find all nodes' name
  * @access public
  */

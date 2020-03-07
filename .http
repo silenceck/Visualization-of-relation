@@ -31,18 +31,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkZTcxMzJjM
 
 GET  http://localhost:5000/api/profiles/test HTTP/1.1
 
-### 添加profile 
-POST http://localhost:5000/api/profiles/ HTTP/1.1
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkM2YwNGYyNTM5ZTZhNDg5MDczOTkyNSIsIm5hbWUiOiJjaGVuZ2t1biIsImF2YXRhciI6Ii8vd3d3LmdyYXZhdGFyLmNvbS9hdmF0YXIvNWNkNGY1NTdlMWIyYzE1M2NmOTQ0ZjVkNWE4NDE2NWU_cz0yMDAmcj1wZyZkPW1tIiwiaWRlbnRpdHkiOiJlbXBsb3llZSIsImlhdCI6MTU2NDQxNDk5NiwiZXhwIjoxNTY0NDE4NTk2fQ.O0FV4BznI8pXi9tzLEwMDLF10X6DkV1Ey-DnM8OHDtg
-
-{
-    "type": "优惠券",
-    "income": "1111",
-    "expend": "123456",
-    "cash": "123456",
-    "remark": "很好"
-}
 
 
 ### text

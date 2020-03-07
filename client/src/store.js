@@ -10,6 +10,7 @@ const types = {
   SET_AUTHENTICATED: "SET_AUTHENTICATED",
   SET_USER: "SET_USER",
   SET_NEWCHART: "SET_NEWCHART",
+  SET_FIELD: "SET_FIELD",
   ADD_NODE: "ADD_NDOE",
   ADD_EDGE: "ADD_EDGE",
   DELETE_NODE: "DELETE_NODE",
@@ -24,6 +25,7 @@ const state = {
     nodes: [],
     links: []
   },
+  field: '',
   sidebar: {
     opened: true,
     withoutAnimation: false
@@ -39,6 +41,7 @@ const getters = {
   isAuthenticated: state => state.isAuthenticated,
   user: state => state.user,
   newChart: state => state.newChart,
+  field: state => state.field,
   sidebar: state => state.sidebar,
   device: state => state.device,
   avatar: state => state.avatar,
@@ -56,6 +59,10 @@ const mutations = {
   [types.SET_NEWCHART](state, newChart) {
     if (newChart) state.newChart = newChart;
     else state.newChart = {}
+  },
+  [types.SET_FIELD](state, field) {
+    if (field) state.field = field;
+    else state.field = ''
   },
   [types.ADD_NODE](state, node) {
     if (node) state.newChart.nodes.push(node);
@@ -75,7 +82,7 @@ const mutations = {
     if (info) state.newChart.links = state.newChart.links.filter(link => {
       return link.id !== info.id;
     });
-    else state.links = []
+    else state.links = [];
   },
   [types.UPDATE_NODE](state, info) {
     if (info) {
@@ -134,6 +141,9 @@ const actions = {
   },
   setNewChart: ({commit}, newChart) => {
     commit(types.SET_NEWCHART, newChart)
+  },
+  setField: ({commit}, field) => {
+    commit(types.SET_FIELD, field)
   },
   addNode: ({commit}, node) => {
     commit(types.ADD_NODE, node)

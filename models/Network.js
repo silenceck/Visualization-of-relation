@@ -21,7 +21,7 @@ const NetworkSchema = new Schema({
     },
     time: {
         type: Date,
-        required: true
+        default: new Date(),
     }
 })
 

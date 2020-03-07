@@ -893,7 +893,7 @@ export default {
 }
 .box-card {
     width: 480px;
-    height: 800px;
+    height: 100%;
 }
 // .el-tree>.el-tree-node{display:inline-block;}
 // .el-tree {
