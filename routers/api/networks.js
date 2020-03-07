@@ -75,6 +75,7 @@ router.get('/:field', (req, res) =>{
                     link.field = relation.properties.field;
                     link.label = relation.properties.label;
                     link.type = relation.properties.type;
+                    link.diagnosis = relation.properties.diagnosis;
                     link.id = relation.properties.id;
                     link.source = node1.properties.id;
                     link.target = node2.properties.id;

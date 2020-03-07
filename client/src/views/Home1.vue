@@ -27,7 +27,7 @@
                             <span>{{click_node.name}}</span>
                         </div>
                         <div v-for="(value, name, index) in click_node" :key="index" class="text item">
-                            <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable'" >
+                            <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable' && name !== 'source' && name !== 'target'" >
                                 <span v-bind:style="{ fontWeight:'bold' }">{{name + ':' }}</span> {{value }} 
                             </div>                         
                         </div>
@@ -645,6 +645,7 @@ export default {
             .then(res => {
                 this.nodes = res.data.nodes;
                 this.links = res.data.links;
+                console.log(this.nodes, this.links);
                 let outcomeNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
                 let InterventionNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
                 for(let node of this.nodes){
@@ -743,25 +744,57 @@ export default {
                 };
                 myChart.setOption(option);
                 const that = this;
-                myChart.on('click', {dataType: 'node'},function (params) {               
-                    const id = params.data.id;
-                    const links = that.links.filter( link => { return link.source === id || link.target === id });
-                    that.click_node = that.nodes.filter( node => { return node.id === id })[0];
-                    let seleted_node = new Set();
-                    for(let link in links) {
-                        seleted_node.add(links[link].source);
-                        seleted_node.add(links[link].target); 
+                myChart.on('click', function (params) {
+                    if (params.componentType === 'markPoint') {
+                        // 点击到了 markPoint 上
+                        if (params.seriesIndex === 5) {
+                            // 点击到了 index 为 5 的 series 的 markPoint 上。
+                        }
                     }
-                    const nodes = that.nodes.filter( node => { return seleted_node.has(node.id) })
-                    const option = {
-                        series : [
-                            {         
-                                data: nodes,
-                                links: links,
+                    else if (params.componentType === 'series') {
+                        if (params.seriesType === 'graph') {
+                            if (params.dataType === 'edge') {
+                                // 点击到了 graph 的 edge（边）上。
+                                const data = params.data
+                                const links = that.links.filter( link => { return link.source === data.source && link.target === data.target });
+                                console.log('link:', links)
+                                that.click_node = links[0];
+                                const nodes = that.nodes.filter( node => { return node.id === data.source || node.id === data.target });
+                                const option = {
+                                    series : [
+                                        {         
+                                            data: nodes,
+                                            links: links,
+                                        }
+                                    ]
+                                };
+                                myChart.setOption(option);
                             }
-                        ]
-                    };
-                    myChart.setOption(option);
+                            else {
+                                // 点击到了 graph 的 node（节点）上。
+                                const id = params.data.id;
+                                const links = that.links.filter( link => { return link.source === id || link.target === id });
+                                that.click_node = that.nodes.filter( node => { return node.id === id })[0];
+                                let seleted_node = new Set();
+                                for(let link in links) {
+                                    seleted_node.add(links[link].source);
+                                    seleted_node.add(links[link].target); 
+                                }
+                                
+                                const nodes = that.nodes.filter( node => { return seleted_node.has(node.id) });
+                                console.log('node:', nodes, links);
+                                const option = {
+                                    series : [
+                                        {         
+                                            data: nodes,
+                                            links: links,
+                                        }
+                                    ]
+                                };
+                                myChart.setOption(option);
+                            }
+                        }
+                    }
                 });
             })
         },
@@ -823,6 +856,7 @@ export default {
         },
         handleNodeClick: function(data) {
             const label = data.label;
+            console.log('label:', label);
             const id = this.nodes.find(item => item.name === label).id;
             let myChart = this.$echarts.init(document.getElementById('main'));
             const links = this.links.filter( link => { return link.source === id || link.target === id });
