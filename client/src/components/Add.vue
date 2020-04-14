@@ -1,7 +1,7 @@
 <template>
     <div class="add">     
         <div class="field">
-            <el-input v-model="field" placeholder="field"></el-input>
+            Field:&#12288;<el-input v-model="field" ></el-input>
         </div>   
         <div class="propery">
             <el-row :gutter="24">
@@ -17,9 +17,9 @@
                 <el-col class="relation" :span="12">
                     <div class="title">&#12288; 关系</div>
                     <div class="relation_label" > 
-                        <el-input v-model="source_id" placeholder="source_name" :disabled="updateLable  && showinfo.type === 'link'"></el-input>--
+                        <el-input v-model="source_id" placeholder="source" :disabled="updateLable  && showinfo.type === 'link'"></el-input>--
                         <el-input v-model="relation_label" placeholder="link_label" :disabled="updateLable  && showinfo.type === 'link'"></el-input> --
-                        <el-input v-model="target_id" placeholder="target_name" :disabled="updateLable  && showinfo.type === 'link'"></el-input>
+                        <el-input v-model="target_id" placeholder="target" :disabled="updateLable  && showinfo.type === 'link'"></el-input>
                     </div>
                     <div class="res_pro" v-for='i in relation' :key="i.key+`relation`">
                         <el-input v-model="i.name" placeholder="name"></el-input> : <el-input v-model="i.value" placeholder="value"></el-input>  &#12288;
@@ -58,14 +58,14 @@ export default {
             node_id: 0,
             link_id: 0,
             iter_num: 1,
-            node_label: 'a',
+            node_label: '',
             source_id: '',
             relation_label: '',
             target_id: '',
             node: [
                 {
-                    name: "name",
-                    value: "1",
+                    name: "",
+                    value: "",
                     key: 1,
                 }
             ],
@@ -85,7 +85,7 @@ export default {
         };
     },
     mounted: function(){
-        // console.log('newChart:', this.$store.getters.newChart);
+        console.log('newChart:', this.$store.getters.newChart);
         const field = this.$route.query.field;
         this.$emit('finish-adding', '') // set showinfo to be null
         if(field){
@@ -93,7 +93,8 @@ export default {
             this.$http.get(`/api/networks/${field}`)
             .then(res => {
                 const newChart = res.data;
-                // console.log('edit:', newChart);
+                this.field = field;
+                console.log('edit:', newChart);
                 let min = 0;
                 newChart.nodes.forEach(element => {
                     if(Number(element.id) > min) {
@@ -134,31 +135,31 @@ export default {
         },
         add_propery: function(){
             // 清空节点属性
-            this.node_label = '';
-            for(let i of this.node){
-                i.name = '';
-                i.value = '';
-            }
-            this.relation = [
-                {
-                    name: "a",
-                    value: "a",
-                    key: 1,
-                }
-            ]
-            // if (this.iter_num < 3) {
-            //     this.iter_num += 1;
-            //     this.node.push({
-            //         name: "",
-            //         value: "",
-            //         key: this.iter_num,
-            //     });
-            //     this.relation.push({
-            //         name: "",
-            //         value: "",
-            //         key: this.iter_num,
-            //     });
-            // }           
+            // this.node_label = '';
+            // for(let i of this.node){
+            //     i.name = '';
+            //     i.value = '';
+            // }
+            // this.relation = [
+            //     {
+            //         name: "a",
+            //         value: "a",
+            //         key: 1,
+            //     }
+            // ]
+            if (this.iter_num < 3) {
+                this.iter_num += 1;
+                this.node.push({
+                    name: "",
+                    value: "",
+                    key: this.iter_num,
+                });
+                this.relation.push({
+                    name: "",
+                    value: "",
+                    key: this.iter_num,
+                });
+            }           
         },
         add_element: function(){
             // all nodes and links need to have name propery
@@ -172,8 +173,15 @@ export default {
                     const value = i.value;
                     if(name !== "" && value !== ''){
                         node[name] = value;
-                    }else {
-                        this.$message.error('属性内容不能为空！！！');
+                    }
+                    // else {
+                    //     this.$message.error('属性内容不能为空！！！');
+                    //     return;
+                    // }
+                }
+                for(let item of this.nodes) {
+                    if(item.name === node.name) {
+                        this.$message.error('节点名称重复！！！');
                         return;
                     }
                 }
@@ -214,10 +222,11 @@ export default {
                     const value = i.value;
                     if(name !== "" && value !== ''){
                         link[name] = value;
-                    }else {
-                        this.$message.error('属性内容不能为空！！！');
-                        return;
                     }
+                    // else {
+                    //     this.$message.error('属性内容不能为空！！！');
+                    //     return;
+                    // }
                 }
                 this.link_id = this.link_id + 1;
                 this.$store.dispatch('addLink', link);
@@ -262,6 +271,7 @@ export default {
                             let info = {};
                             info.field = this.showinfo.field;
                             info.label = this.showinfo.label;
+                            info.value = info.label;
                             info.id = this.showinfo.id;
                             info.source = this.showinfo.source;
                             info.target = this.showinfo.target;
@@ -297,7 +307,6 @@ export default {
             const isAuthenticated = this.$store.getters.isAuthenticated;
             if(isAuthenticated){
                 const chartData = this.$store.getters.newChart;
-                console.log('chartData:', chartData);
                 let nodes = chartData.nodes;
                 let links = chartData.links;
                 // const field = this.$route.query.field;
@@ -360,12 +369,14 @@ export default {
                         message: "网络生成成功",
                         type: "success"
                     })
-                    this.$store.dispatch('setNewChart', {nodes:{}, links: {}});
-                });
-                this.nodes = [];
-                this.links = [];
-                this.isEdit = false;
-                this.$emit('finish-adding', '') // set showinfo to be ''
+                    this.$store.dispatch('setNewChart', {nodes:[], links: []});
+                    this.nodes = [];
+                    this.links = [];
+                    this.isEdit = false;
+                    this.field = '';
+                    this.$emit('finish-adding', '') // set showinfo to be ''
+                    });
+                
             }else{
                 this.$message({
                     message: '用户未登录！！！',

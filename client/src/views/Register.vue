@@ -18,12 +18,12 @@
                     <el-form-item label="确认密码" prop="checkPass">
                         <el-input type="password" v-model="registerUser.checkPass" placeholder="请确认密码"></el-input>
                     </el-form-item>
-                    <el-form-item label="选择身份" prop="identity">
+                    <!-- <el-form-item label="选择身份" prop="identity">
                         <el-select v-model="registerUser.identity" placeholder="请选择">
                             <el-option label="管理员" value="manager"> </el-option>
                             <el-option label="用户" value="employee"> </el-option>
                         </el-select>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item>
                         <el-button type="primary" class="submit_btn" @click="submitForm('registerForm')">注册</el-button>
                     </el-form-item>
@@ -51,7 +51,7 @@ export default {
                 email: "",
                 password: "",
                 checkPass: "",
-                identity: "",
+                identity: "user",
             },
             rules:{
                 name: [
@@ -133,7 +133,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background: url(../assets/bg1.jpg) no-repeat center center;
+  background: url(../assets/bg2.jpg) no-repeat center center;
   background-size: 100% 100%;
 }
 .form_container {

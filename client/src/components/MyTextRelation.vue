@@ -75,8 +75,14 @@ export default {
             const username = this.$store.getters.user.name;
             this.$http.get(`/api/texts/v1/${username}`)
             .then(res => {
-                console.log(res.data);
                 const texts = res.data.texts;
+                for(let text of texts) {
+                    const date = new Date(text.time);
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1;
+                    const day = date.getDate();
+                    text.time = year + '/' + month + '/' + day; 
+                }
                 this.allTableData = texts;
                 this.filterTableData = texts;
                 this.setPaginations();

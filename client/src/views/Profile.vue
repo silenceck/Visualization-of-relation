@@ -38,7 +38,7 @@ export default {
     margin-top: 5%;
 }
 .rightContainer {
-    width: 1000px;
+    width: 1200px;
     height: 855px;
     margin-left: 20px;
     margin-top: 5%;

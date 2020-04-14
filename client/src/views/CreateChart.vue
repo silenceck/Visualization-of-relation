@@ -3,20 +3,168 @@
         <div class="container">
             <el-row :gutter="20" class="row">               
                 <el-col :span='12' class="col1">  
+                    <div @click="undo" v-bind:style="{cursor:'pointer' }"> <i id="undo" class="icon el-icon-refresh-left" >undo</i></div>
+                    <!-- <el-button id="undo" icon="custom-icon el-icon-refresh-left" @click="undo">undo</el-button> -->
                     <div id="main" class="chart"></div> 
                 </el-col>
                 <el-col :span='12' class="col2">
                     &#12288;&#12288;&#12288;&#12288;
-                    <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
-                    <router-link to="/search"><i class="el-icon-search"></i></router-link>
-                    <div class="add_search" >
+                    <!-- <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
+                    <router-link to="/search"><i class="el-icon-search"></i></router-link> -->
+                    <!-- <div class="add_search" >
                         <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive" v-on:search="searchData" ref="add" @finish-adding='setShowinfo'></router-view>
-                    </div>
+                    </div> -->
+                    <div class="rightArea">
+                        <el-button type="text" @click="dialogFormVisible = true" class="button">添加概念</el-button>
+                        <el-button type="text" @click="dialogRelationVisible = true" class="button">添加关系</el-button>
+                        <el-dialog title="新增概念" :visible.sync="dialogFormVisible"  width="30%" top="25vh" :before-close="handleFormClose">
+                                    <div class="dialog">概念名称</div> 
+                                    <el-input class="dialog" v-model="type"></el-input> 
+                                    <div class="dialog">属性名称</div> 
+                                    <div class="dialog" v-for='i in property' :key="i.key+`property`">
+                                        <el-input v-model="i.name"></el-input> 
+                                    </div>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button  @click="addProperty">添加属性</el-button>
+                            <el-button @click="formCancel">取 消</el-button>
+                            <el-button type="primary" @click="addConcept">确 定</el-button>
+                        </div>
+                        </el-dialog>
+                        <el-table
+                            :data="conceptTabelData"
+                            style="width: 600px;fontSize: 15px;">
+                            <el-table-column
+                                prop="number"
+                                label="序号"
+                                width="180">
+                            </el-table-column>
+                            <el-table-column
+                                prop="concept"
+                                label="概念名称"
+                                width="180">
+                            </el-table-column>
+                            <el-table-column
+                            label="操作"
+                            width="240">
+                                <template slot-scope="scope">
+                                    <el-button
+                                    size="mini"
+                                    @click="addEntity(scope.$index, scope.row)" type='primary' icon="el-icon-plus">添加实例</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div class="pagination">
+                        <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="paginations.page_index"
+                            :page-sizes="paginations.page_sizes"
+                            :page-size="paginations.page_size"
+                            :layout="paginations.layout"
+                            :total="paginations.total">
+                        </el-pagination>
+                        </div>
+                        <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">查询</el-button> &#12288;
+                        <el-button type="text" class="button" @click="quitQuery" v-if="queryLabel === true">退出查询</el-button>
+                        <el-button type="text" class="button" @click="dialogNetworkVisible = true">保存</el-button>
+                        <el-upload
+                            class="upload-demo"
+                            ref="upload"
+                            action="http://localhost:8080/api/networks/v1/file"
+                            :on-success="uploadSuccess"
+                            :on-preview="handlePreview"
+                            :on-remove="handleRemove"
+                            :file-list="fileList"
+                            :before-upload="beforeUpload"
+                            :auto-upload=false>
+                            <el-button slot="trigger" size="small" type="primary" class="button" icon="el-icon-folder-opened">选取文件</el-button>
+                            <el-button style="margin-left: 10px; fontSize: 16px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">上传</el-button>
+                        </el-upload>
+                        <el-dialog title="新增实例" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
+                                <!-- <el-form :model="form"> -->
+                                    <!-- <el-form-item label="概念名称" :label-width="formLabelWidth"> -->
+                                        <div class="dialog">实例类别: {{entity.label}}</div> 
+                                        <!-- <el-input class="dialog" v-model="type"></el-input>  -->
+                                        <div class="dialog" v-for='i in entityProperty' :key="i.key+`property`">
+                                            {{i.name}} <el-input v-model="i.value" class="dialog"></el-input> 
+                                        </div>
+                                    <!-- </el-form-item> -->
+                                <!-- </el-form> -->
+                            <div slot="footer" class="dialog-footer">
+                                <el-button @click="dialogEntityVisible = false;entityProperty = [];">取 消</el-button>
+                                <el-button type="primary" @click="addNode">确 定</el-button>
+                            </div>
+                        </el-dialog>
+                        <el-dialog title="新增关系" :visible.sync="dialogRelationVisible"  width="30%" top="25vh" :before-close="handleRelationClose">
+                            <div class="dialog">关系名称</div> 
+                            <el-input class="dialog" v-model="relationType"></el-input> 
+                            <div class="dialog">节点1名称</div> 
+                            <el-input class="dialog" v-model="sourceNodeName"></el-input> 
+                            <div class="dialog">节点2名称</div> 
+                            <el-input class="dialog" v-model="targetNodeName"></el-input> 
+                            <div slot="footer" class="dialog-footer">
+                                <el-button @click="RelationCancel">取 消</el-button>
+                                <el-button type="primary" @click="addRelation">保 存</el-button>
+                            </div>
+                        </el-dialog>
+                        <el-dialog title="确定领域" :visible.sync="dialogNetworkVisible"  width="30%" top="25vh" >
+                            <div class="dialog">领域名称</div>  
+                            <el-input class="dialog" v-model="field"></el-input> 
+                            <div slot="footer" class="dialog-footer">
+                                <el-button @click="dialogNetworkVisible = false">取 消</el-button>
+                                <el-button type="primary" @click="addNetwork">保 存</el-button>
+                            </div>
+                        </el-dialog>
+                        <el-dialog title="更新元素" :visible.sync="dialogUpdateVisible"  width="30%" top="25vh" :before-close="handleUpdateClose"  >
+                            <div v-if="showinfo !== null">
+                                <!-- <div class="dialog">label:{{showinfo.label}}</div> -->
+                                <!-- <el-input class="dialog" v-model="showinfo.label"></el-input> -->
+                                <div class="dialog" v-for='i in showinfoDetail' :key="i.name+`showinfo`">
+                                    <div v-if=" i.name !== 'field'&& i.name !== 'id'&& i.name !== 'type'">
+                                        <span class="dialog">{{i.name}}</span>  <el-input v-model="i.value" class="dialog" :disabled="i.name === 'label'"></el-input>
+                                    </div>
+                                </div> 
+                            </div>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button @click="updateCancel">取 消</el-button>
+                                <el-button type="primary" @click="updateElement">更 新</el-button>
+                            </div>
+                        </el-dialog>
+                        <el-dialog title="查询元素" :visible.sync="dialogQueryVisible"  width="30%" top="25vh" :before-close="handleQueryClose"  >
+                            <div>
+                                <el-row :gutter="20">
+                                    <el-col :span='8'>
+                                        <el-input v-model="querySourceLabel" class="query" placeholder="source_label"></el-input>
+                                        <span class="n1_pro" v-for='i in sourceNodeProperty' :key="i.key+`node1`">
+                                            <div ><el-input class="n1_pro" v-model="i.name" placeholder="name" ></el-input> : <el-input class="n1_pro" v-model="i.value" placeholder="value" ></el-input>  &#12288;</div>
+                                        </span>
+                                    </el-col>
+                                    <el-col :span='8'>
+                                        <el-input v-model="queryRelationLabel" class="query" placeholder="relation_label"></el-input>
+                                    </el-col>
+                                    <el-col :span='8'>
+                                        <el-input v-model="queryTargetLabel" class="query" placeholder="target_label"></el-input>
+                                        <span class="n1_pro" v-for='i in targetNodeProperty' :key="i.key+`node1`">
+                                            <div><el-input class="n1_pro" v-model="i.name" placeholder="name"></el-input> : <el-input class="n1_pro" v-model="i.value" placeholder="value"></el-input>  &#12288;</div>
+                                        </span>
+                                    </el-col>
+                                </el-row>
+                            </div>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button class="add_btn" @click="addQueryProperty">添加属性</el-button>
+                                <el-button @click="handleQueryClose">取 消</el-button>
+                                <el-button type="primary" @click="query">查 询</el-button>
+                            </div>
+                        </el-dialog>
+                    </div> 
+                    
                 </el-col>
             </el-row>
             <el-row :gutter="20">
                 <el-col :span="12">
-                    <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:</span>{{val}} </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="update_element(showinfo)">更新</el-button><el-button class="delete" @click="delete_element(showinfo)">删除</el-button></span></div>
+                    <transition name="slide-fade">
+                        <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:</span>{{val}} </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">更新</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">删除</el-button></span></div>
+                    </transition>
                 </el-col>
             </el-row>
         </div>
@@ -27,297 +175,183 @@ export default {
     name: 'create_chart',
     data() {
         return {
-            showinfo: null, // transmit showinfo to Child components namely Add.vue
+            showinfo: null,
+            showinfoDetail: [], // transmit showinfo to Child components namely Add.vue
             updateLable: false, // transmit updateLable to Child components namely Add.vue 
+            dialogFormVisible: false,
+            dialogEntityVisible: false,
+            dialogRelationVisible: false,
+            dialogNetworkVisible: false,
+            dialogUpdateVisible: false,
+            dialogQueryVisible: false,
+            isEdit: false,
+            type: '', // 概念类别
+            relationType: '',
+            sourceNodeName: '',
+            targetNodeName: '',
+            concepts: [],
+            property: [
+                {
+                    name: "name",
+                    value: '',
+                    key: 1,
+                }
+            ],
+            field:'',
+            entityProperty: [], 
+            conceptNum: 1,
+            iter_num: 1,
+            entity: {}, // 
+            nodeId: 0,
+            linkId: 0,
+            conceptTabelData: [],
+            allTableData: [],
+            filterTableData: [],
+            paginations: {
+                page_index: 1, // 当前位于哪一页
+                total: 0, // 总数
+                page_size: 5, // 一页显示多少条
+                page_sizes: [5,10], // 每页显示多少条
+                layout: 'total,sizes,prev,pager,next,jumper' //翻页属性
+            },
+            nodes: [],
+            links: [],
+            querySourceLabel: '',
+            queryRelationLabel: '',
+            queryTargetLabel: '',
+            sourceNodeProperty: [],
+            // relationProperty: [], 
+            targetNodeProperty: [],
+            queryNum: 1,
+            queryLabel: false, // 判断当前的数据是否是查询结果
+            queryNodes: [],
+            queryLinks: [],
+            fileList: [],
+            graphHistory: [{nodes: [], links: []}], // graph快照
+            graphQueryHistory: [], // 查询模式graph快照
         }
     },
     mounted: function(){
-        this.getChartData()
+        const field = this.$route.query.field;
+        const relationData = this.$route.params.RelationData; // 因果关系提取页面传递的数据
+        this.$emit('finish-adding', '') // set showinfo to be null
+        if(field){
+            this.isEdit = true;
+            this.$http.get(`/api/networks/${field}`)
+            .then(res => {
+                const newChart = res.data;
+                this.field = field;
+                console.log('edit:', newChart);
+                let min = 0;
+                newChart.nodes.forEach(element => {
+                    if(Number(element.id) > min) {
+                        min = Number(element.id);
+                    }
+                });
+                this.nodeId = min + 1;
+                min = 0;
+                newChart.links.forEach(element => {
+                    if(Number(element.id) > min) {
+                        min = Number(element.id);
+                    }
+                });
+                this.linkId = min + 1;
+                this.nodes = newChart.nodes;
+                this.links = newChart.links;
+                const record = {nodes: this.nodes, links: this.links};
+                this.graphHistory.push(this.deepClone(record));
+                // add concept
+                for (let node of this.nodes) {
+                    let concept = {};
+                    if(!this.conceptTabelData.find(item => item.concept === node.label)) {
+                        concept.type = node.label;
+                        let propertyName = [];
+                        for(let property in node) {
+                            if(property !== 'draggable' && property !== 'field' && property !== 'id' && property !== 'category' && property !== 'type' && property !== 'label') {
+                                propertyName.push(property);
+                            }
+                        }
+                        concept.property = propertyName;
+                        this.concepts.push(concept);
+                        this.conceptTabelData.push({
+                            number: this.conceptNum,
+                            concept: concept.type,
+                        }) 
+                        this.conceptNum += 1;
+                    }
+                }
+                // this.$store.dispatch('setNewChart', newChart);
+                // this.$store.dispatch('setField', field);
+            })
+        }
+        this.getChartData();
+        // 
+        if(relationData) {
+            let node = [];
+            for(let relation of relationData) {
+                let sourceId = null;
+                let targetId = null;
+                if(!node.includes(relation.keyword1)){
+                    node.push(relation.keyword1);
+                    this.nodes.push({
+                        name: relation.keyword1,
+                        id: String(this.nodeId),
+                        label: 'causality',
+                        type: 'causality',
+                    })
+                    sourceId = String(this.nodeId);
+                    this.nodeId += 1;
+                } else {
+                    sourceId = this.nodes.find(element => element.name === relation.keyword1).id;
+                }
+                if(!node.includes(relation.keyword2)){
+                    node.push(relation.keyword2);
+                    this.nodes.push({
+                        name: relation.keyword2,
+                        id: String(this.nodeId),
+                        label: 'causality',
+                        type: 'causality',
+                    })
+                    targetId = String(this.nodeId);
+                    this.nodeId += 1;
+                } else  {
+                    targetId = this.nodes.find(element => element.name === relation.keyword2).id;
+                }
+                let relationType = null;
+                if (relation.relation === 1) {
+                    relationType = 'casues';
+                } else if (relation.relation === 2) {
+                    relationType = 'is_caused_by';
+                } else if (relation.relation === 3) {
+                    relationType = 'is_related_with';
+                } else if (relation.relation === 0) {
+                    continue;
+                }
+                this.links.push({
+                    source: sourceId,
+                    target: targetId,
+                    id: String(this.linkId),
+                    label: relationType,
+                })
+                this.linkId += 1;
+            }
+        }
     },
-    computed: {
-        nodes(){
-            return this.$store.getters.newChart.nodes
-        },
-        links(){
-            return this.$store.getters.newChart.links
-        },
+    // computed: {
+    //     nodes(){
+    //         return this.$store.getters.newChart.nodes
+    //     },
+    //     links(){
+    //         return this.$store.getters.newChart.links
+    //     },
+    // },
+    beforeRouteLeave(to, form, next) {
+        this.$store.dispatch('setNewChart', {nodes:[], links: []});
+        next()
     },
     methods: {
         getChartData: function(){
             let myChart = this.$echarts.init(document.getElementById('main'));
-            // var categories = [];
-            // for (var i = 0; i < 9; i++) {
-            //     categories[i] = {
-            //         name: '类目' + i
-            //     };
-            // }
-            // this.nodes = [];
-            
-            // this.links = [
-                //     {id: "0", name: null, source: "1", target: "0", lineStyle: {}},
-                //     {id: "1", name: null, source: "2", target: "0", lineStyle: {}},
-                //     {id: "2", name: null, source: "3", target: "0", lineStyle: {}},
-                //     {id: "3", name: null, source: "3", target: "2", lineStyle: {}},
-                //     {id: "4", name: null, source: "4", target: "0", lineStyle: {}},
-                //     {id: "5", name: null, source: "5", target: "0", lineStyle: {}},
-                //     {id: "6", name: null, source: "6", target: "0", lineStyle: {}},
-                //     {id: "7", name: null, source: "7", target: "0", lineStyle: {}},
-                //     {id: "8", name: null, source: "8", target: "0", lineStyle: {}},
-                //     {id: "9", name: null, source: "9", target: "0", lineStyle: {}},
-                //     {id: "13", name: null, source: "11", target: "0", lineStyle: {}},
-                //     {id: null, name: null, source: "11", target: "2", lineStyle: {}},
-                //     {id: "11", name: null, source: "11", target: "3", lineStyle: {}},
-                //     {id: "10", name: null, source: "11", target: "10", lineStyle: {}},
-                //     {id: "14", name: null, source: "12", target: "11", lineStyle: {}},
-                //     {id: "15", name: null, source: "13", target: "11", lineStyle: {}},
-                //     {id: "16", name: null, source: "14", target: "11", lineStyle: {}},
-                //     {id: "17", name: null, source: "15", target: "11", lineStyle: {}},
-                //     {id: "18", name: null, source: "17", target: "16", lineStyle: {}},
-                //     {id: "19", name: null, source: "18", target: "16", lineStyle: {}},
-                //     {id: "20", name: null, source: "18", target: "17", lineStyle: {}},
-                //     {id: "21", name: null, source: "19", target: "16", lineStyle: {}},
-                //     {id: "22", name: null, source: "19", target: "17", lineStyle: {}},
-                //     {id: "23", name: null, source: "19", target: "18", lineStyle: {}},
-                //     {id: "24", name: null, source: "20", target: "16", lineStyle: {}},
-                //     {id: "25", name: null, source: "20", target: "17", lineStyle: {}},
-                //     {id: "26", name: null, source: "20", target: "18", lineStyle: {}},
-                //     {id: "27", name: null, source: "20", target: "19", lineStyle: {}},
-                //     {id: "28", name: null, source: "21", target: "16", lineStyle: {}},
-                //     {id: "29", name: null, source: "21", target: "17", lineStyle: {}},
-                //     {id: "30", name: null, source: "21", target: "18", lineStyle: {}},
-                //     {id: "31", name: null, source: "21", target: "19", lineStyle: {}},
-                //     {id: "32", name: null, source: "21", target: "20", lineStyle: {}},
-                //     {id: "33", name: null, source: "22", target: "16", lineStyle: {}},
-                //     {id: "34", name: null, source: "22", target: "17", lineStyle: {}},
-                //     {id: "35", name: null, source: "22", target: "18", lineStyle: {}},
-                //     {id: "36", name: null, source: "22", target: "19", lineStyle: {}},
-                //     {id: "37", name: null, source: "22", target: "20", lineStyle: {}},
-                //     {id: "38", name: null, source: "22", target: "21", lineStyle: {}},
-                //     {id: "47", name: null, source: "23", target: "11", lineStyle: {}},
-                //     {id: "46", name: null, source: "23", target: "12", lineStyle: {}},
-                //     {id: "39", name: null, source: "23", target: "16", lineStyle: {}},
-                //     {id: "40", name: null, source: "23", target: "17", lineStyle: {}},
-                //     {id: "41", name: null, source: "23", target: "18", lineStyle: {}},
-                //     {id: "42", name: null, source: "23", target: "19", lineStyle: {}},
-                //     {id: "43", name: null, source: "23", target: "20", lineStyle: {}},
-                //     {id: "44", name: null, source: "23", target: "21", lineStyle: {}},
-                //     {id: "45", name: null, source: "23", target: "22", lineStyle: {}},
-                //     {id: null, name: null, source: "24", target: "11", lineStyle: {}},
-                //     {id: "48", name: null, source: "24", target: "23", lineStyle: {}},
-                //     {id: "52", name: null, source: "25", target: "11", lineStyle: {}},
-                //     {id: "51", name: null, source: "25", target: "23", lineStyle: {}},
-                //     {id: "50", name: null, source: "25", target: "24", lineStyle: {}},
-                //     {id: null, name: null, source: "26", target: "11", lineStyle: {}},
-                //     {id: null, name: null, source: "26", target: "16", lineStyle: {}},
-                //     {id: "53", name: null, source: "26", target: "24", lineStyle: {}},
-                //     {id: "56", name: null, source: "26", target: "25", lineStyle: {}},
-                //     {id: "57", name: null, source: "27", target: "11", lineStyle: {}},
-                //     {id: "58", name: null, source: "27", target: "23", lineStyle: {}},
-                //     {id: null, name: null, source: "27", target: "24", lineStyle: {}},
-                //     {id: "59", name: null, source: "27", target: "25", lineStyle: {}},
-                //     {id: "61", name: null, source: "27", target: "26", lineStyle: {}},
-                //     {id: "62", name: null, source: "28", target: "11", lineStyle: {}},
-                //     {id: "63", name: null, source: "28", target: "27", lineStyle: {}},
-                //     {id: "66", name: null, source: "29", target: "11", lineStyle: {}},
-                //     {id: "64", name: null, source: "29", target: "23", lineStyle: {}},
-                //     {id: "65", name: null, source: "29", target: "27", lineStyle: {}},
-                //     {id: "67", name: null, source: "30", target: "23", lineStyle: {}},
-                //     {id: null, name: null, source: "31", target: "11", lineStyle: {}},
-                //     {id: null, name: null, source: "31", target: "23", lineStyle: {}},
-                //     {id: null, name: null, source: "31", target: "27", lineStyle: {}},
-                //     {id: "68", name: null, source: "31", target: "30", lineStyle: {}},
-                //     {id: "72", name: null, source: "32", target: "11", lineStyle: {}},
-                //     {id: "73", name: null, source: "33", target: "11", lineStyle: {}},
-                //     {id: "74", name: null, source: "33", target: "27", lineStyle: {}},
-                //     {id: "75", name: null, source: "34", target: "11", lineStyle: {}},
-                //     {id: "76", name: null, source: "34", target: "29", lineStyle: {}},
-                //     {id: "77", name: null, source: "35", target: "11", lineStyle: {}},
-                //     {id: null, name: null, source: "35", target: "29", lineStyle: {}},
-                //     {id: "78", name: null, source: "35", target: "34", lineStyle: {}},
-                //     {id: "82", name: null, source: "36", target: "11", lineStyle: {}},
-                //     {id: "83", name: null, source: "36", target: "29", lineStyle: {}},
-                //     {id: "80", name: null, source: "36", target: "34", lineStyle: {}},
-                //     {id: "81", name: null, source: "36", target: "35", lineStyle: {}},
-                //     {id: "87", name: null, source: "37", target: "11", lineStyle: {}},
-                //     {id: "88", name: null, source: "37", target: "29", lineStyle: {}},
-                //     {id: "84", name: null, source: "37", target: "34", lineStyle: {}},
-                //     {id: "85", name: null, source: "37", target: "35", lineStyle: {}},
-                //     {id: "86", name: null, source: "37", target: "36", lineStyle: {}},
-                //     {id: "93", name: null, source: "38", target: "11", lineStyle: {}},
-                //     {id: "94", name: null, source: "38", target: "29", lineStyle: {}},
-                //     {id: "89", name: null, source: "38", target: "34", lineStyle: {}},
-                //     {id: "90", name: null, source: "38", target: "35", lineStyle: {}},
-                //     {id: "91", name: null, source: "38", target: "36", lineStyle: {}},
-                //     {id: "92", name: null, source: "38", target: "37", lineStyle: {}},
-                //     {id: "95", name: null, source: "39", target: "25", lineStyle: {}},
-                //     {id: "96", name: null, source: "40", target: "25", lineStyle: {}},
-                //     {id: "97", name: null, source: "41", target: "24", lineStyle: {}},
-                //     {id: "98", name: null, source: "41", target: "25", lineStyle: {}},
-                //     {id: "101", name: null, source: "42", target: "24", lineStyle: {}},
-                //     {id: "100", name: null, source: "42", target: "25", lineStyle: {}},
-                //     {id: "99", name: null, source: "42", target: "41", lineStyle: {}},
-                //     {id: "102", name: null, source: "43", target: "11", lineStyle: {}},
-                //     {id: "103", name: null, source: "43", target: "26", lineStyle: {}},
-                //     {id: "104", name: null, source: "43", target: "27", lineStyle: {}},
-                //     {id: null, name: null, source: "44", target: "11", lineStyle: {}},
-                //     {id: "105", name: null, source: "44", target: "28", lineStyle: {}},
-                //     {id: "107", name: null, source: "45", target: "28", lineStyle: {}},
-                //     {id: "108", name: null, source: "47", target: "46", lineStyle: {}},
-                //     {id: "112", name: null, source: "48", target: "11", lineStyle: {}},
-                //     {id: "110", name: null, source: "48", target: "25", lineStyle: {}},
-                //     {id: "111", name: null, source: "48", target: "27", lineStyle: {}},
-                //     {id: "109", name: null, source: "48", target: "47", lineStyle: {}},
-                //     {id: null, name: null, source: "49", target: "11", lineStyle: {}},
-                //     {id: "113", name: null, source: "49", target: "26", lineStyle: {}},
-                //     {id: null, name: null, source: "50", target: "24", lineStyle: {}},
-                //     {id: "115", name: null, source: "50", target: "49", lineStyle: {}},
-                //     {id: "119", name: null, source: "51", target: "11", lineStyle: {}},
-                //     {id: "118", name: null, source: "51", target: "26", lineStyle: {}},
-                //     {id: "117", name: null, source: "51", target: "49", lineStyle: {}},
-                //     {id: null, name: null, source: "52", target: "39", lineStyle: {}},
-                //     {id: "120", name: null, source: "52", target: "51", lineStyle: {}},
-                //     {id: "122", name: null, source: "53", target: "51", lineStyle: {}},
-                //     {id: "125", name: null, source: "54", target: "26", lineStyle: {}},
-                //     {id: "124", name: null, source: "54", target: "49", lineStyle: {}},
-                //     {id: "123", name: null, source: "54", target: "51", lineStyle: {}},
-                //     {id: "131", name: null, source: "55", target: "11", lineStyle: {}},
-                //     {id: "132", name: null, source: "55", target: "16", lineStyle: {}},
-                //     {id: "133", name: null, source: "55", target: "25", lineStyle: {}},
-                //     {id: null, name: null, source: "55", target: "26", lineStyle: {}},
-                //     {id: "128", name: null, source: "55", target: "39", lineStyle: {}},
-                //     {id: "134", name: null, source: "55", target: "41", lineStyle: {}},
-                //     {id: "135", name: null, source: "55", target: "48", lineStyle: {}},
-                //     {id: "127", name: null, source: "55", target: "49", lineStyle: {}},
-                //     {id: "126", name: null, source: "55", target: "51", lineStyle: {}},
-                //     {id: "129", name: null, source: "55", target: "54", lineStyle: {}},
-                //     {id: "136", name: null, source: "56", target: "49", lineStyle: {}},
-                //     {id: "137", name: null, source: "56", target: "55", lineStyle: {}},
-                //     {id: null, name: null, source: "57", target: "41", lineStyle: {}},
-                //     {id: null, name: null, source: "57", target: "48", lineStyle: {}},
-                //     {id: "138", name: null, source: "57", target: "55", lineStyle: {}},
-                //     {id: "145", name: null, source: "58", target: "11", lineStyle: {}},
-                //     {id: null, name: null, source: "58", target: "27", lineStyle: {}},
-                //     {id: "142", name: null, source: "58", target: "48", lineStyle: {}},
-                //     {id: "141", name: null, source: "58", target: "55", lineStyle: {}},
-                //     {id: "144", name: null, source: "58", target: "57", lineStyle: {}},
-                //     {id: "148", name: null, source: "59", target: "48", lineStyle: {}},
-                //     {id: "147", name: null, source: "59", target: "55", lineStyle: {}},
-                //     {id: null, name: null, source: "59", target: "57", lineStyle: {}},
-                //     {id: "146", name: null, source: "59", target: "58", lineStyle: {}},
-                //     {id: "150", name: null, source: "60", target: "48", lineStyle: {}},
-                //     {id: "151", name: null, source: "60", target: "58", lineStyle: {}},
-                //     {id: "152", name: null, source: "60", target: "59", lineStyle: {}},
-                //     {id: "153", name: null, source: "61", target: "48", lineStyle: {}},
-                //     {id: "158", name: null, source: "61", target: "55", lineStyle: {}},
-                //     {id: "157", name: null, source: "61", target: "57", lineStyle: {}},
-                //     {id: "154", name: null, source: "61", target: "58", lineStyle: {}},
-                //     {id: "156", name: null, source: "61", target: "59", lineStyle: {}},
-                //     {id: "155", name: null, source: "61", target: "60", lineStyle: {}},
-                //     {id: "164", name: null, source: "62", target: "41", lineStyle: {}},
-                //     {id: "162", name: null, source: "62", target: "48", lineStyle: {}},
-                //     {id: "159", name: null, source: "62", target: "55", lineStyle: {}},
-                //     {id: null, name: null, source: "62", target: "57", lineStyle: {}},
-                //     {id: "160", name: null, source: "62", target: "58", lineStyle: {}},
-                //     {id: "161", name: null, source: "62", target: "59", lineStyle: {}},
-                //     {id: null, name: null, source: "62", target: "60", lineStyle: {}},
-                //     {id: "165", name: null, source: "62", target: "61", lineStyle: {}},
-                //     {id: null, name: null, source: "63", target: "48", lineStyle: {}},
-                //     {id: "174", name: null, source: "63", target: "55", lineStyle: {}},
-                //     {id: null, name: null, source: "63", target: "57", lineStyle: {}},
-                //     {id: null, name: null, source: "63", target: "58", lineStyle: {}},
-                //     {id: "167", name: null, source: "63", target: "59", lineStyle: {}},
-                //     {id: null, name: null, source: "63", target: "60", lineStyle: {}},
-                //     {id: "172", name: null, source: "63", target: "61", lineStyle: {}},
-                //     {id: "169", name: null, source: "63", target: "62", lineStyle: {}},
-                //     {id: "184", name: null, source: "64", target: "11", lineStyle: {}},
-                //     {id: null, name: null, source: "64", target: "48", lineStyle: {}},
-                //     {id: "175", name: null, source: "64", target: "55", lineStyle: {}},
-                //     {id: "183", name: null, source: "64", target: "57", lineStyle: {}},
-                //     {id: "179", name: null, source: "64", target: "58", lineStyle: {}},
-                //     {id: "182", name: null, source: "64", target: "59", lineStyle: {}},
-                //     {id: "181", name: null, source: "64", target: "60", lineStyle: {}},
-                //     {id: "180", name: null, source: "64", target: "61", lineStyle: {}},
-                //     {id: "176", name: null, source: "64", target: "62", lineStyle: {}},
-                //     {id: "178", name: null, source: "64", target: "63", lineStyle: {}},
-                //     {id: "187", name: null, source: "65", target: "48", lineStyle: {}},
-                //     {id: "194", name: null, source: "65", target: "55", lineStyle: {}},
-                //     {id: "193", name: null, source: "65", target: "57", lineStyle: {}},
-                //     {id: null, name: null, source: "65", target: "58", lineStyle: {}},
-                //     {id: "192", name: null, source: "65", target: "59", lineStyle: {}},
-                //     {id: null, name: null, source: "65", target: "60", lineStyle: {}},
-                //     {id: "190", name: null, source: "65", target: "61", lineStyle: {}},
-                //     {id: "188", name: null, source: "65", target: "62", lineStyle: {}},
-                //     {id: "185", name: null, source: "65", target: "63", lineStyle: {}},
-                //     {id: "186", name: null, source: "65", target: "64", lineStyle: {}},
-                //     {id: "200", name: null, source: "66", target: "48", lineStyle: {}},
-                //     {id: "196", name: null, source: "66", target: "58", lineStyle: {}},
-                //     {id: "197", name: null, source: "66", target: "59", lineStyle: {}},
-                //     {id: "203", name: null, source: "66", target: "60", lineStyle: {}},
-                //     {id: "202", name: null, source: "66", target: "61", lineStyle: {}},
-                //     {id: "198", name: null, source: "66", target: "62", lineStyle: {}},
-                //     {id: "201", name: null, source: "66", target: "63", lineStyle: {}},
-                //     {id: "195", name: null, source: "66", target: "64", lineStyle: {}},
-                //     {id: "199", name: null, source: "66", target: "65", lineStyle: {}},
-                //     {id: "204", name: null, source: "67", target: "57", lineStyle: {}},
-                //     {id: null, name: null, source: "68", target: "11", lineStyle: {}},
-                //     {id: null, name: null, source: "68", target: "24", lineStyle: {}},
-                //     {id: "205", name: null, source: "68", target: "25", lineStyle: {}},
-                //     {id: "208", name: null, source: "68", target: "27", lineStyle: {}},
-                //     {id: null, name: null, source: "68", target: "41", lineStyle: {}},
-                //     {id: "209", name: null, source: "68", target: "48", lineStyle: {}},
-                //     {id: "213", name: null, source: "69", target: "11", lineStyle: {}},
-                //     {id: "214", name: null, source: "69", target: "24", lineStyle: {}},
-                //     {id: "211", name: null, source: "69", target: "25", lineStyle: {}},
-                //     {id: null, name: null, source: "69", target: "27", lineStyle: {}},
-                //     {id: "217", name: null, source: "69", target: "41", lineStyle: {}},
-                //     {id: "216", name: null, source: "69", target: "48", lineStyle: {}},
-                //     {id: "212", name: null, source: "69", target: "68", lineStyle: {}},
-                //     {id: "221", name: null, source: "70", target: "11", lineStyle: {}},
-                //     {id: "222", name: null, source: "70", target: "24", lineStyle: {}},
-                //     {id: "218", name: null, source: "70", target: "25", lineStyle: {}},
-                //     {id: "223", name: null, source: "70", target: "27", lineStyle: {}},
-                //     {id: "224", name: null, source: "70", target: "41", lineStyle: {}},
-                //     {id: "225", name: null, source: "70", target: "58", lineStyle: {}},
-                //     {id: "220", name: null, source: "70", target: "68", lineStyle: {}},
-                //     {id: "219", name: null, source: "70", target: "69", lineStyle: {}},
-                //     {id: "230", name: null, source: "71", target: "11", lineStyle: {}},
-                //     {id: "233", name: null, source: "71", target: "25", lineStyle: {}},
-                //     {id: "226", name: null, source: "71", target: "27", lineStyle: {}},
-                //     {id: "232", name: null, source: "71", target: "41", lineStyle: {}},
-                //     {id: null, name: null, source: "71", target: "48", lineStyle: {}},
-                //     {id: "228", name: null, source: "71", target: "68", lineStyle: {}},
-                //     {id: "227", name: null, source: "71", target: "69", lineStyle: {}},
-                //     {id: "229", name: null, source: "71", target: "70", lineStyle: {}},
-                //     {id: "236", name: null, source: "72", target: "11", lineStyle: {}},
-                //     {id: "234", name: null, source: "72", target: "26", lineStyle: {}},
-                //     {id: "235", name: null, source: "72", target: "27", lineStyle: {}},
-                //     {id: "237", name: null, source: "73", target: "48", lineStyle: {}},
-                //     {id: "238", name: null, source: "74", target: "48", lineStyle: {}},
-                //     {id: "239", name: null, source: "74", target: "73", lineStyle: {}},
-                //     {id: "242", name: null, source: "75", target: "25", lineStyle: {}},
-                //     {id: "244", name: null, source: "75", target: "41", lineStyle: {}},
-                //     {id: null, name: null, source: "75", target: "48", lineStyle: {}},
-                //     {id: "241", name: null, source: "75", target: "68", lineStyle: {}},
-                //     {id: "240", name: null, source: "75", target: "69", lineStyle: {}},
-                //     {id: "245", name: null, source: "75", target: "70", lineStyle: {}},
-                //     {id: "246", name: null, source: "75", target: "71", lineStyle: {}},
-                //     {id: "252", name: null, source: "76", target: "48", lineStyle: {}},
-                //     {id: "253", name: null, source: "76", target: "58", lineStyle: {}},
-                //     {id: "251", name: null, source: "76", target: "62", lineStyle: {}},
-                //     {id: "250", name: null, source: "76", target: "63", lineStyle: {}},
-                //     {id: "247", name: null, source: "76", target: "64", lineStyle: {}},
-                //     {id: "248", name: null, source: "76", target: "65", lineStyle: {}},
-                //     {id: "249", name: null, source: "76", target: "66", lineStyle: {}},
-                // ]
-            // this.nodes.forEach(function (node) {
-            //     node.itemStyle = null;
-            //     node.symbolSize = 10;
-            //     node.value = node.symbolSize;
-            //     // node.category = node.attributes.modularity_class;
-            //     // Use random x, y
-            //     node.x = node.y = null;
-            //     node.draggable = true;
-            // });
             const option = {
                 title: {
                     // text: 'Les Miserables',
@@ -343,19 +377,20 @@ export default {
                             normal: {
                                 show: true,
                                 textStyle: {
-                                    fontSize: 12
+                                    fontSize: 16
                                 },
                             }
                         },
                         force: {
                             repulsion: 1000
                         },
-                        edgeSymbolSize: [4, 50],
+                        edgeSymbol:'arrow',
+                        edgeSymbolSize: [0, 8],
                         edgeLabel: {
                             normal: {
                                 show: true,
                                 textStyle: {
-                                    fontSize: 10
+                                    fontSize: 15
                                 },
                                 formatter: "{c}"
                             }
@@ -369,7 +404,8 @@ export default {
                                 width: 1,
                                 curveness: 0
                             }
-                        }
+                        },
+                        cursor: 'pointer'
                     }
                 ]
             };
@@ -384,35 +420,95 @@ export default {
                 }
                 else if (params.componentType === 'series') {
                     if (params.seriesType === 'graph') {
+                        that.showinfoDetail = [];
                         if (params.dataType === 'edge') {
-                            that.showinfo = params.data;
+                            that.showinfo = {};
+                            if(params.data.field) {
+                                that.showinfo.field = params.data.field;
+                            }
+                            that.showinfo.label = params.data.label;
+                            that.showinfo.id = params.data.id;
+                            for(let name in params.data) {
+                                if(name !== 'field' && name !== 'label' && name !== 'id') {
+                                    that.showinfo[name] = params.data[name]
+                                }
+                            }
                             that.showinfo.type = 'link';
                             delete that.showinfo.emphasis;
                             delete that.showinfo.value;
+                            delete that.showinfo.source;
+                            delete that.showinfo.target;
                         }
                         else {
-                            that.showinfo = params.data;
+                            that.showinfo = {};
+                            if(params.data.field) {
+                                that.showinfo.field = params.data.field;
+                            }
+                            that.showinfo.label = params.data.label;
+                            that.showinfo.id = params.data.id;
+                            for(let name in params.data) {
+                                if(name !== 'field' && name !== 'label' && name !== 'id') {
+                                    that.showinfo[name] = params.data[name]
+                                }
+                            }
                             that.showinfo.type = 'node';
                             delete that.showinfo.emphasis;
                             delete that.showinfo.category;
                             delete that.showinfo.draggable;
+                            
                         }
+                        let temp = [];
+                        for(let key in that.showinfo) {
+                            temp.push({
+                                name: key,
+                                value: that.showinfo[key]
+                            })
+                        }
+                        that.showinfoDetail = temp;
                     }
                 }
             });
         },
         delete_element: function(showinfo){
             if(showinfo.type == 'node'){
-                this.$store.dispatch('deleteNode', showinfo);
+                this.nodes = this.nodes.filter(node => {
+                    return node.id !== showinfo.id;
+                });
+                this.links = this.links.filter(link => {
+                    return link.source !== showinfo.id && link.target !== showinfo.id;
+                });
+                if (this.queryLabel === true) {
+                    this.queryNodes = this.queryNodes.filter(node => {
+                        return node.id !== showinfo.id;
+                    });
+                    this.queryLinks = this.queryLinks.filter(link => {
+                        return link.source !== showinfo.id && link.target !== showinfo.id;
+                    });
+                    const record = {nodes: this.queryNodes, links: this.queryLinks};
+                    this.graphQueryHistory.push(this.deepClone(record));
+                } else {
+                    const record = {nodes: this.nodes, links: this.links};
+                    this.graphHistory.push(this.deepClone(record));
+                }
+                // this.$store.dispatch('deleteNode', showinfo);
                 this.showinfo = null;
             }else{
-                this.$store.dispatch('deleteLink', showinfo);
+                // this.$store.dispatch('deleteLink', showinfo);
+                this.links = this.links.filter(link => {
+                    return link.id !== showinfo.id;
+                });
+                if (this.queryLabel === true) {
+                    this.queryLinks = this.queryLinks.filter(link => {
+                        return link.source !== showinfo.id && link.target !== showinfo.id;
+                    });
+                    const record = {nodes: this.queryNodes, links: this.queryLinks};
+                    this.graphQueryHistory.push(this.deepClone(record));
+                } else {
+                    const record = {nodes: this.nodes, links: this.links};
+                    this.graphHistory.push(this.deepClone(record));
+                }
                 this.showinfo = null;
             }
-        },
-        update_element: function(showinfo){
-            this.updateLable = true;
-            this.$refs.add.edit_property(this.showinfo);
         },
         receive: function(elements, showinfo){
             if(showinfo.type === 'node'){
@@ -440,7 +536,6 @@ export default {
             }
             if(data === '') {
                 data = this.$store.getters.newChart;
-                console.log('data:', data)
             }
             let myChart = this.$echarts.init(document.getElementById('main'));
             var types = [];
@@ -486,11 +581,635 @@ export default {
         },
         setShowinfo: function(data) {
             this.showinfo = null;
-        }
+        },
+        addProperty: function() {
+            this.iter_num += 1;
+            this.property.push({
+                name: "",
+                key: this.iter_num,
+            });
+        },
+        addConcept: function() {
+            let concept = {};
+            concept.type = this.type;
+            if (concept.type === '') {
+                this.$message.error('概念名称不能为空！！！');
+                return;
+            }
+            if(this.concepts.find(item => item === this.type)) {
+                this.$message.error('概念名称重复！！！');
+                return;
+            }
+            let propertyName = [];
+            for(let property of this.property) {
+                if (property.name === '') {
+                    this.$message.error('属性名称不能为空！！！');
+                }
+                propertyName.push(property.name);
+            }
+            this.dialogFormVisible = false;
+            concept.property = propertyName;
+            this.concepts.push(concept);
+            this.conceptTabelData.push({
+                number: this.conceptNum,
+                concept: this.type,
+            }) 
+            this.conceptNum += 1;
+            this.property = [
+                {
+                    name: "name",
+                    value: '',
+                    key: 1,
+                }
+            ],
+            this.iter_num = 1;
+            this.type = '';
+            this.allTableData = this.conceptTabelData;
+            this.filterTableData = this.conceptTabelData;
+            this.setPaginations();
+        },
+        addEntity:function (index, row) {
+            this.dialogEntityVisible = true;
+            this.entity.label = row.concept;
+            let concept = this.concepts.find(element => element.type === row.concept);
+            for(let i = 0; i<concept.property.length; i++) {
+                this.entityProperty.push({
+                    name: concept.property[i],
+                    value: '',
+                    key: i+1,
+                })
+            }
+        },
+        addNode: function() {
+            let node = {
+                label: this.entity.label,
+                id: String(this.nodeId),
+                type: this.entity.label,
+            }
+            for(let i of this.entityProperty){
+                const name = i.name;
+                const value = i.value;
+                if(value !== ''){
+                    node[name] = value;
+                } else {
+                    this.$message.error('属性值不能为空！！！');
+                    return;
+                }
+            }
+            for(let item of this.nodes) {
+                if(item.name === node.name) {
+                    this.$message.error('节点名称重复！！！');
+                    return;
+                }
+            }
+            this.dialogEntityVisible = false;
+            this.entityProperty = [];
+            this.nodeId = this.nodeId + 1;
+            this.nodes.push(node);
+            if (this.queryLabel === true) {
+                this.queryNodes.push(node);
+                const record = {nodes: this.queryNodes, links: this.queryLinks};
+                this.graphQueryHistory.push(this.deepClone(record));
+            } else {
+                const record = {nodes: this.nodes, links: this.links};
+                this.graphHistory.push(this.deepClone(record));
+                
+            }
+            
+        },
+        addRelation: function() {
+            const source_node = this.nodes.find(element => element.name === this.sourceNodeName);
+            const target_node = this.nodes.find(element => element.name === this.targetNodeName);
+            if(!source_node){
+                this.$message.error('源节点不存在！！！');
+                return;
+            }
+            if(!target_node){
+                this.$message.error('目标节点不存在！！！');
+                return;
+            }
+            if(source_node.name === target_node.name) {
+                this.$message.error('源节点和目标节点不能是同一个节点！！！');
+                return;
+            }
+            if(this.links.find(element => element.source === source_node.id && element.target === target_node.id)) {
+                this.$message.error('节点之间关系已存在！！！');
+                return;
+            }
+            const link = {
+                id: String(this.linkId),
+                label: this.relationType,
+                source: source_node.id,
+                target: target_node.id,
+            }
+            this.links.push(link);
+            if (this.queryLabel === true) {
+                this.queryLinks.push(link);
+                const record = {nodes: this.queryNodes, links: this.queryLinks};
+                this.graphQueryHistory.push(this.deepClone(record));
+            } else {
+                const record = {nodes: this.nodes, links: this.links};
+                this.graphHistory.push(this.deepClone(record));
+            }
+            this.sourceNodeName = '';
+            this.relationType = '';
+            this.targetNodeName = '';
+            this.dialogRelationVisible = false;
+            this.linkId += 1; 
+        },
+        handleClose: function(done) {
+            this.entityProperty = [];
+            done();
+        },
+        formCancel: function() {
+            this.dialogFormVisible = false;
+            this.property = [
+                {
+                    name: "name",
+                    value: '',
+                    key: 1,
+                }
+            ]
+        },
+        handleFormClose: function(done) {
+            this.property = [
+                {
+                    name: "name",
+                    value: '',
+                    key: 1,
+                }
+            ];
+            done();
+        },
+        RelationCancel: function() {
+            this.sourceNodeName = '';
+            this.relationType = '';
+            this.targetNodeName = '';
+            this.dialogRelationVisible = false;
+        },
+        handleRelationClose: function(done) {
+            this.sourceNodeName = '';
+            this.relationType = '';
+            this.targetNodeName = '';
+            this.dialogRelationVisible = false;
+            done();
+        },
+        addNetwork: function() {
+            this.dialogNetworkVisible = false;
+            const isAuthenticated = this.$store.getters.isAuthenticated;
+            if(isAuthenticated){
+                let nodes = this.nodes;
+                let links = this.links;
+                let newNodes = {};
+                let newLinks = {};
+                for(let node of nodes){
+                    node.field = this.field;
+                    if(node.label in newNodes){
+                        const label = node.label;
+                        newNodes[label].push(node);
+                    }else{
+                        const label = node.label;
+                        newNodes[label] = [node];
+                    }
+                    delete node.draggable;
+                    delete node.category;
+                }
+                for(let link of links){
+                    link.field = this.field;
+                    if(link.label in newLinks){
+                        const temp = {};
+                        temp.id = link.id;
+                        temp.source = link.source;
+                        temp.target = link.target;
+                        const label = link.label;
+                        delete link.source;
+                        delete link.target;
+                        temp.propery = link;
+                        temp.propery.source = temp.source;
+                        temp.propery.target = temp.target;
+                        newLinks[label].push(temp);
+                    }else{
+                        const temp = {};
+                        temp.id = link.id;
+                        temp.source = link.source;
+                        temp.target = link.target;
+                        const label = link.label;
+                        delete link.source;
+                        delete link.target;
+                        temp.propery = link;
+                        temp.propery.source = temp.source;
+                        temp.propery.target = temp.target;
+                        newLinks[label] = [temp];
+                    }
+                }
+
+                const data = {
+                    user: this.$store.getters.user,
+                    field: this.field,
+                    nodes: newNodes,
+                    links: newLinks,
+                    isEdit: this.isEdit,
+                }
+                console.log('add_network:', data);
+                this.$http.post('/api/networks/', data)
+                .then(res => {
+                    this.$message({
+                        message: "网络生成成功",
+                        type: "success"
+                    })
+                    // this.$store.dispatch('setNewChart', {nodes:[], links: []});
+                    this.nodes = [];
+                    this.links = [];
+                    this.isEdit = false;
+                    this.field = '';
+                    this.concepts = [];
+                    this.showinfo = null;
+                    this.nodeId = 0;
+                    this.linkId = 0;
+                    this.conceptTabelData = [];
+                    this.$emit('finish-adding', '') // set showinfo to be ''
+                    });
+                
+            }else{
+                this.$message({
+                    message: '用户未登录！！！',
+                    type: 'warning'
+                });
+                this.$router.push('/login');
+            }
+        },
+        updateElement: function() {
+            this.dialogUpdateVisible = false;
+            if(this.showinfo){
+                if(this.showinfo.type === "node"){    
+                    for(let item of this.nodes){
+                        if(item.id === this.showinfo.id){
+                            let info = {};
+                            for(let info of this.showinfoDetail) {
+                                item[info.name] = info.value;
+                            }
+                            for(let name in item){
+                                info[name] = item[name];
+                            }
+                            this.showinfo = info;
+                            delete this.showinfo.emphasis;
+                            delete this.showinfo.category;
+                            delete this.showinfo.draggable;
+                            item.type = item.label;
+                        }
+                    }
+                    
+                    if(this.queryLabel === true) {
+                        for(let item of this.queryNodes){
+                            if(item.id === this.showinfo.id){
+                                let info = {};
+                                for(let info of this.showinfoDetail) {
+                                    item[info.name] = info.value;
+                                }
+                                for(let name in item){
+                                    info[name] = item[name];
+                                }
+                                this.showinfo = info;
+                                delete this.showinfo.emphasis;
+                                delete this.showinfo.category;
+                                delete this.showinfo.draggable;
+                            }
+                        } 
+                        const record = {nodes: this.queryNodes, links: this.queryLinks};
+                        this.graphQueryHistory.push(this.deepClone(record));
+                    } else {
+                        const record = {nodes: this.nodes, links: this.links};
+                        this.graphHistory.push(this.deepClone(record));
+                    }
+                    // this.showinfoDetail = [];                               
+                }else{
+                    for(let item of this.links){
+                        if(item.id === this.showinfo.id){
+                            let info = {};
+                            for(let info of this.showinfoDetail) {
+                                item[info.name] = info.value;
+                            }
+                            for(let name in item){
+                                info[name] = item[name];
+                            }
+                            this.showinfo = info;
+                            delete this.showinfo.emphasis;
+                            delete this.showinfo.value;
+                            delete this.showinfo.source;
+                            delete this.showinfo.target;
+                        }
+                    }
+                    if (this.queryLabel === true) {
+                        for(let item of this.queryLinks){
+                            if(item.id === this.showinfo.id){
+                                let info = {};
+                                for(let info of this.showinfoDetail) {
+                                    item[info.name] = info.value;
+                                }
+                                for(let name in item){
+                                    info[name] = item[name];
+                                }
+                                this.showinfo = info;
+                                delete this.showinfo.emphasis;
+                                delete this.showinfo.value;
+                                delete this.showinfo.source;
+                                delete this.showinfo.target;
+                            }
+                        } 
+                        const record = {nodes: this.queryNodes, links: this.queryLinks};
+                        this.graphQueryHistory.push(record);
+                    } else{
+                        const record = {nodes: this.nodes, links: this.links};
+                        this.graphHistory.push(record);
+                    }
+                    // this.showinfoDetail = [];
+                }
+            }
+        },
+        updateCancel: function() {
+            this.dialogUpdateVisible = false;
+            // this.showinfoDetail = [];
+        },
+        handleUpdateClose: function() {
+            this.updateCancel();
+        },
+        // 查询
+        addQueryProperty: function() {
+            if (this.queryNum < 3) {
+                this.queryNum += 1;
+                if (this.querySourceLabel !== '') {
+                    this.sourceNodeProperty.push({
+                        name: "",
+                        value: "",
+                        key: this.queryNum
+                    });
+                }
+                if (this.queryTargetLabel !== '') {
+                    this.targetNodeProperty.push({
+                        name: "",
+                        value: "",
+                        key: this.queryNum
+                    });
+                }
+            }
+        },
+        handleQueryClose: function() {
+            this.dialogQueryVisible = false;
+            this.querySourceLabel = '';
+            this.queryRelationLabel = '';
+            this.queryTargetLabel = '';
+            this.sourceNodeProperty = [];
+            this.targetNodeProperty = [];
+        },
+        query: function() {
+            this.queryLabel = true;
+            this.dialogQueryVisible = false;
+            const field = this.field;
+            if(this.queryRelationLabel !== '' || this.querySourceLabel !== '' || this.queryTargetLabel !== ''){
+                const node1Propery = {field: field};
+                const node2Propery = {field: field};
+                const relationPropery = {field: field};
+                for(let item of this.sourceNodeProperty){
+                    if(item.name !== '')
+                        node1Propery[item.name] = item.value;
+                }
+                for(let item of this.targetNodeProperty){
+                    if(item.name !== '')
+                        node2Propery[item.name] = item.value;
+
+                }
+                // for(let item of this.relation){
+                //     if(item.name !== '')
+                //         relationPropery[item.name] = item.value;
+                // }
+                const data = {
+                    label: {
+                        node1: this.querySourceLabel,
+                        node2: this.queryTargetLabel,
+                        relation: this.queryRelationLabel,
+                    },
+                    propery: {
+                        node1: node1Propery,
+                        node2: node2Propery,
+                        relation: relationPropery,
+                    }
+                }
+                const str = JSON.stringify(data);
+                this.$http.get(`/api/networks/v1/query/?data=${str}`)
+                .then(res => {
+                    const data = {
+                        nodes: res.data.data.nodes,
+                        links: res.data.data.links,
+                    }
+                    console.log('searchData:', data); // Javert Babet Joly Valjean
+                    this.queryNodes = data.nodes;
+                    this.queryLinks = data.links;
+                    const record = {nodes: this.queryNodes, links: this.queryLinks};
+                    this.graphQueryHistory.push(this.deepClone(record));
+                    this.querySourceLabel = '';
+                    this.queryTargetLabel = '';
+                    this.queryRelationLabel = '';
+                })
+            }else{
+                this.$message.error('输入框不能为空！！！');
+            }
+        },
+        quitQuery: function() {
+            this.queryLabel = false;
+            let myChart = this.$echarts.init(document.getElementById('main'));
+            var types = [];
+            var categories = [];
+            this.nodes.map(node => {
+                if(!types.includes(node.label)){
+                    types.push(node.label);
+                }
+            })
+            for (var i = 0; i < types.length; i++) {
+                categories[i] = {
+                    name: types[i],
+                };
+            }
+            this.nodes.forEach(function (node) {
+                node.draggable = true,
+                node.category = types.findIndex((element) => element === node.label);
+            });
+            this.links.forEach(function (link) {
+                link.value = link.label;
+            });;
+
+            const record = {nodes: this.nodes, links: this.links};
+            this.graphHistory.push(this.deepClone(record));
+            const option = {
+                legend: [{
+                        // selectedMode: 'single',
+                        data: categories.map(function (a) {
+                            return a.name;
+                        })
+                    }],
+                series: {
+                    type: 'graph',
+                    categories: categories,
+                    data: this.nodes,
+                    links: this.links,
+                }
+            }
+            myChart.setOption(option);
+        },
+        // upload file
+        submitUpload() {
+            this.$refs.upload.submit();
+        },
+        beforeUpload(file) {
+            var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)
+            const extension = testmsg === 'csv'
+            const extension2 = testmsg === 'xlsx'
+            // const isLt2M = file.size / 1024 / 1024 < 10
+            if(!extension && !extension2) {
+                this.$message({
+                    message: '上传文件只能是 csv、xlsx格式!',
+                    type: 'warning'
+                });
+                return false;
+            }
+            // if(!isLt2M) {
+            //     this.$message({
+            //         message: '上传文件大小不能超过 10MB!',
+            //         type: 'warning'
+            //     });
+            // }
+            // return (extension || extension2) && isLt2M
+        },
+        handleRemove(file, fileList) {
+            console.log(file, fileList);
+        },
+        handlePreview(file) {
+            console.log(file);
+        },
+        handleExceed(files, fileList) {
+            this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+        },
+        beforeRemove(file, fileList) {
+            return this.$confirm(`确定移除 ${ file.name }？`);
+        },
+        uploadSuccess(response, file, fileList) {
+            this.fileList = [];
+            if (response.type === 'node' ) {
+                const nodes = response.data;
+                for( let node of nodes) {
+                    node.id = String(this.nodeId);
+                    node.type = node.label;
+                    this.nodes.push(node);
+                    this.nodeId += 1;
+                }
+                let node = nodes[0];
+                let concept = {};
+                if(!this.conceptTabelData.find(ltem => item.concept === node.label)) {
+                    concept.type = node.label;
+                    let propertyName = [];
+                    for(let property in node) {
+                        if(property !== 'draggable' && property !== 'field' && property !== 'id' && property !== 'category' && property !== 'type' && property !== 'label') {
+                            propertyName.push(property);
+                        }
+                    }
+                    concept.property = propertyName;
+                    this.concepts.push(concept);
+                    this.conceptTabelData.push({
+                        number: this.conceptNum,
+                        concept: concept.type,
+                    }) 
+                    this.conceptNum += 1;
+                }
+            } else {
+                const links = response.data;
+                const labels = response.label;
+                for( let link of links) {
+                    const source_node = this.nodes.find(element => element.name === link.sourceName);
+                    const target_node = this.nodes.find(element => element.name === link.targetName);
+                    if (source_node && target_node) {
+                        delete link.sourceName;
+                        delete link.targetName;
+                        link.id = String(this.linkId);
+                        link.source = source_node.id;
+                        link.target = target_node.id;
+                        this.links.push(link);
+                        this.linkId += 1;
+                    }
+                    
+                }
+            }
+            console.log(response.data);
+        },
+        // 分页
+        setPaginations () {
+            this.paginations.total = this.allTableData.length
+            this.paginations.page_index = 1
+            this.paginations.page_size = 5
+            // 设置默认分页数据
+            this.conceptTabelData = this.allTableData.filter((item, index) => {
+                return index < this.paginations.page_size
+            })
+        },
+        handleSizeChange (page_size) { // 控制一页显示的数据量
+            this.paginations.page_index = 1
+            this.paginations.page_size = page_size
+            this.conceptTabelData = this.allTableData.filter((item, index) => {
+                return index < page_size
+            })
+        },
+        handleCurrentChange (page) { // 分页跳转
+            let tables = []
+            // 当前页前面有多少数据
+            let index = this.paginations.page_size * (page - 1)
+            let nums = this.paginations.page_size * page
+            for (let i = index; i < nums; i++) {
+                if (this.allTableData[i]) {
+                tables.push(this.allTableData[i])
+                }
+            }
+            this.conceptTabelData = tables
+        },
+        // undo
+        // putRecord(graphData) {
+        //     this.graphHistory.push(graphData);
+        // },
+        undo() {
+            console.log('history:', this.graphQueryHistory);
+            if (this.queryLabel === true && this.graphQueryHistory.length > 1) {
+                this.graphQueryHistory.pop();
+                // if (this.graphQueryHistory.length === 0) {
+                //     return;
+                // }
+                this.queryNodes = this.deepClone(this.graphQueryHistory[this.graphQueryHistory.length-1].nodes);
+                this.queryLinks = this.deepClone(this.graphQueryHistory[this.graphQueryHistory.length-1].links);
+                // const record = {nodes: this.queryNodes, links: this.queryLinks};
+                // this.graphQueryHistory.push(this.deepClone(record));
+                this.showinfo = null;
+            } else if (this.queryLabel === false && this.graphHistory.length > 1) {
+                this.graphHistory.pop();
+                // if (this.graphHistory.length === 1) {
+                //     var element = document.getElementById('undo');
+                //     element.style.color = '#dcdde1'
+                //     return;
+                // }
+                this.nodes = this.deepClone(this.graphHistory[this.graphHistory.length-1].nodes);
+                this.links = this.deepClone(this.graphHistory[this.graphHistory.length-1].links);
+                // const record = {nodes: this.nodes, links: this.links};
+                // this.graphHistory.push(this.deepClone(record));
+                this.showinfo = null;
+            }
+        },
+        deepClone (obj) {
+            let _tmp = JSON.stringify(obj);//将对象转换为json字符串形式
+            let result = JSON.parse(_tmp);//将转换而来的字符串转换为原生js对象
+            return result;
+        },
     },
     watch: {
         nodes: {
             handler: function(val, oldVal){
+                if (this.queryLabel === true) {
+                    return;
+                }
                 let myChart = this.$echarts.init(document.getElementById('main'));
                 var types = [];
                 var categories = [];
@@ -527,10 +1246,19 @@ export default {
         },
         links: {
             handler: function(val, oldVal){
+                if (this.queryLabel === true) {
+                    return;
+                }
                 let myChart = this.$echarts.init(document.getElementById('main'));
                 this.links.forEach(function (link) {
-                    link.value = link.label;
-                });
+                    if (link.label === 'causes') {
+                        link.value = ''
+                    } else {
+                        link.value = link.label;
+                    }
+                    
+                    
+                })
                 const option = {
                     series: {
                         type: 'graph',
@@ -541,14 +1269,110 @@ export default {
             },
             deep: true,
         },
-        
-        
+        queryNodes: {
+            handler: function(val, oldVal){
+                let myChart = this.$echarts.init(document.getElementById('main'));
+                var types = [];
+                var categories = [];
+                this.queryNodes.map(node => {
+                    if(!types.includes(node.label)){
+                        types.push(node.label);
+                    }
+                })
+                for (var i = 0; i < types.length; i++) {
+                    categories[i] = {
+                        name: types[i],
+                    };
+                }
+                this.queryNodes.forEach(function (node) {
+                    node.draggable = true,
+                    node.category = types.findIndex((element) => element === node.label);
+                });
+                const option = {
+                    legend: [{
+                            // selectedMode: 'single',
+                            data: categories.map(function (a) {
+                                return a.name;
+                            })
+                        }],
+                    series: {
+                        type: 'graph',
+                        categories: categories,
+                        data: this.queryNodes,
+                    }
+                }
+                myChart.setOption(option);
+            },
+            deep: true,
+        },
+        queryLinks: {
+            handler: function(val, oldVal){
+                let myChart = this.$echarts.init(document.getElementById('main'));
+                this.queryLinks.forEach(function (link) {
+                    link.value = link.label;
+                    
+                });
+                const option = {
+                    series: {
+                        type: 'graph',
+                        links: this.queryLinks,
+                    }
+                }
+                myChart.setOption(option);
+            },
+            deep: true,
+        },
+        graphHistory: function(val, oldVal){
+            if (val.length === 1) {
+                let element = document.getElementById('undo');
+                element.style.color = '#dcdde1';
+                this.isEdit = false;
+                this.field = '';
+            } else {
+                let element = document.getElementById('undo');
+                element.style.color = 'black';
+            }
+        },
+        graphQueryHistory: function(val, oldVal){
+            if (val.length === 1) {
+                let element = document.getElementById('undo');
+                element.style.color = '#dcdde1';
+            } else {
+                let element = document.getElementById('undo');
+                element.style.color = 'black';
+            }
+        },
+        querySourceLabel: function(val, oldVal){
+            if(val !== '' && oldVal === ''){
+                this.sourceNodeProperty.push({
+                    name: "",
+                    value: "",
+                });
+            }
+            if(val === ''){
+                this.sourceNodeProperty = [];
+            }
+        },
+        queryTargetLabel: function (val, oldVal) {
+            if (val !== '' && oldVal === '') {
+                this.targetNodeProperty.push({
+                    name: "",
+                    value: "",
+                });
+            }
+            if(val === ''){
+                this.targetNodeProperty = [];
+            }
+        },
     }
 }
 </script>
-<style scoped>
+<style  scoped>
 .row {
-    top: 100px;
+    top: 50px;
+}
+.custom-icon {
+    font-size: 2rem;
 }
 .add_search {
     margin-top: 80px;
@@ -562,15 +1386,32 @@ export default {
     border: 2px solid #a6282f;
     border-bottom: 1px solid rgb(220, 223, 230);
 }
+.rightArea {
+    margin-left: 100px;
+}
+.dialog {
+    margin-top: 10px;
+}
+.query.el-input{
+    width: 150px;
+    margin-top: 10px;
+}
+.n1_pro.el-input {
+    width: 70px;
+    margin-top: 10px;
+}
 .update {
     text-align: right;
+}
+.button {
+    font-size: 16px;
 }
 .btn {
     display: inline-block;
     text-align: right;
 }
 .showinfo {
-    margin-top: 100px;
+    margin-top: 50px;
     margin-left: 144px;
     padding-top: 1px;
     /* padding-left: 1px; */
@@ -593,5 +1434,15 @@ export default {
 .lead {
   margin-top: 50px;
   font-size: 22px;
+}
+.el-icon-refresh-left{
+    color: #dcdde1;
+    margin-left: 890px;
+}
+.slide-fade-enter-active {
+  transition: all .8s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s ease;
 }
 </style>

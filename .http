@@ -10,7 +10,7 @@ Content-Type: application/json
     "name": "chengkun",
     "email": "14555153792@qq.com",
     "password": "123456",
-    "identity": "employee",
+    "identity": "user",
 }
 
 ### login 
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 ### current 
 GET  http://localhost:5000/api/users/current HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkZTcxMzJjMmI1MjE0NWRlNzZiODY0ZSIsIm5hbWUiOiJzaWxlbmNkZiIsImF2YXRhciI6Ii8vd3d3LmdyYXZhdGFyLmNvbS9hdmF0YXIvODQ2NzE1NjAyZTQ3N2U5MjUzNTMwZTM4M2FkOTYyMTI_cz0yMDAmcj1wZyZkPW1tIiwiaWRlbnRpdHkiOiJlbXBsb3llZSIsImVtYWlsIjoiMTQ1NTUxNTM3QHFxLmNvbSIsImlhdCI6MTU4Mjk0MDk0MywiZXhwIjoxNTgyOTQ0NTQzfQ.gnVKW9XvnqQbxhypINYqECzcdPTsXc75Dl-2M_nlcVQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkZTcxMzJjMmI1MjE0NWRlNzZiODY0ZSIsIm5hbWUiOiJzaWxlbmNlY2siLCJhdmF0YXIiOiIvL3d3dy5ncmF2YXRhci5jb20vYXZhdGFyLzg0NjcxNTYwMmU0NzdlOTI1MzUzMGUzODNhZDk2MjEyP3M9MjAwJnI9cGcmZD1tbSIsImlkZW50aXR5IjoiZW1wbG95ZWUiLCJlbWFpbCI6IjE0NTU1MTUzN0BxcS5jb20iLCJpYXQiOjE1ODYyMjAwMzksImV4cCI6MTU4NjIyMzYzOX0.nAGwqgVFAstA1tskRNiCMMiV4ijncGwC3d031wBscAk
 
 ### profile 
 
@@ -39,9 +39,8 @@ POST http://localhost:5000/api/texts/ HTTP/1.1
 Content-Type: application/json
 
 {
-    "key1": "alcohol",
-    "key2": "depression",
-    "text": "Mental health problems including PTSD, anxiety and depression, as well as anger, functional impairment and being single were all related to greater alcohol misuse. Hazardous users of alcohol and smokers had 3.1 respectively 3.0 times higher risk for depression (p = 0.001 respectively 0.003). Life satisfaction and happiness were associated with a lower risk of depression, while hazardous alcohol drinking and poor sleep quality were related to a higher risk of depression. Our data revealed that depression proneness confers vulnerability to alcohol, emulating patterns of alcohol dependence seen in human addicts, and that depression resilience to a large extent protects from the development of AUD-like phenotypes."
+    "keywords": ["alcohol", "depression", "diabetes", "heart disease", "heart rate", "hypertension", "stroke", "cancer", "smoke", "heart attack", "systolic blood pressure", "eyesight", "height"],
+    "text": "Hazardous users of alcohol and smokers had 3.1 respectively 3.0 times higher risk for depression (p = 0.001 respectively 0.003). Life satisfaction and happiness were associated with a lower risk of depression, while hazardous alcohol drinking and poor sleep quality were related to a higher risk of depression. At 6 weeks after discharge, patients completed standardized measures for 5 risk factors (pain intensity, depression, posttraumatic stress disorder, alcohol abuse, and tobacco use) and 4 protective factors (resilience, social support, self-efficacy for return to usual activity, and self-efficacy for managing the financial demands of recovery). Our data revealed that depression proneness confers vulnerability to alcohol, emulating patterns of alcohol dependence seen in human addicts, and that depression resilience to a large extent protects from the development of AUD-like phenotypes. The association of numerous diseases including diabetes mellitus, heart disease, as well as depression with chronic low-grade inflammation due to abdominal obesity has raised the possibility that obesity-associated inflammation affecting the brain may promote addictive behaviors leading to a self-perpetuating cycle that may affect not only foods but addictions to drugs, alcohol, and gambling. Increased formaldehyde (FA) and up-regulation of semicarbazide-sensitive amine oxidase, which forms FA from methylamine, have been implicated in disorders such as cerebrovascular disorders, alcohol abuse, diabetes and Alzheimer's disease.  Mortality was significantly increased for all malignant tumours, oesophageal cancer, bowel cancer, liver cancer, lung cancer, alcoholism, ischaemic heart disease, non-malignant respiratory diseases, liver cirrhosis, external causes and suicides. Prominent primary diagnosis subgroups included asphyxia and respiratory failure (15.2%), traumatic brain injury and skull fractures (11.3%), acute myocardial infarction and ischemic heart disease (10.9%), poisonings and drug and alcohol disorders (6.7%), dysrhythmias (6.7%), hemorrhagic and nonhemorrhagic stroke (5.9%), acute heart failure and cardiomyopathies (5.6%), pneumonia and aspiration (4.9%), and sepsis, septicemia, and septic shock (3.2%). A physiological correlate of emotional regulation is autonomic flexibility, emotional dysregulation in men who misuse alcohol being correlated with reduced parasympathetic activation to control heart rate variability during stress and/or conflict situations.  Subjective alcohol craving and heart rate variability were recorded across the task.  The content encompasses heavy alcohol consumption, depression, diabetes, folic acid intake, hypertension, normal weight, recommended physical activity, current smoking, unwanted pregnancy, and use of contraception. In this study, the causal effect of alcohol intake on hypertension in 2,011 men and women from the Ansan-Ansung cohort was estimated using an instrumental variable (IV) approach, with both a phenotypic and genotypic instrument for alcohol intake: alcohol flushing and the rs671 genotype (in the alcohol dehydrogenase 2 [ALDH2] gene), respectively."
 }
 
 ### 关键词爬虫 GET http://localhost:5000/api/texts/?key1=smoke&key2=cancer HTTP/1.1
@@ -51,7 +50,7 @@ Content-Type: application/json
 
 ### add
 
-GET  http://localhost:5000/api/networks/test HTTP/1.1
+GET  http://localhost:5000/api/networks/v1/test/export/test HTTP/1.1
 
 ### true add 
 POST  http://localhost:5000/api/networks/ HTTP/1.1

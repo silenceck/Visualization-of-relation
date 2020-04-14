@@ -21,7 +21,7 @@
                         <div class="title">email </div>
                         <div class="action" v-if="isEmailClicked">
                           <div class="info">{{user.email}}</div> &#12288;
-                          <div class="edit"  @click="editFunc('isEmailClicked')">edit</div>
+                          <!-- <div class="edit"  @click="editFunc('isEmailClicked')">edit</div> -->
                         </div>
                         <div v-else>
                           <el-input v-model="user.email" placeholder="email"></el-input>

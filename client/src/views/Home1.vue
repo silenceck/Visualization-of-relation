@@ -17,7 +17,7 @@
                     </el-scrollbar>
                 </el-col>
                 <el-col :span="9">
-                    <div class="title" @click="resetData" v-bind:style="{cursor:'pointer' }">护理领域</div>
+                    <div class="title" @click="resetData" v-bind:style="{cursor:'pointer' }">{{field}} Field</div>
                     <div id="main" class="chart"></div>
                 </el-col>
                 <el-col :span="9" class="card">
@@ -27,7 +27,7 @@
                             <span>{{click_node.name}}</span>
                         </div>
                         <div v-for="(value, name, index) in click_node" :key="index" class="text item">
-                            <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable' && name !== 'source' && name !== 'target'" >
+                            <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable' && name !== 'source' && name !== 'target' && name !== 'field' && name !=='draggable' && name !=='category' && name !=='type' && name !=='value'" >
                                 <span v-bind:style="{ fontWeight:'bold' }">{{name + ':' }}</span> {{value }} 
                             </div>                         
                         </div>
@@ -51,6 +51,121 @@ export default {
                     id: 1,
                     label: 'Nursing',
                     children: [
+                        {
+                            id: 4,
+                            label: 'Diagnosis',
+                            children: [
+                                {
+                                    id: 'A4',
+                                    label: 'A',
+                                    children: [],
+                                },
+                                {
+                                    id: 'B4',
+                                    label: 'B',
+                                    children: [],
+                                },
+                                {
+                                    id: 'C4',
+                                    label: 'C',
+                                    children: [],
+                                },
+                                {
+                                    id: 'D4',
+                                    label: 'D',
+                                    children: [],
+                                },
+                                {
+                                    id: 'E4',
+                                    label: 'E',
+                                    children: [],
+                                },
+                                {
+                                    id: 'F4',
+                                    label: 'F',
+                                    children: [],
+                                },
+                                {
+                                    id: 'G4',
+                                    label: 'G',
+                                    children: [],
+                                },
+                                {
+                                    id: 'H4',
+                                    label: 'H',
+                                    children: [],
+                                },
+                                {
+                                    id: 'J4',
+                                    label: 'J',
+                                    children: [],
+                                },{
+                                    id: 'K4',
+                                    label: 'K',
+                                    children: [],
+                                },
+                                {
+                                    id: 'L4',
+                                    label: 'L',
+                                    children: [],
+                                },
+                                {
+                                    id: 'M4',
+                                    label: 'M',
+                                    children: [],
+                                },
+                                {
+                                    id: 'N4',
+                                    label: 'N',
+                                    children: [],
+                                },
+                                {
+                                    id: 'P4',
+                                    label: 'P',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Q4',
+                                    label: 'Q',
+                                    children: [],
+                                },
+                                {
+                                    id: 'R4',
+                                    label: 'R',
+                                    children: [],
+                                },
+                                {
+                                    id: 'S4',
+                                    label: 'S',
+                                    children: [],
+                                },
+                                {
+                                    id: 'T4',
+                                    label: 'T',
+                                    children: [],
+                                },
+                                {
+                                    id: 'W4',
+                                    label: 'W',
+                                    children: [],
+                                },
+                                {
+                                    id: 'X4',
+                                    label: 'X',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Y4',
+                                    label: 'Y',
+                                    children: [],
+                                },
+                                {
+                                    id: 'Z4',
+                                    label: 'Z',
+                                    children: [],
+                                },
+                            ],
+                        },
                         {
                             id: 2,
                             label: 'Intervention',
@@ -280,7 +395,8 @@ export default {
                                     children: [],
                                 },
                             ],
-                        }
+                        },
+                        
                     ]
                 }, 
             ],
@@ -633,48 +749,135 @@ export default {
             },
             click_node: {
 
-            }
+            },
+            field: ''
         }
     },
-    beforeMount: function() {
-        this.getChartData();
+    mounted: function() {
+        let field = this.$route.query.field;
+        if (!field) {
+            field = 'Nursing'
+        } 
+        this.field = field;
+        this.$emit('passField', this.field);
+        this.getChartData(field);
     },
     methods: {
-        getChartData: function(){
-            this.$http.get('api/networks/Nursing')
+        getChartData: function(field){
+            this.$http.get(`api/networks/${field}`)
             .then(res => {
+                let alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
                 this.nodes = res.data.nodes;
                 this.links = res.data.links;
                 console.log(this.nodes, this.links);
-                let outcomeNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
-                let InterventionNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
-                for(let node of this.nodes){
-                    // console.log(node.name)
-                    const char = node.name.trim()[0];
-                    char = char.toUpperCase();
-                    if(node.lable === 'Intervention'){
-                        if(!InterventionNodes[char]){
-                            break;
+                let nodeTypes = [];
+                if (field === 'Nursing') {
+                    let outcomeNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
+                    let InterventionNodes = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
+                    let Diagnosis = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]};
+                    nodeTypes = ['Intervention', 'Outcome']
+                    for(let node of this.nodes){
+                        const char = node.name.trim()[0];
+                        char = char.toUpperCase();
+                        if(node.label === 'Intervention'){
+                            node.type = node.label;
+                            if(!InterventionNodes[char]){
+                                break;
+                            }
+                            InterventionNodes[char].push({label:node.name});
+                        }else if(node.label === 'Outcome') {
+                            node.type = node.label;
+                            if(!outcomeNodes[char]){
+                                break;
+                            }
+                            outcomeNodes[char].push({label:node.name});
                         }
-                        InterventionNodes[char].push({label:node.name});
-                    }else if(node.lable === 'Outcome') {
-                        if(!outcomeNodes[char]){
-                            break;
-                        }
-                        outcomeNodes[char].push({label:node.name});
                     }
-                }
-                for(let key in InterventionNodes){
-                    InterventionNodes[key] = InterventionNodes[key].sort(function(a,b){return a['label'].localeCompare(b['label'])}); // in alphabetical order
-                    this.$refs.tree.updateKeyChildren(key+'2', InterventionNodes[key]);
-                }
-                for(let key in outcomeNodes){
-                    outcomeNodes[key] = outcomeNodes[key].sort(function(a,b){return a['label'].localeCompare(b['label'])});
-                    this.$refs.tree.updateKeyChildren(key+'3', outcomeNodes[key]);
+                    let temDiagnosis = [];
+                    for(let link of this.links) {
+                        if(!temDiagnosis.includes(link.diagnosis)){
+                            temDiagnosis.push(link.diagnosis);
+                        }
+                    }
+                    for(let diagnosis of temDiagnosis){
+                        const char = diagnosis.trim()[0];
+                        char = char.toUpperCase();
+                        Diagnosis[char].push({label: diagnosis});
+                    }
+                    for(let key in InterventionNodes){
+                        InterventionNodes[key] = InterventionNodes[key].sort(function(a,b){return a['label'].localeCompare(b['label'])}); // in alphabetical order
+                        this.$refs.tree.updateKeyChildren(key+'2', InterventionNodes[key]);
+                    }
+                    for(let key in outcomeNodes){
+                        outcomeNodes[key] = outcomeNodes[key].sort(function(a,b){return a['label'].localeCompare(b['label'])});
+                        this.$refs.tree.updateKeyChildren(key+'3', outcomeNodes[key]);
+                    }
+                    for(let key in Diagnosis){
+                        Diagnosis[key] = Diagnosis[key].sort(function(a,b){return a['label'].localeCompare(b['label'])});
+                        this.$refs.tree.updateKeyChildren(key+'4', Diagnosis[key]);
+                    }
+                } else {
+                    this.data = [
+                        {
+                          id: 1,
+                          label: field,
+                          children:  []
+                        }
+                    ]
+                    for(let node of this.nodes) {
+                        if(!nodeTypes.includes(node.label)){
+                            nodeTypes.push(node.label);
+                        }
+                    }
+                    for(let link of this.links) {
+                        link.type = link.label;
+                    }
+                    for(let type of nodeTypes) {
+                        let index = 2;
+                        let temp = []
+                        for(let i = 0; i <26; i++){
+                            temp.push({
+                                id: alphabet[i] + String(index),
+                                label: alphabet[i],
+                                children: [],
+                            })
+                        }
+                        this.data[0].children.push(
+                            {
+                                id: String(index),
+                                label: type,
+                                children: temp,
+                            }
+                        )
+                    }
+                    // update nodeTree in the left side 
+                    let nodeTree = {};
+                    for(let type of nodeTypes) {
+                        nodeTree[type] = {A:[],B:[],C:[],D:[],E:[],F:[],G:[],H:[],I:[],J:[],K:[],L:[],M:[],N:[],O:[],P:[],Q:[],R:[],S:[],T:[],U:[],V:[],W:[],X:[],Y:[],Z:[]}
+                    }
+                    for(let node of this.nodes){
+                        const char = node.name.trim()[0];
+                        char = char.toUpperCase();
+                        for(let type of nodeTypes) {
+                            if(node.label === type) {
+                                nodeTree[type][char].push({label:node.name});
+                            }
+                        }
+                    }
+                    for(let type of nodeTypes) {
+                        let index = 2;
+                        for(let key in nodeTree[type]) {
+                            nodeTree[type][key] = nodeTree[type][key].sort(function(a,b){return a['label'].localeCompare(b['label'])});
+                        }
+                        for(let i = 0; i <26; i++) {
+                            this.data[0].children[nodeTypes.indexOf(type)].children[i].children = nodeTree[type][alphabet[i]]
+                        }
+                        index += 1;
+                    }
                 }
                 let myChart = this.$echarts.init(document.getElementById('main'));
                 var categories = [];
-                var types = ['Intervention', 'Outcome'];
+                var types = nodeTypes;
                 for (var i = 0; i < types.length; i++) {
                     categories[i] = {
                         name: types[i],
@@ -683,26 +886,33 @@ export default {
                 this.nodes.forEach(function (node) {
                     node.itemStyle = null;
                     node.symbolSize = Math.random()*40 + 1;
+                    node.type = node.label;
                     node.label = {
                         normal: {
                             // show: node.name.length > 10
                             show: false
                         }
                     };
-                    node.category = types.findIndex((element) => element === node.lable);
+                    node.category = types.findIndex((element) => element === node.type);
+                    
                 });
                 // Because the number of nodes is large, we select part of the nodes to show
-                this.partLinks = this.links.slice(0, 50);
-                let ids = [];
-                for(let item of this.partLinks){
-                    if(!ids.find(element => element === item.source)){
-                        ids.push(item.source);
+                if (this.links.length > 50) {
+                    this.partLinks = this.links.slice(0, 50);
+                    let ids = [];
+                    for(let item of this.partLinks){
+                        if(!ids.find(element => element === item.source)){
+                            ids.push(item.source);
+                        }
+                        if(!ids.find(element => element === item.target)){
+                            ids.push(item.target);
+                        }
                     }
-                    if(!ids.find(element => element === item.target)){
-                        ids.push(item.target);
-                    }
+                    this.partNodes = this.nodes.filter(element =>  ids.indexOf(element.id) !== -1);
+                } else {
+                    this.partLinks = this.links;
+                    this.partNodes = this.nodes;
                 }
-                this.partNodes = this.nodes.filter(element =>  ids.indexOf(element.id) !== -1);
                 const option = {
                     title: {
                         top: 'bottom',
@@ -757,7 +967,6 @@ export default {
                                 // 点击到了 graph 的 edge（边）上。
                                 const data = params.data
                                 const links = that.links.filter( link => { return link.source === data.source && link.target === data.target });
-                                console.log('link:', links)
                                 that.click_node = links[0];
                                 const nodes = that.nodes.filter( node => { return node.id === data.source || node.id === data.target });
                                 const option = {
@@ -839,6 +1048,7 @@ export default {
                 ]
             };
             myChart.setOption(option);
+            this.click_node = {};
         },
         testChartData: function(){
             let myChart = this.$echarts.init(document.getElementById('main'));
@@ -856,41 +1066,74 @@ export default {
         },
         handleNodeClick: function(data) {
             const label = data.label;
-            console.log('label:', label);
-            const id = this.nodes.find(item => item.name === label).id;
             let myChart = this.$echarts.init(document.getElementById('main'));
-            const links = this.links.filter( link => { return link.source === id || link.target === id });
-            this.click_node = this.nodes.filter( node => { return node.id === id })[0];
-            let seleted_node = new Set();
-            for(let link in links) {
-                seleted_node.add(links[link].source);
-                seleted_node.add(links[link].target); 
+            let diagnosis = [];
+            for(let link of this.links) {
+                if(!diagnosis.includes(link.diagnosis)) {
+                    diagnosis.push(link.diagnosis);
+                }
             }
-            const nodes = this.nodes.filter( node => { return seleted_node.has(node.id) })
-            // console.log('id:', id, 'node:', nodes, 'links:', links);
-            const option = {
-                series : [
-                    {         
-                        data: nodes,
-                        links: links,
+            if(diagnosis.includes(label)) {
+                const links = this.links.filter( link => { return link.diagnosis === label });
+                let node_id = [];
+                for(let link of links) {
+                    if(!node_id.includes(link.source)) {
+                        node_id.push(link.source);
                     }
-                ]
-            };
-            myChart.setOption(option);
+                    if(!node_id.includes(link.target)) {
+                        node_id.push(link.target);
+                    }
+                }
+                const nodes = this.nodes.filter( node => { return node_id.includes(node.id) });
+                this.click_node = links[0];
+                const option = {
+                    series : [
+                        {         
+                            data: nodes,
+                            links: links,
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+            }else {
+                if(!this.nodes.find(item => item.name === label)) {
+                    return;
+                }
+                const id = this.nodes.find(item => item.name === label).id;               
+                const links = this.links.filter( link => { return link.source === id || link.target === id });
+                this.click_node = this.nodes.filter( node => { return node.id === id })[0];
+                let seleted_node = new Set();
+                for(let link in links) {
+                    seleted_node.add(links[link].source);
+                    seleted_node.add(links[link].target); 
+                }
+                const nodes = this.nodes.filter( node => { return seleted_node.has(node.id) })
+                const option = {
+                    series : [
+                        {         
+                            data: nodes,
+                            links: links,
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+            }
+            
         },
         renderContent(h, { node, data, store }) {
             return (
             <span class="custom-tree-node">
                 <span>{node.label}</span>
             </span>);
+        },
+        exitSocket() {
+            this.socket.close();
         }
 
     },
     watch: {
         keyword(val, oldVal){
-            console.log('home:', val);
             if(val !== ''){
-                
                 this.handleNodeClick({label: val});
             }
         }
@@ -926,6 +1169,7 @@ export default {
     left: 80px;
 }
 .box-card {
+    margin-left: 120px;
     width: 480px;
     height: 100%;
 }

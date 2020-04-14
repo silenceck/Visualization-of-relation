@@ -47,14 +47,14 @@
                     },
                     {
                         icon: "fa-asterisk",
-                        name: "我的关系网络",
-                        path: 'my-network',
+                        name: "关系图谱",
+                        path: 'my_network',
                     },
-                    {
-                        icon: "fa-asterisk",
-                        name: "我的文本关系",
-                        path: 'my-text-relation',
-                    },
+                    // {
+                    //     icon: "fa-bars",
+                    //     name: "我的文本关系",
+                    //     path: 'my-text-relation',
+                    // },
                 ]
             }
         },

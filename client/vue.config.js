@@ -52,7 +52,15 @@ module.exports = {
                 pathRewrite: {
                     '^/api': ''
                 }
-            }
+            },
+            // '/': {
+            //     target: 'http://localhost:5000/socket.io/',
+            //     ws: true,
+            //     changOrigin: true,
+            //     pathRewrite: {
+            //         '^/': ''
+            //     }
+            // }
         },
         before: app => { }
     }

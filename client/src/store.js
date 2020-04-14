@@ -11,6 +11,8 @@ const types = {
   SET_USER: "SET_USER",
   SET_NEWCHART: "SET_NEWCHART",
   SET_FIELD: "SET_FIELD",
+  SET_INDEX: 'SET_INDEX',
+  SET_RELATIONDATA: 'SET_RELATIONDATA',
   ADD_NODE: "ADD_NDOE",
   ADD_EDGE: "ADD_EDGE",
   DELETE_NODE: "DELETE_NODE",
@@ -25,6 +27,8 @@ const state = {
     nodes: [],
     links: []
   },
+  relationData: [],
+  index: 'index',
   field: '',
   sidebar: {
     opened: true,
@@ -41,6 +45,8 @@ const getters = {
   isAuthenticated: state => state.isAuthenticated,
   user: state => state.user,
   newChart: state => state.newChart,
+  relationData: state =>state.relationData,
+  index: state => state.index,
   field: state => state.field,
   sidebar: state => state.sidebar,
   device: state => state.device,
@@ -64,6 +70,15 @@ const mutations = {
     if (field) state.field = field;
     else state.field = ''
   },
+  [types.SET_INDEX](state, index) {
+    if (index) state.index = index;
+    else state.index = ''
+  },
+  [types.SET_RELATIONDATA](state, relationData) {
+    console.log('set relation data')
+    if (relationData) state.relationData = relationData;
+    else state.relationData = []
+  },
   [types.ADD_NODE](state, node) {
     if (node) state.newChart.nodes.push(node);
     else state.nodes = []
@@ -73,9 +88,14 @@ const mutations = {
     else state.links = []
   },
   [types.DELETE_NODE](state, info) {
-    if (info) state.newChart.nodes = state.newChart.nodes.filter(node => {
-      return node.id !== info.id;
-    });
+    if (info) {
+      state.newChart.nodes = state.newChart.nodes.filter(node => {
+        return node.id !== info.id;
+      });
+      state.newChart.links = state.newChart.links.filter(link => {
+        return link.source !== info.id && link.target !== info.id;
+      });
+    }
     else state.nodes = []
   },
   [types.DELETE_EDGE](state, info) {
@@ -144,6 +164,12 @@ const actions = {
   },
   setField: ({commit}, field) => {
     commit(types.SET_FIELD, field)
+  },
+  setIndex: ({commit}, index) => {
+    commit(types.SET_INDEX, index)
+  },
+  setRelationData: ({commit}, relationData) => {
+    commit(types.SET_RELATIONDATA, relationData)
   },
   addNode: ({commit}, node) => {
     commit(types.ADD_NODE, node)

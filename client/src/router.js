@@ -15,6 +15,8 @@ import Search from './components/Search.vue'
 import Profile from './views/Profile.vue'
 import MyNetwork from './components/MyNetworks.vue'
 import MyTextRelation from './components/MyTextRelation.vue'
+import UploadData from './views/UploadData.vue'
+import Entry from './views/Entry.vue'
 
 
 Vue.use(Router)
@@ -26,23 +28,26 @@ const router = new Router({
     {
       path: '/',
       redirect: '/index',
-      // component:Home1,
     },
     {
       path: '/index',
       name: 'index',
       component: Index,
       children:[            
+        // {                                     
+        //   path:'',
+        //   component:Home,
+        // },
         {                                     
-          path:'',
+          path:'/index',
+          component: Entry,
+        },
+        {                                     
+          path:'/home',
           component:Home,
         },
         {                                     
-          path:'/1',
-          component:Home,
-        },
-        {                                     
-          path:'/2',
+          path:'/create_chart',
           name:'create_chart',
           component:CreateChart,
           children:[
@@ -61,9 +66,17 @@ const router = new Router({
             ]
           },
         {                                     
-            path:'/3',
+            path:'/relation_extraction',
             component:TextRelation,
         },
+        {                                     
+            path:'/4-1',
+            component:UploadData,
+        },
+        // {                                     
+        //     path:'/4-2',
+        //     component:Creeper,
+        // },
         { 
             path: '/profile',
             component: Profile,
@@ -77,7 +90,7 @@ const router = new Router({
                 component: Info
               },
               {
-                path:'/my-network',
+                path:'/my_network',
                 component: MyNetwork,
               },
               {

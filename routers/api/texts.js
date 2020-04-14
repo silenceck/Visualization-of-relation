@@ -11,13 +11,21 @@ const path = 'C:/Users/会议室/PycharmProjects/relation_extraction/v1.1.py'
  * @route post /api/text/
  * @description extract relatin of the text 
  * @access public
- */
+ */ 
 router.post('/', (req, res) => {
     const data = req.body;
+    console.log('data:', data);
+    let keywords = ''
+    for(let item of data.keywords) {
+        keywords += item + '-';
+    }
+    keywords[keywords.length-1] = ''
     let result = [];
     // res.json(result);
+    // console.log()
+    
     let pyshell = new PythonShell(path);
-    pyshell.send(JSON.stringify({ key1: data.key1, key2: data.key2, text: data.text }));
+    pyshell.send(JSON.stringify({ keywords: keywords.slice(0, keywords.length-1), text: data.text }));
     pyshell.on('message', function (message) {
       result.push(message);
     });

@@ -5,5 +5,6 @@ module.exports = {
         URL: "bolt://localhost:7687",
         USER: "neo4j",
         PASSWORD: "123456"        
-    }
+    },
+    relationExtractionPath: 'C:/Users/会议室/PycharmProjects/relation_extraction/v1.1.py',
 }

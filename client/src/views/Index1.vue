@@ -1,9 +1,9 @@
 <template>
     <div class="index">
         <el-scrollbar style="height:100%;" wrapStyle="overflow-x:hidden;">
-          <HeaderNav @passKeyword='getKeyword'></HeaderNav>
+          <HeaderNav @passKeyword='getKeyword' :field='field' :adminField='adminField'></HeaderNav>
             <div class="rightContainer">
-              <router-view :keyword="keyword"></router-view>
+              <router-view :keyword="keyword" @passField='getField' @passAdminField='getAdminField'></router-view>
             </div>
         </el-scrollbar>
     </div>
@@ -16,6 +16,8 @@ export default {
     data() {
       return {
         keyword: '', //search content
+        field: '',
+        adminField: [],
       }
     },
     components: { 
@@ -23,8 +25,13 @@ export default {
     },
     methods: {
       getKeyword(keyword){
-        console.log('index:', keyword);
         this.keyword = keyword;
+      },
+      getField(field){
+        this.field = field;
+      },
+      getAdminField(fields) {
+        this.adminField = fields;
       }
     }
 }

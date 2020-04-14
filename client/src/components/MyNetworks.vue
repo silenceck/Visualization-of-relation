@@ -21,15 +21,21 @@
                 <el-table-column
                     prop="time"
                     label="创建时间"
-                    width="240">
+                    width="200">
                 </el-table-column>
                 <el-table-column
                 label="操作"
-                width="180">
+                width="280">
                     <template slot-scope="scope">
                         <el-button
                         size="mini"
-                        @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        @click="handleLook(scope.$index, scope.row)" type='primary'>查看</el-button>
+                        <el-button
+                        size="mini"
+                        @click="handleEdit(scope.$index, scope.row)" type='success'>编辑</el-button>
+                        <el-button
+                        size="mini"
+                        @click="handleExport(scope.$index, scope.row)" type='info'>导出</el-button>
                         <el-button
                         size="mini"
                         type="danger"
@@ -85,6 +91,13 @@ export default {
             this.$http.get(`/api/networks/v1/${id}`)
             .then(res => {
                 const networks = res.data.networks;
+                for(let network of networks) {
+                    const date = new Date(network.time);
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1;
+                    const day = date.getDate();
+                    network.time = year + '/' + month + '/' + day; 
+                }
                 this.allTableData = networks;
                 this.filterTableData = networks;
                 this.setPaginations();
@@ -118,12 +131,17 @@ export default {
             }
             this.tableData = tables
         },
+        handleLook (index, row) {
+            this.$store.dispatch('setIndex', 'index');
+            this.$router.push({path:'/home',query: {field: row.field}});
+        },
         handleEdit (index, row) {
-            this.$router.push({path:'/2',query: {field: row.field}});
+            this.$store.dispatch('setIndex', 'create_chart');
+            this.$router.push({path:'/create_chart',query: {field: row.field}});
         },
         handleDelete(index, row){
             const id = row._id;
-            this.$http.delete(`/api/networks/${id}`)
+            this.$http.post(`/api/networks/delete`, {field: row.field, id: id})
             .then(res => {
                 this.allTableData = this.allTableData.filter(item => {
                     return item._id !== id
@@ -132,6 +150,25 @@ export default {
                     return item._id !== id
                 });
                 this.setPaginations();
+            })
+        },
+        handleExport(index, row){
+            const field = row.field;
+            this.$http.get(`/api/networks/v1/test/export/${field}`)
+            .then(res => {
+                const fileData = res.data.data;
+                console.log(fileData);
+                for(let fileName in fileData) {
+                    // 创建Blob对象 传入一个合适的MIME类型
+                    const blob = new Blob(['\ufeff' + fileData[fileName]], {type: 'text/csv,charset=UTF-8'}); // 参考链接 https://developer.mozilla.org/zh-CN/docs/Web/API/Blob
+                    // 使用 Blob 创建一个指向类型化数组的URL
+                    const csvUrl = URL.createObjectURL(blob); // 参考链接 https://developer.mozilla.org/zh-CN/docs/Web/API/URL/createObjectURL
+                    let link = document.createElement('a'); 
+                    link.download = fileName; //文件名字 
+                    link.href = csvUrl;
+                    // 触发下载
+                    link.click();
+                }
             })
         }
     }

@@ -13,13 +13,13 @@
                     :fetch-suggestions="querySearch"
                     placeholder="请输入内容"
                     :trigger-on-focus="false"
-                    @select="handleSelect">
+                    :disabled='isDisabled'>
                 </el-autocomplete>
             </el-col>
             <el-col :span="2" class="search_container">
                 <el-button type="primary" icon="el-icon-search" @click="search" >搜索</el-button>
             </el-col>            
-            <el-col :span="5" class="nav_container">
+            <el-col :span="8" class="nav_container">
                 <el-menu
                     :default-active="activeIndex"
                     class="el-menu-demo"
@@ -30,34 +30,39 @@
                     active-text-color="#a6282f"
                     :router=true>
                     <!-- <el-menu-item index="0" class="logo" ><img src="../assets/logo.png" alt=""></el-menu-item> -->                        
-                    <el-menu-item index="1" class="index1">首页</el-menu-item>
-                    <el-menu-item index="2" class="index">构建关系网络</el-menu-item>
+                    <el-menu-item index="index" class="index1">首页</el-menu-item>
+                    <el-menu-item index="create_chart" class="index">关系图谱构建</el-menu-item>
                     <!-- <el-submenu index="2" class="index">
                         <template slot="title">构建关系网络</template>
                         <el-menu-item index="2-1">选项1</el-menu-item>
                         <el-menu-item index="2-2">选项2</el-menu-item>
                         <el-menu-item index="2-3">选项3</el-menu-item>
                     </el-submenu> -->
-                    <el-menu-item index="3" class="index" >文本关系提取</el-menu-item>
+                    <el-menu-item index="relation_extraction" class="index" >因果关系提取</el-menu-item>
+                    <!-- <el-submenu index="4" class="index">
+                        <template slot="title" ><span v-bind:style="{height:'80px', lineHeight:'80px', fontSize: '18px' }">数据收集</span></template>
+                        <el-menu-item index="4-1" class="index">数据上传</el-menu-item>
+                        <el-menu-item index="4-2" class="index">自动爬取</el-menu-item>
+                    </el-submenu> -->
                               
                 </el-menu>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="5">
                 <div v-if="username === null" class="login" ><span @click="login" v-bind:style="{cursor:'pointer', marginRight:'30px' }" >登录</span></div>
                 <div v-else class="username">
                     <div class="right-menu">
-                        <el-dropdown class="avatar-container" trigger="click">
+                        <el-dropdown class="avatar-container" trigger="click" @command="handleCommand">
                             <div class="avatar-wrapper">
                                 {{username}}
                             <i class="el-icon-caret-bottom" />
                             </div>
                             <el-dropdown-menu slot="dropdown" class="user-dropdown">
-                            <el-dropdown-item >
-                                <span @click="info">个人中心</span>
-                            </el-dropdown-item>
-                            <el-dropdown-item divided>
-                                <span style="display:block;" @click="logout">退出</span>
-                            </el-dropdown-item>
+                                <el-dropdown-item command="info">
+                                    <span >个人中心</span>
+                                </el-dropdown-item>
+                                <el-dropdown-item divided command="logout">
+                                    <span style="display:block;">退出</span>
+                                </el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
                     </div>
@@ -68,12 +73,41 @@
 </template>
 <script>
 export default {
+    props: [
+        'field',
+        'adminField',
+    ],
     data() {
         return {
-            activeIndex: '1',
             searchData: '',
             keywordData: null,
+            isDisabled: false,
         };
+    },
+    watch: {
+        field(val, oldVal){
+            if(val !== ''){
+                this.getAllNodesName();
+            }
+        },
+        adminField(val, oldVal){
+            let fieldData = [];
+            let temp  = JSON.parse(JSON.stringify(val));
+            temp = temp.sort(function(a,b){return a.localeCompare(b)});
+            for (let item of temp) {
+                fieldData.push({value: item})
+            }
+            this.keywordData = fieldData;
+        },
+        activeIndex(val, oldVal) {
+            if (val !== 'index') {
+                this.searchData = '';
+                this.isDisabled = true;
+            } else {
+                this.isDisabled = false;
+            }
+        }
+        
     },
     computed:{
         username(){
@@ -82,22 +116,56 @@ export default {
             } else {
                 return null;
             }
+        },
+        activeIndex(){
+            if(this.$store.getters.index) {
+                return this.$store.getters.index;
+            }
         }
     },
     mounted(){
-        this.getAllNodesName();
+        if(this.field !== '') {
+            this.getAllNodesName();
+        }
+        
+        if (localStorage.eleToken) {
+            this.$http.get(`/api/users/current`)
+            .then(res => {
+                // let nodesData = []; 
+                // const data = res.data.data.sort(function(a,b){return a.localeCompare(b)});
+                // for(let item of data) {
+                //     nodesData.push({value:item})
+                // }
+                // this.keywordData = nodesData;
+            })
+            .catch(err => {
+                localStorage.removeItem("eleToken");
+                this.$store.dispatch("clearCurrentState");
+            })
+        }
+        
     },
     methods: {
         handleSelect(key, keyPath) {
+            this.$store.dispatch('setIndex', key);
         },
         search(){
-            this.$emit('passKeyword', this.searchData);
+            if (this.$route.path === '/index') {
+                this.$store.dispatch('setIndex', 'index');
+                this.$router.push({path:'/home',query: {field: this.searchData}});
+                this.searchData = ''
+            } else {
+                this.$emit('passKeyword', this.searchData);
+                this.searchData = '';
+            }
+            
         },
         getAllNodesName: function (){
             // only find all nodes in Nursing field, you can find other field by changing the network.js
             let data = [];
-            this.$http.get('api/networks/nodes/name')
+            this.$http.get(`api/networks/nodes/name/${this.field}`)
             .then(res => {
+                console.log('name: ', res.data.dada)
                 let nodesData = []; 
                 const data = res.data.data.sort(function(a,b){return a.localeCompare(b)});
                 for(let item of data) {
@@ -123,11 +191,24 @@ export default {
         logout(){
             localStorage.removeItem("eleToken");
             this.$store.dispatch("clearCurrentState");
+            this.$store.dispatch('setIndex', 'index');
             this.$router.push('/index')
             this.username = null;
         },
         info() {
             this.$router.push('/profile');
+        },
+        changeIndex() {
+            this.activeIndex = String(Math.floor((Math.random()*3)+1));
+        },
+        handleCommand(command) {
+            console.log(command);
+            if(command === 'info') {
+                this.info();
+            } else if (command === 'logout') {
+                this.logout();
+            }
+            
         }
     }
 }
@@ -154,9 +235,13 @@ export default {
     height: 80px;
     line-height: 80px;
     font-size: 18px;
-
 }
 .index.el-menu-item {
+    height: 80px;
+    line-height: 80px;
+    font-size: 18px;
+}
+.el-menu--horizontal>.el-submenu .el-submenu__title {
     height: 80px;
     line-height: 80px;
     font-size: 18px;
