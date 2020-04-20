@@ -150,9 +150,9 @@ export default {
 <style scoped>
 .chart {
     /* position: absolute; */
-    margin-left: 30%;
-    height: 780px;
-    width: 900px;
+    margin-left: 25%;
+    height: 680px;
+    width: 800px;
 }
 
 </style>

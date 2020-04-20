@@ -26,7 +26,7 @@
                     </div>
                 </el-col>
                 <el-col :span="6">
-                    <el-button class="keyBtn" @click="dialogKeywordVisible = true" >添加关键词</el-button>
+                    <el-button class="keyBtn" @click="dialogKeywordVisible = true" >Add Keyword</el-button>
                 </el-col>
             </el-row>
             <el-row :gutter='20'>
@@ -40,14 +40,14 @@
                     </el-input>
                 </el-col>
                 <el-col :span="6">
-                    <el-button @click="submit" class="keyBtn1">关系提取</el-button>
+                    <el-button @click="submit" class="keyBtn1">Extract causality </el-button>
                 </el-col>
             </el-row>
-            <el-dialog title="确定关键词" :visible.sync="dialogKeywordVisible"  width="30%" top="25vh" >
+            <el-dialog title="Confirm Keyword" :visible.sync="dialogKeywordVisible"  width="30%" top="25vh" >
                 <el-input class="dialog" v-model="words" style="width: 100%"></el-input> 
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogKeywordVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="addKeyword">保 存</el-button>
+                    <el-button @click="dialogKeywordVisible = false">Cancel</el-button>
+                    <el-button type="primary" @click="addKeyword">OK</el-button>
                 </div>
             </el-dialog>
             <!-- <el-input v-model="key2"  class="key2" placeholder="keyword2" :style="keyword2Style"></el-input>  -->
@@ -71,17 +71,17 @@
                         </el-table-column>           
                         <el-table-column
                             prop="keyword1"
-                            label="关键词1"
+                            label="Keyword1"
                             width="200">
                         </el-table-column>
                         <el-table-column
                             prop="keyword2"
-                            label="关键词2"
+                            label="Keyword2"
                             width="200">
                         </el-table-column>
                         <el-table-column
                             prop="relation"
-                            label="关系类型"
+                            label="Relation Type"
                             width="180">
                         </el-table-column>
                     </el-table>
@@ -100,7 +100,7 @@
             </div>
             </el-col>
             <el-col :span="6">
-                <el-button @click="edit" class="keyBtn">编辑因果图</el-button>
+                <el-button @click="edit" class="keyBtn">Edit causal graph</el-button>
             </el-col>
         </el-row>
         <!-- <el-button
@@ -235,7 +235,7 @@ export default {
                 //     this.setPaginations();
                 // })
             }else{
-                this.$message.error('输入框不能为空！！！');
+                this.$message.error('The input box cannot be empty！！！');
             }
         },
         reset: function () {
@@ -254,6 +254,7 @@ export default {
             }
             this.sentences = [];
         },
+        // save function is not used
         save: function() {
             const isAuthenticated = this.$store.getters.isAuthenticated;
             if(isAuthenticated){
@@ -338,8 +339,8 @@ export default {
         },
         open1() {
             this.$notify({
-                title: '成功',
-                message: '因果关系提取完成',
+                title: 'success',
+                message: 'Causality extraction completed',
                 type: 'success'
             });
         },
@@ -407,7 +408,7 @@ export default {
 .textarea {
     width: 1000px;
     height: 200px;
-    margin-top: 50px;
+    margin-top: 20px;
     margin-left: 25%;
     margin-bottom: 40px;
     font-size: 16px;

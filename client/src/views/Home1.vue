@@ -795,6 +795,7 @@ export default {
                     }
                     let temDiagnosis = [];
                     for(let link of this.links) {
+                        link.value = link.diagnosis;
                         if(!temDiagnosis.includes(link.diagnosis)){
                             temDiagnosis.push(link.diagnosis);
                         }

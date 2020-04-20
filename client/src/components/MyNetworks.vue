@@ -5,41 +5,41 @@
             style="width: 100%">
                 <el-table-column
                     prop="field"
-                    label="领域"
-                    width="180">
+                    label="Field"
+                    width="140">
                 </el-table-column>
                 <el-table-column
                     prop="numOfNodes"
-                    label="节点数目"
+                    label="Number of nodes"
                     width="180">
                 </el-table-column>
                 <el-table-column
                     prop="numOfLinks"
-                    label="关系数目"
+                    label="Number of links"
                     width="180">
                 </el-table-column>
                 <el-table-column
                     prop="time"
-                    label="创建时间"
+                    label="Creation time"
                     width="200">
                 </el-table-column>
                 <el-table-column
-                label="操作"
-                width="280">
+                label="Operation"
+                width="320">
                     <template slot-scope="scope">
                         <el-button
                         size="mini"
-                        @click="handleLook(scope.$index, scope.row)" type='primary'>查看</el-button>
+                        @click="handleLook(scope.$index, scope.row)" type='primary'>View</el-button>
                         <el-button
                         size="mini"
-                        @click="handleEdit(scope.$index, scope.row)" type='success'>编辑</el-button>
+                        @click="handleEdit(scope.$index, scope.row)" type='success'>Edit</el-button>
                         <el-button
                         size="mini"
-                        @click="handleExport(scope.$index, scope.row)" type='info'>导出</el-button>
+                        @click="handleExport(scope.$index, scope.row)" type='info'>Export</el-button>
                         <el-button
                         size="mini"
                         type="danger"
-                        @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
                     </template>
                 </el-table-column>
         </el-table>

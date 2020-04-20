@@ -42,7 +42,7 @@ axios.interceptors.response.use(response => {
     // 获取错误状态码
     const { status } = error.response
     if (status == '401') {
-        Message.error("token已失效,请重新登录")
+        Message.error("Token has expired, please login again")
         localStorage.removeItem("eleToken")
         // 跳转到登录页面
         // router.push('/login')

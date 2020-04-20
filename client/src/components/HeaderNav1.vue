@@ -1,7 +1,7 @@
 <template>
     <div class="header">        
         <el-row class="header-nav">
-            <el-col :span="6" class="logo_container">
+            <el-col :span="4" class="logo_container">
                 <!-- <img src="../assets/logo.png" class="logo" alt=""> -->
                 <div style="color:#ffffff">dsfa</div>
             </el-col>
@@ -11,15 +11,15 @@
                     class="inline-input"
                     v-model="searchData"
                     :fetch-suggestions="querySearch"
-                    placeholder="请输入内容"
+                    placeholder="Enter the search content"
                     :trigger-on-focus="false"
                     :disabled='isDisabled'>
                 </el-autocomplete>
             </el-col>
             <el-col :span="2" class="search_container">
-                <el-button type="primary" icon="el-icon-search" @click="search" >搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="search" >Search</el-button>
             </el-col>            
-            <el-col :span="8" class="nav_container">
+            <el-col :span="10" class="nav_container">
                 <el-menu
                     :default-active="activeIndex"
                     class="el-menu-demo"
@@ -30,15 +30,15 @@
                     active-text-color="#a6282f"
                     :router=true>
                     <!-- <el-menu-item index="0" class="logo" ><img src="../assets/logo.png" alt=""></el-menu-item> -->                        
-                    <el-menu-item index="index" class="index1">首页</el-menu-item>
-                    <el-menu-item index="create_chart" class="index">关系图谱构建</el-menu-item>
+                    <el-menu-item index="index" class="index1">Home</el-menu-item>
+                    <el-menu-item index="create_chart" class="index">Relational Graph Construction </el-menu-item>
                     <!-- <el-submenu index="2" class="index">
                         <template slot="title">构建关系网络</template>
                         <el-menu-item index="2-1">选项1</el-menu-item>
                         <el-menu-item index="2-2">选项2</el-menu-item>
                         <el-menu-item index="2-3">选项3</el-menu-item>
                     </el-submenu> -->
-                    <el-menu-item index="relation_extraction" class="index" >因果关系提取</el-menu-item>
+                    <el-menu-item index="relation_extraction" class="index" >Causality Extraction</el-menu-item>
                     <!-- <el-submenu index="4" class="index">
                         <template slot="title" ><span v-bind:style="{height:'80px', lineHeight:'80px', fontSize: '18px' }">数据收集</span></template>
                         <el-menu-item index="4-1" class="index">数据上传</el-menu-item>
@@ -48,7 +48,7 @@
                 </el-menu>
             </el-col>
             <el-col :span="5">
-                <div v-if="username === null" class="login" ><span @click="login" v-bind:style="{cursor:'pointer', marginRight:'30px' }" >登录</span></div>
+                <div v-if="username === null" class="login" ><span @click="login" v-bind:style="{cursor:'pointer', marginRight:'30px' }" >Sign in</span></div>
                 <div v-else class="username">
                     <div class="right-menu">
                         <el-dropdown class="avatar-container" trigger="click" @command="handleCommand">
@@ -58,10 +58,10 @@
                             </div>
                             <el-dropdown-menu slot="dropdown" class="user-dropdown">
                                 <el-dropdown-item command="info">
-                                    <span >个人中心</span>
+                                    <span >Personal Center</span>
                                 </el-dropdown-item>
                                 <el-dropdown-item divided command="logout">
-                                    <span style="display:block;">退出</span>
+                                    <span style="display:block;">Sign out</span>
                                 </el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
@@ -218,6 +218,9 @@ export default {
 .el-menu-demo {
     height: 80px;
 }
+.inline-input {
+    font-size: 18px;
+}
 .search_container {   
     height: 80px;
     line-height: 80px;
@@ -225,6 +228,7 @@ export default {
 }
 .search_container .el-button {
     margin-left: 4px;
+    font-size: 18px;
     background: #a6282f;
     border: 1px solid #a6282f;
 }

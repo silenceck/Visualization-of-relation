@@ -3,7 +3,11 @@
         <div class="container">
             <el-row :gutter="20" class="row">               
                 <el-col :span='12' class="col1">  
-                    <div @click="undo" v-bind:style="{cursor:'pointer' }"> <i id="undo" class="icon el-icon-refresh-left" >undo</i></div>
+                    <span v-bind:style="{cursor:'pointer' }"> 
+                        <i  @click="undo" id="undo" class="icon el-icon-refresh-left" >undo</i>
+                        <i  @click="redo" id="redo" class="icon el-icon-refresh-right" >redo</i>
+                    </span>
+                    <!-- <span  v-bind:style="{cursor:'pointer' }"> </span> -->
                     <!-- <el-button id="undo" icon="custom-icon el-icon-refresh-left" @click="undo">undo</el-button> -->
                     <div id="main" class="chart"></div> 
                 </el-col>
@@ -15,19 +19,19 @@
                         <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive" v-on:search="searchData" ref="add" @finish-adding='setShowinfo'></router-view>
                     </div> -->
                     <div class="rightArea">
-                        <el-button type="text" @click="dialogFormVisible = true" class="button">添加概念</el-button>
-                        <el-button type="text" @click="dialogRelationVisible = true" class="button">添加关系</el-button>
-                        <el-dialog title="新增概念" :visible.sync="dialogFormVisible"  width="30%" top="25vh" :before-close="handleFormClose">
-                                    <div class="dialog">概念名称</div> 
+                        <el-button type="text" @click="dialogFormVisible = true" class="button">Add Model</el-button>
+                        <el-button type="text" @click="dialogRelationVisible = true" class="button">Add Relation</el-button>
+                        <el-dialog title="Add Model" :visible.sync="dialogFormVisible"  width="30%" top="25vh" :before-close="handleFormClose">
+                                    <div class="dialog">Model Name</div> 
                                     <el-input class="dialog" v-model="type"></el-input> 
-                                    <div class="dialog">属性名称</div> 
+                                    <div class="dialog">Property</div> 
                                     <div class="dialog" v-for='i in property' :key="i.key+`property`">
                                         <el-input v-model="i.name"></el-input> 
                                     </div>
                         <div slot="footer" class="dialog-footer">
-                            <el-button  @click="addProperty">添加属性</el-button>
-                            <el-button @click="formCancel">取 消</el-button>
-                            <el-button type="primary" @click="addConcept">确 定</el-button>
+                            <el-button  @click="addProperty">Add Property</el-button>
+                            <el-button @click="formCancel">Cancel</el-button>
+                            <el-button type="primary" @click="addConcept">OK</el-button>
                         </div>
                         </el-dialog>
                         <el-table
@@ -35,21 +39,21 @@
                             style="width: 600px;fontSize: 15px;">
                             <el-table-column
                                 prop="number"
-                                label="序号"
+                                label="ID"
                                 width="180">
                             </el-table-column>
                             <el-table-column
                                 prop="concept"
-                                label="概念名称"
+                                label="Model"
                                 width="180">
                             </el-table-column>
                             <el-table-column
-                            label="操作"
+                            label="Operation"
                             width="240">
                                 <template slot-scope="scope">
                                     <el-button
                                     size="mini"
-                                    @click="addEntity(scope.$index, scope.row)" type='primary' icon="el-icon-plus">添加实例</el-button>
+                                    @click="addEntity(scope.$index, scope.row)" type='primary' icon="el-icon-plus">Add Instance</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -64,9 +68,9 @@
                             :total="paginations.total">
                         </el-pagination>
                         </div>
-                        <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">查询</el-button> &#12288;
-                        <el-button type="text" class="button" @click="quitQuery" v-if="queryLabel === true">退出查询</el-button>
-                        <el-button type="text" class="button" @click="dialogNetworkVisible = true">保存</el-button>
+                        <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">Query</el-button> &#12288;
+                        <el-button type="text" class="button" @click="quitQuery" v-if="queryLabel === true">Exit Query</el-button>
+                        <el-button type="text" class="button" @click="dialogNetworkVisible = true">Save</el-button>
                         <el-upload
                             class="upload-demo"
                             ref="upload"
@@ -77,13 +81,13 @@
                             :file-list="fileList"
                             :before-upload="beforeUpload"
                             :auto-upload=false>
-                            <el-button slot="trigger" size="small" type="primary" class="button" icon="el-icon-folder-opened">选取文件</el-button>
-                            <el-button style="margin-left: 10px; fontSize: 16px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">上传</el-button>
+                            <el-button slot="trigger" size="small" type="primary" class="button" icon="el-icon-folder-opened">Select File</el-button>
+                            <el-button style="margin-left: 10px; fontSize: 16px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
                         </el-upload>
-                        <el-dialog title="新增实例" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
+                        <el-dialog title="Add Instance" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
                                 <!-- <el-form :model="form"> -->
                                     <!-- <el-form-item label="概念名称" :label-width="formLabelWidth"> -->
-                                        <div class="dialog">实例类别: {{entity.label}}</div> 
+                                        <div class="dialog">Instance Tpye: {{entity.label}}</div> 
                                         <!-- <el-input class="dialog" v-model="type"></el-input>  -->
                                         <div class="dialog" v-for='i in entityProperty' :key="i.key+`property`">
                                             {{i.name}} <el-input v-model="i.value" class="dialog"></el-input> 
@@ -91,31 +95,31 @@
                                     <!-- </el-form-item> -->
                                 <!-- </el-form> -->
                             <div slot="footer" class="dialog-footer">
-                                <el-button @click="dialogEntityVisible = false;entityProperty = [];">取 消</el-button>
-                                <el-button type="primary" @click="addNode">确 定</el-button>
+                                <el-button @click="dialogEntityVisible = false;entityProperty = [];">Cancel</el-button>
+                                <el-button type="primary" @click="addNode">OK</el-button>
                             </div>
                         </el-dialog>
-                        <el-dialog title="新增关系" :visible.sync="dialogRelationVisible"  width="30%" top="25vh" :before-close="handleRelationClose">
-                            <div class="dialog">关系名称</div> 
+                        <el-dialog title="Add Relation" :visible.sync="dialogRelationVisible"  width="30%" top="25vh" :before-close="handleRelationClose">
+                            <div class="dialog">Relation Name</div> 
                             <el-input class="dialog" v-model="relationType"></el-input> 
-                            <div class="dialog">节点1名称</div> 
+                            <div class="dialog">Node1 Name</div> 
                             <el-input class="dialog" v-model="sourceNodeName"></el-input> 
-                            <div class="dialog">节点2名称</div> 
+                            <div class="dialog">Node2 Name</div> 
                             <el-input class="dialog" v-model="targetNodeName"></el-input> 
                             <div slot="footer" class="dialog-footer">
-                                <el-button @click="RelationCancel">取 消</el-button>
-                                <el-button type="primary" @click="addRelation">保 存</el-button>
+                                <el-button @click="RelationCancel">Cancel</el-button>
+                                <el-button type="primary" @click="addRelation">Save</el-button>
                             </div>
                         </el-dialog>
-                        <el-dialog title="确定领域" :visible.sync="dialogNetworkVisible"  width="30%" top="25vh" >
-                            <div class="dialog">领域名称</div>  
+                        <el-dialog title="Confirm Field" :visible.sync="dialogNetworkVisible"  width="30%" top="25vh" >
+                            <div class="dialog">Field Name</div>  
                             <el-input class="dialog" v-model="field"></el-input> 
                             <div slot="footer" class="dialog-footer">
-                                <el-button @click="dialogNetworkVisible = false">取 消</el-button>
-                                <el-button type="primary" @click="addNetwork">保 存</el-button>
+                                <el-button @click="dialogNetworkVisible = false">Cancel</el-button>
+                                <el-button type="primary" @click="addNetwork">OK</el-button>
                             </div>
                         </el-dialog>
-                        <el-dialog title="更新元素" :visible.sync="dialogUpdateVisible"  width="30%" top="25vh" :before-close="handleUpdateClose"  >
+                        <el-dialog title="Update Element" :visible.sync="dialogUpdateVisible"  width="30%" top="25vh" :before-close="handleUpdateClose"  >
                             <div v-if="showinfo !== null">
                                 <!-- <div class="dialog">label:{{showinfo.label}}</div> -->
                                 <!-- <el-input class="dialog" v-model="showinfo.label"></el-input> -->
@@ -126,11 +130,11 @@
                                 </div> 
                             </div>
                             <div slot="footer" class="dialog-footer">
-                                <el-button @click="updateCancel">取 消</el-button>
-                                <el-button type="primary" @click="updateElement">更 新</el-button>
+                                <el-button @click="updateCancel">Cancel</el-button>
+                                <el-button type="primary" @click="updateElement">Update</el-button>
                             </div>
                         </el-dialog>
-                        <el-dialog title="查询元素" :visible.sync="dialogQueryVisible"  width="30%" top="25vh" :before-close="handleQueryClose"  >
+                        <el-dialog title="Query Element" :visible.sync="dialogQueryVisible"  width="30%" top="25vh" :before-close="handleQueryClose"  >
                             <div>
                                 <el-row :gutter="20">
                                     <el-col :span='8'>
@@ -151,9 +155,9 @@
                                 </el-row>
                             </div>
                             <div slot="footer" class="dialog-footer">
-                                <el-button class="add_btn" @click="addQueryProperty">添加属性</el-button>
-                                <el-button @click="handleQueryClose">取 消</el-button>
-                                <el-button type="primary" @click="query">查 询</el-button>
+                                <el-button class="add_btn" @click="addQueryProperty">Add Property</el-button>
+                                <el-button @click="handleQueryClose">Cancel</el-button>
+                                <el-button type="primary" @click="query">Query Element</el-button>
                             </div>
                         </el-dialog>
                     </div> 
@@ -163,7 +167,7 @@
             <el-row :gutter="20">
                 <el-col :span="12">
                     <transition name="slide-fade">
-                        <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:</span>{{val}} </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">更新</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">删除</el-button></span></div>
+                        <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:</span>{{val}} </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">Update</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">Delete</el-button></span></div>
                     </transition>
                 </el-col>
             </el-row>
@@ -229,6 +233,8 @@ export default {
             fileList: [],
             graphHistory: [{nodes: [], links: []}], // graph快照
             graphQueryHistory: [], // 查询模式graph快照
+            currentIndex: 0, // graph快照索引
+            currentQueryIndex: -1, // // 查询模式下的graph快照索引
         }
     },
     mounted: function(){
@@ -259,7 +265,7 @@ export default {
                 this.nodes = newChart.nodes;
                 this.links = newChart.links;
                 const record = {nodes: this.nodes, links: this.links};
-                this.graphHistory.push(this.deepClone(record));
+                this.putRecord(this.graphHistory, record, false)
                 // add concept
                 for (let node of this.nodes) {
                     let concept = {};
@@ -278,6 +284,9 @@ export default {
                             concept: concept.type,
                         }) 
                         this.conceptNum += 1;
+                        this.allTableData = this.conceptTabelData;
+                        this.filterTableData = this.conceptTabelData;
+                        this.setPaginations();
                     }
                 }
                 // this.$store.dispatch('setNewChart', newChart);
@@ -338,7 +347,7 @@ export default {
         }
     },
     // computed: {
-    //     nodes(){
+    //     currentIndex(){
     //         return this.$store.getters.newChart.nodes
     //     },
     //     links(){
@@ -470,7 +479,7 @@ export default {
             });
         },
         delete_element: function(showinfo){
-            if(showinfo.type == 'node'){
+            if(showinfo.type === 'node'){
                 this.nodes = this.nodes.filter(node => {
                     return node.id !== showinfo.id;
                 });
@@ -485,10 +494,10 @@ export default {
                         return link.source !== showinfo.id && link.target !== showinfo.id;
                     });
                     const record = {nodes: this.queryNodes, links: this.queryLinks};
-                    this.graphQueryHistory.push(this.deepClone(record));
+                    this.putRecord(this.graphQueryHistory, record, true)
                 } else {
                     const record = {nodes: this.nodes, links: this.links};
-                    this.graphHistory.push(this.deepClone(record));
+                    this.putRecord(this.graphHistory, record, false)
                 }
                 // this.$store.dispatch('deleteNode', showinfo);
                 this.showinfo = null;
@@ -502,10 +511,10 @@ export default {
                         return link.source !== showinfo.id && link.target !== showinfo.id;
                     });
                     const record = {nodes: this.queryNodes, links: this.queryLinks};
-                    this.graphQueryHistory.push(this.deepClone(record));
+                    this.putRecord(this.graphQueryHistory, record, true)
                 } else {
                     const record = {nodes: this.nodes, links: this.links};
-                    this.graphHistory.push(this.deepClone(record));
+                    this.putRecord(this.graphHistory, record, false)
                 }
                 this.showinfo = null;
             }
@@ -593,24 +602,24 @@ export default {
             let concept = {};
             concept.type = this.type;
             if (concept.type === '') {
-                this.$message.error('概念名称不能为空！！！');
+                this.$message.error('Model name cannot be empty！！！');
                 return;
             }
             if(this.concepts.find(item => item === this.type)) {
-                this.$message.error('概念名称重复！！！');
+                this.$message.error('Model name is duplicate！！！');
                 return;
             }
             let propertyName = [];
             for(let property of this.property) {
                 if (property.name === '') {
-                    this.$message.error('属性名称不能为空！！！');
+                    this.$message.error('Property name cannot be empty！！！');
                 }
                 propertyName.push(property.name);
             }
             this.dialogFormVisible = false;
             concept.property = propertyName;
             this.concepts.push(concept);
-            this.conceptTabelData.push({
+            this.allTableData.push({
                 number: this.conceptNum,
                 concept: this.type,
             }) 
@@ -624,8 +633,8 @@ export default {
             ],
             this.iter_num = 1;
             this.type = '';
-            this.allTableData = this.conceptTabelData;
-            this.filterTableData = this.conceptTabelData;
+            // this.allTableData = this.conceptTabelData;
+            // this.filterTableData = this.conceptTabelData;
             this.setPaginations();
         },
         addEntity:function (index, row) {
@@ -652,13 +661,13 @@ export default {
                 if(value !== ''){
                     node[name] = value;
                 } else {
-                    this.$message.error('属性值不能为空！！！');
+                    this.$message.error('Property name cannot be empty！！！');
                     return;
                 }
             }
             for(let item of this.nodes) {
                 if(item.name === node.name) {
-                    this.$message.error('节点名称重复！！！');
+                    this.$message.error('Node name is duplicate！！！');
                     return;
                 }
             }
@@ -669,11 +678,10 @@ export default {
             if (this.queryLabel === true) {
                 this.queryNodes.push(node);
                 const record = {nodes: this.queryNodes, links: this.queryLinks};
-                this.graphQueryHistory.push(this.deepClone(record));
+                this.putRecord(this.graphQueryHistory, record, true)
             } else {
                 const record = {nodes: this.nodes, links: this.links};
-                this.graphHistory.push(this.deepClone(record));
-                
+                this.putRecord(this.graphHistory, record, false)
             }
             
         },
@@ -681,19 +689,19 @@ export default {
             const source_node = this.nodes.find(element => element.name === this.sourceNodeName);
             const target_node = this.nodes.find(element => element.name === this.targetNodeName);
             if(!source_node){
-                this.$message.error('源节点不存在！！！');
+                this.$message.error('Source node does not exist！！！');
                 return;
             }
             if(!target_node){
-                this.$message.error('目标节点不存在！！！');
+                this.$message.error('Target node does not exist！！！');
                 return;
             }
             if(source_node.name === target_node.name) {
-                this.$message.error('源节点和目标节点不能是同一个节点！！！');
+                this.$message.error('The source node and the target node cannot be the same node！！！');
                 return;
             }
             if(this.links.find(element => element.source === source_node.id && element.target === target_node.id)) {
-                this.$message.error('节点之间关系已存在！！！');
+                this.$message.error('Relation between nodes already exist！！！');
                 return;
             }
             const link = {
@@ -706,10 +714,10 @@ export default {
             if (this.queryLabel === true) {
                 this.queryLinks.push(link);
                 const record = {nodes: this.queryNodes, links: this.queryLinks};
-                this.graphQueryHistory.push(this.deepClone(record));
+                this.putRecord(this.graphQueryHistory, record, true)
             } else {
                 const record = {nodes: this.nodes, links: this.links};
-                this.graphHistory.push(this.deepClone(record));
+                this.putRecord(this.graphHistory, record, false)
             }
             this.sourceNodeName = '';
             this.relationType = '';
@@ -876,10 +884,10 @@ export default {
                             }
                         } 
                         const record = {nodes: this.queryNodes, links: this.queryLinks};
-                        this.graphQueryHistory.push(this.deepClone(record));
+                        this.putRecord(this.graphQueryHistory, record, true)
                     } else {
                         const record = {nodes: this.nodes, links: this.links};
-                        this.graphHistory.push(this.deepClone(record));
+                        this.putRecord(this.graphHistory, record, false)
                     }
                     // this.showinfoDetail = [];                               
                 }else{
@@ -962,10 +970,11 @@ export default {
             this.targetNodeProperty = [];
         },
         query: function() {
-            this.queryLabel = true;
+            
             this.dialogQueryVisible = false;
             const field = this.field;
             if(this.queryRelationLabel !== '' || this.querySourceLabel !== '' || this.queryTargetLabel !== ''){
+                this.queryLabel = true;
                 const node1Propery = {field: field};
                 const node2Propery = {field: field};
                 const relationPropery = {field: field};
@@ -1005,13 +1014,13 @@ export default {
                     this.queryNodes = data.nodes;
                     this.queryLinks = data.links;
                     const record = {nodes: this.queryNodes, links: this.queryLinks};
-                    this.graphQueryHistory.push(this.deepClone(record));
+                    this.putRecord(this.graphQueryHistory, record, true)
                     this.querySourceLabel = '';
                     this.queryTargetLabel = '';
                     this.queryRelationLabel = '';
                 })
             }else{
-                this.$message.error('输入框不能为空！！！');
+                this.$message.error('The input box cannot be empty！！！');
             }
         },
         quitQuery: function() {
@@ -1038,7 +1047,7 @@ export default {
             });;
 
             const record = {nodes: this.nodes, links: this.links};
-            this.graphHistory.push(this.deepClone(record));
+            this.putRecord(this.graphHistory, record, false)
             const option = {
                 legend: [{
                         // selectedMode: 'single',
@@ -1103,7 +1112,7 @@ export default {
                 }
                 let node = nodes[0];
                 let concept = {};
-                if(!this.conceptTabelData.find(ltem => item.concept === node.label)) {
+                if(!this.conceptTabelData.find(item => item.concept === node.label)) {
                     concept.type = node.label;
                     let propertyName = [];
                     for(let property in node) {
@@ -1113,11 +1122,12 @@ export default {
                     }
                     concept.property = propertyName;
                     this.concepts.push(concept);
-                    this.conceptTabelData.push({
+                    this.allTableData.push({
                         number: this.conceptNum,
                         concept: concept.type,
                     }) 
                     this.conceptNum += 1;
+                    this.setPaginations();
                 }
             } else {
                 const links = response.data;
@@ -1134,10 +1144,11 @@ export default {
                         this.links.push(link);
                         this.linkId += 1;
                     }
-                    
                 }
             }
-            console.log(response.data);
+            // this.allTableData = this.conceptTabelData;
+            // this.filterTableData = this.conceptTabelData;
+            // this.setPaginations();
         },
         // 分页
         setPaginations () {
@@ -1172,29 +1183,74 @@ export default {
         // putRecord(graphData) {
         //     this.graphHistory.push(graphData);
         // },
+        putRecord(history, record, queryModel) {
+            if (queryModel) {
+                if (this.currentQueryIndex < history.length - 1) {
+                    history.splice(this.currentQueryIndex+1, history.length-this.currentQueryIndex-1);
+                }
+                this.currentQueryIndex += 1;
+            } else {
+                // console.log(this.currentIndex, this.graphHistory.length - 1)
+                if (this.currentIndex < history.length - 1) {
+                    history.splice(this.currentIndex+1, history.length-this.currentIndex-1);
+                }
+                this.currentIndex += 1;
+            }
+            history.push(this.deepClone(record));
+            console.log('history:', history);
+        },
         undo() {
-            console.log('history:', this.graphQueryHistory);
-            if (this.queryLabel === true && this.graphQueryHistory.length > 1) {
-                this.graphQueryHistory.pop();
+            console.log('this.graphHistory:', this.graphHistory)
+            if (this.queryLabel === true && this.currentQueryIndex > 0) {
+                // this.graphQueryHistory.pop();
                 // if (this.graphQueryHistory.length === 0) {
                 //     return;
                 // }
-                this.queryNodes = this.deepClone(this.graphQueryHistory[this.graphQueryHistory.length-1].nodes);
-                this.queryLinks = this.deepClone(this.graphQueryHistory[this.graphQueryHistory.length-1].links);
+                this.queryNodes = this.deepClone(this.graphQueryHistory[this.currentQueryIndex-1].nodes);
+                this.queryLinks = this.deepClone(this.graphQueryHistory[this.currentQueryIndex-1].links);
+                this.currentQueryIndex -= 1;
                 // const record = {nodes: this.queryNodes, links: this.queryLinks};
-                // this.graphQueryHistory.push(this.deepClone(record));
+                // this.putRecord(this.graphQueryHistory, record, true)
                 this.showinfo = null;
-            } else if (this.queryLabel === false && this.graphHistory.length > 1) {
-                this.graphHistory.pop();
+            } else if (this.queryLabel === false && this.currentIndex > 0) {
+                // this.graphHistory.pop();
                 // if (this.graphHistory.length === 1) {
                 //     var element = document.getElementById('undo');
                 //     element.style.color = '#dcdde1'
                 //     return;
                 // }
-                this.nodes = this.deepClone(this.graphHistory[this.graphHistory.length-1].nodes);
-                this.links = this.deepClone(this.graphHistory[this.graphHistory.length-1].links);
+                this.nodes = this.deepClone(this.graphHistory[this.currentIndex-1].nodes);
+                this.links = this.deepClone(this.graphHistory[this.currentIndex-1].links);
                 // const record = {nodes: this.nodes, links: this.links};
-                // this.graphHistory.push(this.deepClone(record));
+                // this.putRecord(this.graphHistory, record, false)
+                this.currentIndex -= 1;
+                this.showinfo = null;
+            }
+        },
+        redo() {
+            if (this.queryLabel === true && this.currentQueryIndex < this.graphQueryHistory.length-1) {
+                // this.graphQueryHistory.pop();
+                // if (this.graphQueryHistory.length === 0) {
+                //     return;
+                // }
+                this.queryNodes = this.deepClone(this.graphQueryHistory[this.currentQueryIndex+1].nodes);
+                this.queryLinks = this.deepClone(this.graphQueryHistory[this.currentQueryIndex+1].links);
+                this.currentQueryIndex += 1;
+                // const record = {nodes: this.queryNodes, links: this.queryLinks};
+                // this.putRecord(this.graphQueryHistory, record, true)
+                this.showinfo = null;
+            } else if (this.queryLabel === false && this.currentIndex < this.graphHistory.length-1) {
+                // this.graphHistory.pop();
+                // if (this.graphHistory.length === 1) {
+                //     var element = document.getElementById('undo');
+                //     element.style.color = '#dcdde1'
+                //     return;
+                // }
+                this.nodes = this.deepClone(this.graphHistory[this.currentIndex+1].nodes);
+                this.links = this.deepClone(this.graphHistory[this.currentIndex+1].links);
+                // const record = {nodes: this.nodes, links: this.links};
+                // this.putRecord(this.graphHistory, record, false)
+                this.currentIndex += 1;
                 this.showinfo = null;
             }
         },
@@ -1322,8 +1378,8 @@ export default {
             },
             deep: true,
         },
-        graphHistory: function(val, oldVal){
-            if (val.length === 1) {
+        currentIndex: function(val, oldVal){
+            if (val === 0) {
                 let element = document.getElementById('undo');
                 element.style.color = '#dcdde1';
                 this.isEdit = false;
@@ -1332,9 +1388,16 @@ export default {
                 let element = document.getElementById('undo');
                 element.style.color = 'black';
             }
+            if (this.graphHistory.length - val > 1) {
+                let element = document.getElementById('redo');
+                element.style.color = 'black';
+            } else {
+                let element = document.getElementById('redo');
+                element.style.color = '#dcdde1';
+            }
         },
-        graphQueryHistory: function(val, oldVal){
-            if (val.length === 1) {
+        currentQueryIndex: function(val, oldVal){
+            if (val === 0) {
                 let element = document.getElementById('undo');
                 element.style.color = '#dcdde1';
             } else {
@@ -1437,7 +1500,11 @@ export default {
 }
 .el-icon-refresh-left{
     color: #dcdde1;
-    margin-left: 890px;
+    margin-left: 840px;
+}
+.el-icon-refresh-right{
+    color: #dcdde1;
+    /* margin-left: 890px; */
 }
 .slide-fade-enter-active {
   transition: all .8s ease;

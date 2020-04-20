@@ -42,12 +42,12 @@
                 items: [
                     {
                         icon: "fa-money",
-                        name: "个人信息",
+                        name: "Personal info",
                         path: 'info',
                     },
                     {
                         icon: "fa-asterisk",
-                        name: "关系图谱",
+                        name: "Relational graph",
                         path: 'my_network',
                     },
                     // {

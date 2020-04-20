@@ -2,21 +2,21 @@
     <div class="register">
         <section class="form_container">
             <div class="manage_tip">
-                <span class="title"> 系统注册</span>
+                <span class="title"> Create your account</span>
                 <el-form :model="registerUser" :rules="rules" ref="registerForm" label-width="80px" class="registerForm">
                     
-                    <el-form-item label="用户名" prop="name">
-                        <el-input  v-model="registerUser.name" placeholder="请输入用户名"></el-input>
+                    <el-form-item label="username" prop="name">
+                        <el-input  v-model="registerUser.name" placeholder="Please enter a user name"></el-input>
                     </el-form-item>
-                    <el-form-item label="邮箱" prop="email">
-                        <el-input  v-model="registerUser.email" placeholder="请输入邮箱"></el-input>
+                    <el-form-item label="email" prop="email">
+                        <el-input  v-model="registerUser.email" placeholder="Please enter email address"></el-input>
                     </el-form-item>
                     
-                    <el-form-item label="密码" prop="password">
-                        <el-input type="password" v-model="registerUser.password" placeholder="请输入密码"></el-input>
+                    <el-form-item label="password" prop="password">
+                        <el-input type="password" v-model="registerUser.password" placeholder="Please enter password "></el-input>
                     </el-form-item>
-                    <el-form-item label="确认密码" prop="checkPass">
-                        <el-input type="password" v-model="registerUser.checkPass" placeholder="请确认密码"></el-input>
+                    <el-form-item label="confirm" prop="checkPass">
+                        <el-input type="password" v-model="registerUser.checkPass" placeholder="Please confirm your password"></el-input>
                     </el-form-item>
                     <!-- <el-form-item label="选择身份" prop="identity">
                         <el-select v-model="registerUser.identity" placeholder="请选择">
@@ -25,7 +25,7 @@
                         </el-select>
                     </el-form-item> -->
                     <el-form-item>
-                        <el-button type="primary" class="submit_btn" @click="submitForm('registerForm')">注册</el-button>
+                        <el-button type="primary" class="submit_btn" @click="submitForm('registerForm')">Create account</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -40,7 +40,7 @@ export default {
     data(){
         var validatePass2 = (rule, value, callback) => {
             if (value !== this.registerUser.password) {
-            callback(new Error('两次输入密码不一致!'));
+            callback(new Error('Two passwords are inconsistent!'));
             } else {
             callback();
             }
@@ -57,13 +57,13 @@ export default {
                 name: [
                     {
                         required: true,
-                        message: "用户名不能为空",
+                        message: "Username can not be empty",
                         trigger: "blur"
                     },
                     {
                         min: 2,
                         max: 10,
-                        message: "用户名长度在2到10之间",
+                        message: "Username length is between 2 and 10",
                         trigger: "blur"
                     }
                 ],
@@ -71,31 +71,31 @@ export default {
                     {
                         type: "email",
                         required: true,
-                        message: "邮箱格式不正确",
+                        message: "E-mail format is incorrect",
                         trigger: "blur"
                     }
                 ],
                 password: [
                     {
                         required: true,
-                        message: "用户名不能为空",
+                        message: "Password can not be empty",
                         trigger: "blur"
                     },
                     {
                         min: 2,
                         max: 20,
-                        message: "密码长度在2到10之间",
+                        message: "Password length is between 2 and 10",
                         trigger: "blur"
                     }
                 ],
                 checkPass: [{
                         required: true,
-                        message: "确认密码不能为空",
+                        message: "confirm password can not be blank",
                         trigger: "blur"
                     },{
                         min: 2,
                         max: 20,
-                        message: "密码长度在2到10之间",
+                        message: "Password length is between 2 and 10",
                         trigger: "blur"
                     },{
                        validator: validatePass2,
@@ -112,7 +112,7 @@ export default {
                 this.$http.post('/api/users/register', this.registerUser)
                 .then(res => {
                     this.$message({
-                        message: "注册成功",
+                        message: "Account created successfully",
                         type: "success"
                     })
                 })
