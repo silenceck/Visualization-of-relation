@@ -7,6 +7,7 @@ In the construction system, the layout of the top bar and main content container
 ### home page 
 ![avatar](C:\Users\会议室\Desktop\小论文\图片\系统模块图)
 the top bar contains the search box for keyword search, navigation bar, and the logged-in user name; the overview diagram shows the domain’ name information of some causal graphs and knowledge graphs already in the system. The domain names here mainly include: Asia, Alzheimer, Cancer, Nursing. Select the circular node you click on the domain name, and you will enter the data display page of the corresponding domain.
+
 for example, click on the Nursing node to enter the data display page of the nursing field.
 ![avatar](C:\Users\会议室\Desktop\小论文\图片\系统模块图)
 The red nodes indicate Intervention, and the gray nodes indicate Outcome. The connection between nodes indicates the intervening relation between them.
@@ -19,13 +20,13 @@ Click on the relational graph construction tab to jump to the relational graph c
 ![avatar](C:\Users\会议室\Desktop\小论文\图片\系统模块图)
 
 #### Construct relational graph 
-		1. Make sure that data of the relational graph belongs to which domain.
-		2. Click Add model button to add the model of instance. input the property of model.
-		3. Click the Add Instance button, fill in the attribute value to add the instance data of the category at the right of the attribute box.
-		4. Click the Add Relation button to add the relation of the nodes. In addition, you can click select file button to add instances and relations in bulk.
-		5. Click the node or link in the display box, the information of the node or link will be displayed at the bottom of the display box.
-		6. Click the Update button, the information of the node or link will be displayed in the pop-up box, after the modification in the input box of the pop-up box, click the Update element to complete the update operation.
-		7. Click the Delete button to complete the deletion operation of the corresponding node or relation.
+* Make sure that data of the relational graph belongs to which domain.
+* Click Add model button to add the model of instance. input the property of model.
+* Click the Add Instance button, fill in the attribute value to add the instance data of the category at the right of the attribute box.
+* Click the Add Relation button to add the relation of the nodes. In addition, you can click select file button to add instances and relations in bulk.
+* Click the node or link in the display box, the information of the node or link will be displayed at the bottom of the display box.
+* Click the Update button, the information of the node or link will be displayed in the pop-up box, after the modification in the input box of the pop-up box, click the Update element to complete the update operation.
+* Click the Delete button to complete the deletion operation of the corresponding node or relation.
 in addition, there are undo button and redo button above the display box. you can click the button to complete the undo and redo opreation.
 #### Query model
 Click the Query button to switch to the query mode, which supports multiple query conditions and in-depth relation search.
@@ -35,9 +36,9 @@ Click the Query button to switch to the query mode, which supports multiple quer
 
 ### Causality extraction page
 Click on the causality extraction tab to enter the causality extraction page
-1. enter a piece of text in the text box that needs to extract the relation.
-2. click the Add Keyword button, specify the keyword set extracted from the text in the keyword box which separated by commas.
-3. click the Extract causality button to extract the causality. the causality result will be listed in the list below the text box.
+* enter a piece of text in the text box that needs to extract the relation.
+* click the Add Keyword button, specify the keyword set extracted from the text in the keyword box which separated by commas.
+* click the Extract causality button to extract the causality. the causality result will be listed in the list below the text box.
 
 ### Relation graph information display page
 The personal center displays the related relational graph constructed by the user, as shown in Figure 5 , All the relational graph information (domain name, node number, relation number and creation time) created by all users will be listed in the list, users can view, edit, export, and delete the relational graph data in the list.
