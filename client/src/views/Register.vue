@@ -4,7 +4,6 @@
             <div class="manage_tip">
                 <span class="title"> Create your account</span>
                 <el-form :model="registerUser" :rules="rules" ref="registerForm" label-width="80px" class="registerForm">
-                    
                     <el-form-item label="username" prop="name">
                         <el-input  v-model="registerUser.name" placeholder="Please enter a user name"></el-input>
                     </el-form-item>

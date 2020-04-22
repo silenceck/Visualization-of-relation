@@ -9,8 +9,13 @@
                           <div class="edit"  @click="editFunc('isNameClicked')">edit</div>
                         </div>
                         <div v-else>
-                          <el-input v-model="user.name" placeholder="name" @input="change($event)"></el-input>
-                          <button class="saveBtn" @click="saveFunc('name', 'isNameClicked')">save</button> <button class="cancelBtn" @click="cancelFunc('isNameClicked')">cancel</button>
+                            <el-row>
+                                <el-col :span=12><el-input v-model="user.name" placeholder="name" @input="change($event)"></el-input></el-col>
+                                <el-col :span=12><button class="saveBtn" @click="saveFunc('name', 'isNameClicked')">save</button> <button class="cancelBtn" @click="cancelFunc('isNameClicked')">cancel</button></el-col>
+
+                            </el-row>
+                          
+                          
                         </div>
                     </div>
             </el-col>

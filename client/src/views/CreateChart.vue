@@ -3,7 +3,7 @@
         <div class="container">
             <el-row :gutter="20" class="row">               
                 <el-col :span='12' class="col1">  
-                    <span v-bind:style="{cursor:'pointer' }"> 
+                    <span v-bind:style="{cursor:'pointer'}"> 
                         <i  @click="undo" id="undo" class="icon el-icon-refresh-left" >undo</i>
                         <i  @click="redo" id="redo" class="icon el-icon-refresh-right" >redo</i>
                     </span>
@@ -1500,7 +1500,7 @@ export default {
 }
 .el-icon-refresh-left{
     color: #dcdde1;
-    margin-left: 840px;
+    margin-left: 830px;
 }
 .el-icon-refresh-right{
     color: #dcdde1;

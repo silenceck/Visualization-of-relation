@@ -2,7 +2,9 @@
     <div class="myNetworks">
         <el-table
             :data="tableData"
-            style="width: 100%">
+            style="width: 100%"
+            :header-cell-style="headerStyle"
+            :cell-style='headerStyle'>
                 <el-table-column
                     prop="field"
                     label="Field"
@@ -15,7 +17,7 @@
                 </el-table-column>
                 <el-table-column
                     prop="numOfLinks"
-                    label="Number of links"
+                    label="Number of edges"
                     width="180">
                 </el-table-column>
                 <el-table-column
@@ -68,6 +70,7 @@ export default {
     },
     data(){
         return {
+            headerStyle: {textAlign: 'center'},
             tableData: [],
             allTableData: [],
             filterTableData: [],
