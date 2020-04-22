@@ -5,11 +5,11 @@ Semi-automatic causal graph construction system is located on the platform for c
 In the construction system, the layout of the top bar and main content container is used. By clicking on different tabs in the top bar, you can switch the corresponding function pages of the content container.
 
 ### home page 
-![avatar](C:\Users\会议室\Desktop\小论文\图片\系统模块图)
+![avatar](screen/1.png)
 the top bar contains the search box for keyword search, navigation bar, and the logged-in user name; the overview diagram shows the domain’ name information of some causal graphs and knowledge graphs already in the system. The domain names here mainly include: Asia, Alzheimer, Cancer, Nursing. Select the circular node you click on the domain name, and you will enter the data display page of the corresponding domain.
 
 for example, click on the Nursing node to enter the data display page of the nursing field.
-![avatar](C:\Users\会议室\Desktop\小论文\图片\系统模块图)
+![avatar](screen/2.png)
 The red nodes indicate Intervention, and the gray nodes indicate Outcome. The connection between nodes indicates the intervening relation between them.
 * move mouse to the position of a node or a connection, the name of the node or connection will be displayed
 * click on one of the nodes, all the nodes and relations related to this node will be displayed, and the name and attribute information will appear in the information card.
@@ -17,7 +17,7 @@ The red nodes indicate Intervention, and the gray nodes indicate Outcome. The co
 
 ### Relational graph construction page
 Click on the relational graph construction tab to jump to the relational graph construction page. There is a knowledge graph display box on the left side of the page. The right side of the display box provides the function of constructing the knowledge graph.
-![avatar](C:\Users\会议室\Desktop\小论文\图片\系统模块图)
+![avatar](screen/3.png)
 
 #### Construct relational graph 
 * Make sure that data of the relational graph belongs to which domain.
@@ -36,12 +36,14 @@ Click the Query button to switch to the query mode, which supports multiple quer
 
 ### Causality extraction page
 Click on the causality extraction tab to enter the causality extraction page
+![avatar](screen/5.png)
 * enter a piece of text in the text box that needs to extract the relation.
 * click the Add Keyword button, specify the keyword set extracted from the text in the keyword box which separated by commas.
 * click the Extract causality button to extract the causality. the causality result will be listed in the list below the text box.
 
 ### Relation graph information display page
 The personal center displays the related relational graph constructed by the user, as shown in Figure 5 , All the relational graph information (domain name, node number, relation number and creation time) created by all users will be listed in the list, users can view, edit, export, and delete the relational graph data in the list.
+![avatar](screen/4.png)
 * click view Button, the information of the relational graph will be displayed on the home page.
 * click the edit button to display the nodes and relation information of the relational graph on the relational graph construction page You can do some modification work based on the existing relational graph.
 * click the export button to export the related relation graph nodes and relation data to the local in the form of csv file.
