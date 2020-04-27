@@ -31,7 +31,7 @@
                     :router=true>
                     <!-- <el-menu-item index="0" class="logo" ><img src="../assets/logo.png" alt=""></el-menu-item> -->                        
                     <el-menu-item index="index" class="index1">Home</el-menu-item>
-                    <el-menu-item index="create_chart" class="index">Relational Graph Construction </el-menu-item>
+                    <el-menu-item index="create_chart" class="index">Graph Construction </el-menu-item>
                     <!-- <el-submenu index="2" class="index">
                         <template slot="title">构建关系网络</template>
                         <el-menu-item index="2-1">选项1</el-menu-item>

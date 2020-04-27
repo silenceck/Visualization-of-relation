@@ -7,7 +7,7 @@ let loading;
 function startLoading(){
     loading = Loading.service({
         lock: true,
-        text: '拼命加载中',
+        text: 'loadding',
         background:'rgba(0,0,0,0.7)'
     });
 }

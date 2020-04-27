@@ -19,10 +19,10 @@
                         <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive" v-on:search="searchData" ref="add" @finish-adding='setShowinfo'></router-view>
                     </div> -->
                     <div class="rightArea">
-                        <el-button type="text" @click="dialogFormVisible = true" class="button">Add Model</el-button>
+                        <el-button type="text" @click="dialogFormVisible = true" class="button">Add Pattern</el-button>
                         <el-button type="text" @click="dialogRelationVisible = true" class="button">Add Relation</el-button>
                         <el-dialog title="Add Model" :visible.sync="dialogFormVisible"  width="30%" top="25vh" :before-close="handleFormClose">
-                                    <div class="dialog">Model Name</div> 
+                                    <div class="dialog">Pattern Name</div> 
                                     <el-input class="dialog" v-model="type"></el-input> 
                                     <div class="dialog">Property</div> 
                                     <div class="dialog" v-for='i in property' :key="i.key+`property`">
@@ -44,7 +44,7 @@
                             </el-table-column>
                             <el-table-column
                                 prop="concept"
-                                label="Model"
+                                label="Pattern"
                                 width="180">
                             </el-table-column>
                             <el-table-column
@@ -53,7 +53,7 @@
                                 <template slot-scope="scope">
                                     <el-button
                                     size="mini"
-                                    @click="addEntity(scope.$index, scope.row)" type='primary' icon="el-icon-plus">Add Instance</el-button>
+                                    @click="addEntity(scope.$index, scope.row)" type='primary' icon="el-icon-plus">Add entity</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -68,7 +68,7 @@
                             :total="paginations.total">
                         </el-pagination>
                         </div>
-                        <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">Query</el-button> &#12288;
+                        <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">Query&#12288;</el-button> 
                         <el-button type="text" class="button" @click="quitQuery" v-if="queryLabel === true">Exit Query</el-button>
                         <el-button type="text" class="button" @click="dialogNetworkVisible = true">Save</el-button>
                         <el-upload
@@ -305,8 +305,8 @@ export default {
                     this.nodes.push({
                         name: relation.keyword1,
                         id: String(this.nodeId),
-                        label: 'causality',
-                        type: 'causality',
+                        label: 'factor',
+                        type: 'factor',
                     })
                     sourceId = String(this.nodeId);
                     this.nodeId += 1;
@@ -318,8 +318,8 @@ export default {
                     this.nodes.push({
                         name: relation.keyword2,
                         id: String(this.nodeId),
-                        label: 'causality',
-                        type: 'causality',
+                        label: 'factor',
+                        type: 'factor',
                     })
                     targetId = String(this.nodeId);
                     this.nodeId += 1;
@@ -1365,7 +1365,7 @@ export default {
             handler: function(val, oldVal){
                 let myChart = this.$echarts.init(document.getElementById('main'));
                 this.queryLinks.forEach(function (link) {
-                    link.value = link.label;
+                    link.value = link.type;
                     
                 });
                 const option = {
