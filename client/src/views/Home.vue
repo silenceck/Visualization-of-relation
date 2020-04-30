@@ -555,7 +555,6 @@ export default {
                         }
                     };
                     node.category = types.findIndex((element) => element === node.type);
-                    
                 });
                 // Because the number of nodes is large, we select part of the nodes to show
                 if (this.links.length > 50) {
@@ -657,22 +656,11 @@ export default {
             })
         },
         resetData: function(){
-            // let myChart = this.$echarts.init(document.getElementById('main'));
-            // const option = {
-            //     series : [
-            //         {         
-            //             data: this.partNodes,
-            //             links: this.partLinks,
-            //         }
-            //     ]
-            // };
-            // myChart.setOption(option);
             this.setChartData(this.partNodes, this.partLinks)
             this.click_node = {};
         },
         handleNodeClick: function(data) {
             const label = data.label;
-            // let myChart = this.$echarts.init(document.getElementById('main'));
             let diagnosis = [];
             for(let link of this.links) {
                 if(!diagnosis.includes(link.diagnosis)) {
@@ -692,15 +680,6 @@ export default {
                 }
                 const nodes = this.nodes.filter( node => { return node_id.includes(node.id) });
                 this.click_node = links[0];
-                // const option = {
-                //     series : [
-                //         {         
-                //             data: nodes,
-                //             links: links,
-                //         }
-                //     ]
-                // };
-                // myChart.setOption(option);
                 this.setChartData(nodes, links);
             }else {
                 if(!this.nodes.find(item => item.name === label)) {
@@ -715,15 +694,6 @@ export default {
                     seleted_node.add(links[link].target); 
                 }
                 const nodes = this.nodes.filter( node => { return seleted_node.has(node.id) })
-                // const option = {
-                //     series : [
-                //         {         
-                //             data: nodes,
-                //             links: links,
-                //         }
-                //     ]
-                // };
-                // myChart.setOption(option);
                 this.setChartData(nodes, links);
             }
             

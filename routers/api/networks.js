@@ -292,7 +292,7 @@ router.post('/', (req, res) => {
     const isEdit = data.isEdit;
     Network.findOne({field: field})
         .then(network => {
-            if(network && !isEdit){  // 
+            if(network && !isEdit){  
                 res.status(400).json(`${field}领域已存在`);
             }else {
                 if(isEdit) {
@@ -303,10 +303,9 @@ router.post('/', (req, res) => {
                         .then(result =>{
                             Network.findOneAndRemove({field: field})
                             .then(network => {
-                                // console.log('删除成功');
                             })
                             .catch(err => {
-                                res.status(404).json(err);
+                                res.status(400).json(err);
                             });
                             const linksSize = Object.getOwnPropertyNames(links).length;    
                             const nodesSize = Object.getOwnPropertyNames(nodes).length;
@@ -339,7 +338,7 @@ router.post('/', (req, res) => {
                                                     message: "success"
                                                 })
                                             }).catch(err => {
-                                                res.status(404).json(err);
+                                                res.status(400).json(err);
                                             })
                                         }else {
                                             for(let key in links){
@@ -358,7 +357,7 @@ router.post('/', (req, res) => {
                                                                 .then(result =>{
                                                                 })
                                                                 .catch(err => {
-                                                                    res.status(404).json(err);
+                                                                    res.status(400).json(err);
                                                                 })
                                                             }
                                                         }
@@ -374,31 +373,29 @@ router.post('/', (req, res) => {
                                                                 message: "success"
                                                             })
                                                         }).catch(err => {
-                                                            res.status(404).json(err);
+                                                            res.status(400).json(err);
                                                         })
                                                         
                                                     }
                                                 })
                                                 .catch(err => {
-                                                    res.status(404).json(err);
+                                                    res.status(400).json(err);
                                                 })
                                             }
-                                            // set properies of relationships
-                                            
                                         }
                                     }
                                 })
                                 .catch(err => {
-                                    res.status(404).json(err);
+                                    res.status(400).json(err);
                                 })
                             }
                     })
                     .catch(err => {
-                        res.status(404).json(err);
+                        res.status(400).json(err);
                     })
                     })
                     .catch(err => {
-                        res.status(404).json(err);
+                        res.status(400).json(err);
                     })
                     
                     
@@ -434,7 +431,7 @@ router.post('/', (req, res) => {
                                             message: "success"
                                         })
                                     }).catch(err => {
-                                        res.status(404).json(err);
+                                        res.status(400).json(err);
                                     })
                                 }else {
                                     for(let key in links){
@@ -453,7 +450,7 @@ router.post('/', (req, res) => {
                                                         .then(result =>{
                                                         })
                                                         .catch(err => {
-                                                            res.status(404).json(err);
+                                                            res.status(400).json(err);
                                                         })
                                                     }
                                                 }
@@ -469,20 +466,20 @@ router.post('/', (req, res) => {
                                                         message: "success"
                                                     })
                                                 }).catch(err => {
-                                                    res.status(404).json(err);
+                                                    res.status(400).json(err);
                                                 })
                                                 
                                             }
                                         })
                                         .catch(err => {
-                                            res.status(404).json(err);
+                                            res.status(400).json(err);
                                         })
                                     }
                                 }
                             }
                         })
                         .catch(err => {
-                            res.status(404).json(err);
+                            res.status(400).json(err);
                         })
                     }
                 }
@@ -586,7 +583,7 @@ router.post('/file/', (req, res) => {
                 if (fileType === 'csv') {
                     fs.readFile(path,function(err,data){
                         if(err){
-                            console.log(err);
+                            res.status(400).json(err)
                         }else{
                             const fileData = data.toString().split('\r\n');
                             for(let i=0; i<fileData.length-1; i++) {
@@ -610,33 +607,6 @@ router.post('/file/', (req, res) => {
                             })
                         }
                     });
-                    
-                    // let input = fs.createReadStream(path)
-                    // const rl = readline.createInterface({
-                    //     input: input
-                    // });
-                    // let index = 0;
-                    // rl.on('line', (line) => {
-                    //     if (index === 0) {
-                    //         property = line.split(',');
-                    //     } else {
-                    //         let link = {};
-                    //         let value = line.split(',');
-                    //         for(let i in property) {
-                    //             link[property[i]] = String(value[i]);
-                    //         } 
-                    //         link.label = relationLabel;
-                    //         links.push(link);
-                    //     }
-                    // });
-                    // rl.on('close', (line) => {
-                    //     console.log(links)
-                    //     res.json({
-                    //         type: 'link',
-                    //         label: [sourceLabel, targetLabel],
-                    //         data: links
-                    //     })
-                    // });
                 } else if (fileType === 'xlsx'){
                     var sheets = xlsx.parse(path);
                     const label = filename;

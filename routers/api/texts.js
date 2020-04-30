@@ -11,7 +11,6 @@ const path = require('../../config/store').relationExtractionPath;
  */ 
 router.post('/extract-relation', (req, res) => {
     const data = req.body;
-    console.log('data:', data);
     let keywords = ''
     for(let item of data.keywords) {
         keywords += item + '-';

@@ -15,7 +15,7 @@ var io = require('socket.io')(http);
 const db = require('./config/store').mongooseURL;
 const port = process.env.PORT || 5000;
 
-mongoose.connect(db)
+mongoose.connect(db ,{useNewUrlParser:true, useUnifiedTopology: true})
     .then(() => console.log('mongoDB connected'))
     .catch(err => console.log(err))
 

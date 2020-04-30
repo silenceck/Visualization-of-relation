@@ -52,7 +52,6 @@ export default {
                             repulsion: 500,
                             edgeLength: 10
                         },
-                        roam: true,
                         label: {
                             normal: {
                                 show: true,
@@ -111,7 +110,6 @@ export default {
                             repulsion: 500,
                             edgeLength: 10
                         },
-                        roam: true,
                         data: this.graphData,
                     }]
                 }

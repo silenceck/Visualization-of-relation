@@ -69,7 +69,6 @@ const mutations = {
     else state.index = ''
   },
   [types.SET_RELATIONDATA](state, relationData) {
-    console.log('set relation data')
     if (relationData) state.relationData = relationData;
     else state.relationData = []
   },
