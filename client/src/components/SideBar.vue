@@ -6,29 +6,13 @@
                 background-color="#FFFFFF"
                 text-color="#5a5a5a"
                 active-text-color="#409eff">
-                    <!-- <el-menu-item index="1">
-                        <i class="fa fa-margin fa-server"></i>
-                        <span slot="title">{{user.name}}</span>
-                    </el-menu-item>
-                    <router-link to="home">
-                        <el-menu-item index="0">
-                            <i class="fa fa-margin fa-server"></i>
-                            <span slot="title">首页</span>
-                        </el-menu-item>
-                    </router-link> -->
                     <template v-for="item in items" >
-                        <!-- <el-submenu v-if="item.children" :index="item.path" :key="item.path">
-                            <template slot="title">
-                                <i :class="'fa fa-margin ' + item.icon" ></i>
-                                <span slot="title"> {{item.name}}</span>    
-                            </template> -->
                             <router-link  :to="item.path" :key="item.path">
                                 <el-menu-item :index="item.path">
                                     <i :class="'fa fa-margin ' + item.icon" ></i>
                                     <span slot="title" > {{item.name}}</span>
                                 </el-menu-item>
                             </router-link>
-                        <!-- </el-submenu> -->
                     </template>
             </el-menu>
         </el-col>
@@ -50,11 +34,6 @@
                         name: "Relational graph",
                         path: 'my_network',
                     },
-                    // {
-                    //     icon: "fa-bars",
-                    //     name: "我的文本关系",
-                    //     path: 'my-text-relation',
-                    // },
                 ]
             }
         },

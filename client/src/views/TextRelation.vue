@@ -1,18 +1,6 @@
 <template>
     <div class="pubmedCreeper"> 
         <div class="keyword"> 
-            <!-- <el-input v-model="key1"  class="key1" placeholder="keyword1"></el-input> -->
-            <!-- <transition name="slide-fade1">
-                <span v-if='ifshow' class="blackspace" ></span>  
-            </transition>
-            <transition name="slide-fade2">
-                <span v-if='ifLeftShow'> <img src="../assets/left.png"></span>    
-            </transition>
-            <transition name="slide-fade3">
-                <span v-if='ifRightShow'> <img src="../assets/right.png"></span>
-            </transition> -->
-            <!-- <span  class="line1" :style="line1Style"></span>
-            <span  class="line2" :style="line2Style"></span> -->
             <el-row :gutter='20' class="row1">
                 <el-col :span="18">
                     <div class="keywords">
@@ -50,13 +38,7 @@
                     <el-button type="primary" @click="addKeyword">OK</el-button>
                 </div>
             </el-dialog>
-            <!-- <el-input v-model="key2"  class="key2" placeholder="keyword2" :style="keyword2Style"></el-input>  -->
-            <!-- <el-button @click="reset" class="btn1">重置</el-button> -->
-            <!-- <el-button @click="save" class="btn">保存</el-button> -->
         </div>
-        <!-- <el-row :gutter="20" class="tabel"> -->
-            <!-- <el-col :span="10"><div id="main" class="chart"></div></el-col> -->
-            <!-- <el-col :span="14"> -->
         <el-row :gutter='20'>
                 <el-col :span="18">
                     <div class="tabel">
@@ -103,13 +85,6 @@
                 <el-button @click="edit" class="keyBtn">Edit causal graph</el-button>
             </el-col>
         </el-row>
-        <!-- <el-button
-            plain
-            @click="open1">
-            成功
-        </el-button> -->
-            <!-- </el-col> -->
-        <!-- </el-row> -->
     </div>
 </template>
 
@@ -148,10 +123,8 @@ export default {
                 layout: 'total,sizes,prev,pager,next,jumper' //翻页属性
             },
             socket: null,
+            serverAddress: 'http://localhost:5000',
         }
-    },
-    computed: {
-        
     },
     mounted: function(){ 
         const relationData = this.$store.getters.relationData;
@@ -165,9 +138,7 @@ export default {
     },
     methods: {
         submit: function(){ 
-            this.socket = io.connect('http://localhost:5000');          
-            // this.keywords = this.keywords.trim();
-            // this.textarea = this.textarea.trim();
+            this.socket = io.connect(this.serverAddress);          
             if(this.keywords.length > 0 && this.textarea !== ''){
                 const keywords = this.keywords;
                 const text = this.textarea;
@@ -178,7 +149,7 @@ export default {
                 this.socket.emit('text data', JSON.stringify(data));
                 const that = this;
                 this.socket.on('res message', function(msg){
-                    that.open1();
+                    that.notify();
                     const data = JSON.parse(msg.pop());
                     let tableData = [];
                     let num = 1;
@@ -209,31 +180,9 @@ export default {
                         that.setPaginations();
                     } else {
                         that.$store.dispatch('setRelationData', tableData);
-                        // that.allTableData = that.tableData;
-                        // that.filterTableData = that.tableData;
-                        // that.setPaginations();
                     }
                     that.socket.close();
                 });
-                // this.$http.post(`/api/texts/`, data)
-                // .then( res => {
-                //     const data = JSON.parse(res.data.data.pop());
-                //     console.log('data', data);
-                //     for(let key in data) {
-                //         let keywordPair = key.split('-');
-                //         this.tableData.push({
-                //             num: this.num,
-                //             keyword1: keywordPair[0],
-                //             keyword2: keywordPair[1],
-                //             relation: data[key]
-                //         })
-                //         this.num += 1;
-                //     }
-                //     console.log(this.tableData);
-                //     this.allTableData = this.tableData;
-                //     this.filterTableData = this.tableData;
-                //     this.setPaginations();
-                // })
             }else{
                 this.$message.error('The input box cannot be empty！！！');
             }
@@ -293,21 +242,22 @@ export default {
             this.paginations.total = this.allTableData.length
             this.paginations.page_index = 1
             this.paginations.page_size = 5
-            // 设置默认分页数据
+            // Set the default paging data
             this.tableData = this.allTableData.filter((item, index) => {
                 return index < this.paginations.page_size
             })
         },
-        handleSizeChange (page_size) { // 控制一页显示的数据量
+        // Control the amount of data displayed on a page
+        handleSizeChange (page_size) { 
             this.paginations.page_index = 1
             this.paginations.page_size = page_size
             this.tableData = this.allTableData.filter((item, index) => {
                 return index < page_size
             })
         },
-        handleCurrentChange (page) { // 分页跳转
+        // Paging jump
+        handleCurrentChange (page) { 
             let tables = []
-            // 当前页前面有多少数据
             let index = this.paginations.page_size * (page - 1)
             let nums = this.paginations.page_size * page
             for (let i = index; i < nums; i++) {
@@ -319,9 +269,6 @@ export default {
         },
         deleteKeyword(keyword) {
             this.keywords = this.keywords.filter(element => element !== keyword);
-        },
-        addProperty() {
-            this.keywords.push('disater');
         },
         addKeyword() {
             this.dialogKeywordVisible = false;
@@ -337,7 +284,7 @@ export default {
             this.$store.dispatch('setIndex', 'create_chart');
             this.$router.push({name:'create_chart', params: {RelationData: this.tableData}});
         },
-        open1() {
+        notify() {
             this.$notify({
                 title: 'success',
                 message: 'Causality extraction completed',

@@ -12,8 +12,6 @@ const fs = require('fs');
 const readline = require('readline');
 const pathLib = require("path");
 const xlsx = require('node-xlsx');
-let {PythonShell} = require('python-shell');
-const pythonPath = 'D:/PycharmProjects/relation_extraction/v1.1.py'
 // const sleep = require()
 
 // 去除数组中的重复对象, set中相同的对象但是内存地址并不同
@@ -50,83 +48,109 @@ function deleteQuotationMark(obj) {
     return propery;
 }
 
-function writeCSV(filename, text) {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(filename, text, 'utf-8', (err, data) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(console.log('写入完成'))
-        });
- 
-    })
+// 关系label为空时的查询结果
+function parseRecordNodeMode(nodes, links, records) {
+    let paths = []
+    for(let item of records){
+        paths.push(item['_fields'][0]);
+        for(let segment of item['_fields'][0]['segments']){
+            let fromNode = segment.start.properties;
+            fromNode.label = segment.start.labels[0];
+            let toNode = segment.end.properties;
+            toNode.label = segment.end.labels[0];
+            nodes.add(fromNode);
+            nodes.add(toNode);
+            let link = segment.relationship.properties;
+            link.type = segment.relationship.type;
+            link.source = fromNode.id;
+            link.target = toNode.id;
+            links.add(link);
+        }
+    }
+    return paths
 }
-
+// 关系label不为空时的查询结果
+function parseRecordRelationMode(nodes, links, records) {
+    let paths = []
+    for(let item of records){
+        let fromNode = item['_fields'][0].properties;
+        fromNode.label = item['_fields'][0].labels[0];
+        let toNode = item['_fields'][2].properties;
+        toNode.label = item['_fields'][2].labels[0];
+        let link = item['_fields'][1].properties;
+        link.type = item['_fields'][1].type;
+        link.source = fromNode.id;
+        link.target = toNode.id;
+        nodes.add(fromNode);
+        nodes.add(toNode);
+        links.add(link);
+    }
+    return paths
+}
 /**
- * @route get /api/networks/:field
- * @description 获取指定field的network
+ * @route get /api/networks/field/:field
+ * @description get networks specified by field 
  * @access public
  */
-router.get('/:field', (req, res) =>{
+router.get('/field/:field', async (req, res) =>{
     const field = req.params.field;
     let nodes = [];
-    instance.cypher('MATCH (p {field: {field}}) RETURN p', {field: field})
-    .then(result => { 
-        for(let item of result.records){
-            const singleRecord = item;
-            let node = singleRecord.get(0).properties;
-            if(field === 'Nursing') {
-                node.label = singleRecord.get(0).labels[0];
-            }
-            if(field === 'test') {
-                node.label = 'Person';
-            }
-            nodes.push(node);
-        } 
-        let links = [];
-        instance.cypher('MATCH (n {field:$field})-[r {field:$field}]->(m {field:$field}) RETURN n,r,m', {field: field})
-        .then(result => { 
-            for(let item of result.records){
-                let link = {};
-                const node1 = item.get(0);
-                const relation = item.get(1);
-                const node2 = item.get(2);
-                if (field === 'Nursing') {
-                    link.field = relation.properties.field;
-                    link.label = relation.properties.label;
-                    link.type = relation.properties.type;
-                    link.diagnosis = relation.properties.diagnosis;
-                    link.id = relation.properties.id;
-                    link.source = node1.properties.id;
-                    link.target = node2.properties.id;
-                }else if(field === 'test'){
-                    link.field = relation.properties.field;
-                    link.source = node1.properties.id;
-                    link.target = node2.properties.id;
-                    link.label = "IS_FRIENDS_WITH";
-                }else {
-                    link = relation.properties;
-                }
-                links.push(link);
-            } 
-            res.json({
-                nodes: nodes,
-                links: links,
-            })
-        });
-    }).catch(err => {
-        return res.status(400).json("获取数据失败");
-    });
-    
+    let nodeResult = await instance.cypher('MATCH (p {field: {field}}) RETURN p', {field: field})
+    .catch(err => {
+        return res.status(400).json("Failed to get node data");
+    })
+    for(let item of nodeResult.records){
+        const singleRecord = item;
+        let node = singleRecord.get(0).properties;
+        if(field === 'Nursing') {
+            node.label = singleRecord.get(0).labels[0];
+        }
+        if(field === 'test') {
+            node.label = 'Person';
+        }
+        nodes.push(node);
+    } 
+    let links = [];
+    let linkResult = await instance.cypher('MATCH (n {field:$field})-[r {field:$field}]->(m {field:$field}) RETURN n,r,m', {field: field})
+    .catch(err => {
+        return res.status(400).json("Failed to get relation data");
+    })
+    for(let item of linkResult.records){
+        let link = {};
+        const node1 = item.get(0);
+        const relation = item.get(1);
+        const node2 = item.get(2);
+        if (field === 'Nursing') {
+            link.field = relation.properties.field;
+            link.label = relation.properties.label;
+            link.type = relation.properties.type;
+            link.diagnosis = relation.properties.diagnosis;
+            link.id = relation.properties.id;
+            link.source = node1.properties.id;
+            link.target = node2.properties.id;
+        }else if(field === 'test'){
+            link.field = relation.properties.field;
+            link.source = node1.properties.id;
+            link.target = node2.properties.id;
+            link.label = "IS_FRIENDS_WITH";
+        }else {
+            link = relation.properties;
+        }
+        links.push(link);
+    } 
+    res.json({
+        nodes: nodes,
+        links: links,
+    }) 
 });
 
 
 /**
- * @route get /api/networks/v1/query
+ * @route get /api/networks/query
  * @description according to different query conditions to search nodes and links 
  * @access public
  */
-router.get('/v1/query', (req, res) => {
+router.get('/query', (req, res) => {
     const condition = JSON.parse(req.query.data);
     const label = condition.label;
     const propery = condition.propery;
@@ -139,23 +163,7 @@ router.get('/v1/query', (req, res) => {
         if(label.node1 !== '' && label.node2 !== ''){
             instance.cypher(`match p=(a: ${label.node1} ${node1Propery})-[*]->(b: ${label.node2} ${node2Propery}) return p`, {
             }).then(result => {
-                let paths = [];
-                for(let item of result.records){
-                    paths.push(item['_fields'][0]);
-                    for(let segment of item['_fields'][0]['segments']){
-                        let fromNode = segment.start.properties;
-                        fromNode.label = segment.start.labels[0];
-                        let toNode = segment.end.properties;
-                        toNode.label = segment.end.labels[0];
-                        nodes.add(fromNode);
-                        nodes.add(toNode);
-                        let link = segment.relationship.properties;
-                        link.type = segment.relationship.type;
-                        link.source = fromNode.id;
-                        link.target = toNode.id;
-                        links.add(link);
-                    }
-                }
+                let paths = parseRecordNodeMode(nodes, links, result.records);
                 res.json({
                     data: {
                         paths: paths,
@@ -169,25 +177,7 @@ router.get('/v1/query', (req, res) => {
             const propery = node1Propery;
             instance.cypher(`MATCH p=(a:${nodeLabel} ${propery})-[]->(b) RETURN p`) //
             .then(result => {
-                let paths = [];
-                // res.json(result.records);
-                for(let item of result.records){
-                    paths.push(item['_fields'][0]);
-                    for(let segment of item['_fields'][0]['segments']){
-                        let fromNode = segment.start.properties;
-                        fromNode.label = segment.start.labels[0];
-                        let toNode = segment.end.properties;
-                        toNode.label = segment.end.labels[0];
-                        nodes.add(fromNode);
-                        nodes.add(toNode);
-                        let link = segment.relationship.properties;
-                        link.type = segment.relationship.type;
-                        link.label = "IS_FRIENDS_WITH";
-                        link.source = fromNode.id;
-                        link.target = toNode.id;
-                        links.add(link);
-                    }
-                }
+                let paths = parseRecordNodeMode(nodes, links, result.records);
                 res.json({
                     data: {
                         paths: paths,
@@ -201,23 +191,7 @@ router.get('/v1/query', (req, res) => {
             const propery = node2Propery;
             instance.cypher(`MATCH p=(a)-[]->(b:${nodeLabel} ${propery}) RETURN p`)
             .then(result => {
-                let paths = [];
-                for(let item of result.records){
-                    paths.push(item['_fields'][0]);
-                    for(let segment of item['_fields'][0]['segments']){
-                        let fromNode = segment.start.properties;
-                        fromNode.label = segment.start.labels[0];
-                        let toNode = segment.end.properties;
-                        toNode.label = segment.end.labels[0];
-                        nodes.add(fromNode);
-                        nodes.add(toNode);
-                        let link = segment.relationship.properties;
-                        link.type = segment.relationship.type;
-                        link.source = fromNode.id;
-                        link.target = toNode.id;
-                        links.add(link);
-                    }
-                }
+                let paths = parseRecordNodeMode(nodes, links, result.records);
                 res.json({
                     data: {
                         paths: paths,
@@ -264,20 +238,7 @@ router.get('/v1/query', (req, res) => {
         }else if(label.node1 !== ''){
             instance.cypher(`match (a: ${label.node1} ${node1Propery})-[r:${label.relation} ${relationPropery}]->(b) return a,r,b`, {
             }).then(result => {
-                let paths = [];
-                for(let item of result.records){
-                    let fromNode = item['_fields'][0].properties;
-                    fromNode.label = item['_fields'][0].labels[0];
-                    let toNode = item['_fields'][2].properties;
-                    toNode.label = item['_fields'][2].labels[0];
-                    let link = item['_fields'][1].properties;
-                    link.type = item['_fields'][1].type;
-                    link.source = fromNode.id;
-                    link.target = toNode.id;
-                    nodes.add(fromNode);
-                    nodes.add(toNode);
-                    links.add(link);
-                }
+                let paths = parseRecordRelationMode(nodes, links, result.records);
                 res.json({
                     data: {
                         paths: paths,
@@ -289,20 +250,7 @@ router.get('/v1/query', (req, res) => {
         }else if(label.node2 !== ''){
             instance.cypher(`match (a)-[r:${label.relation} ${relationPropery}]->(b: ${label.node2} ${node2Propery}) return a,r,b`, {
             }).then(result => {
-                let paths = [];
-                for(let item of result.records){
-                    let fromNode = item['_fields'][0].properties;
-                    fromNode.label = item['_fields'][0].labels[0];
-                    let toNode = item['_fields'][2].properties;
-                    toNode.label = item['_fields'][2].labels[0];
-                    let link = item['_fields'][1].properties;
-                    link.type = item['_fields'][1].type;
-                    link.source = fromNode.id;
-                    link.target = toNode.id;
-                    nodes.add(fromNode);
-                    nodes.add(toNode);
-                    links.add(link);
-                }
+                let paths = parseRecordRelationMode(nodes, links, result.records);
                 res.json({
                     data: {
                         paths: paths,
@@ -314,20 +262,7 @@ router.get('/v1/query', (req, res) => {
         }else{
             instance.cypher(`match (a)-[r:${label.relation} ${relationPropery}]->(b) return a,r,b`, {
             }).then(result => {
-                let paths = [];
-                for(let item of result.records){
-                    let fromNode = item['_fields'][0].properties;
-                    fromNode.label = item['_fields'][0].labels[0];
-                    let toNode = item['_fields'][2].properties;
-                    toNode.label = item['_fields'][2].labels[0];
-                    let link = item['_fields'][1].properties;
-                    link.type = item['_fields'][1].type;
-                    link.source = fromNode.id;
-                    link.target = toNode.id;
-                    nodes.add(fromNode);
-                    nodes.add(toNode);
-                    links.add(link);
-                }
+                let paths = parseRecordRelationMode(nodes, links, result.records);
                 res.json({
                     data: {
                         paths: paths,
@@ -335,6 +270,8 @@ router.get('/v1/query', (req, res) => {
                         links: deteleObject(Array.from(links)),
                     }
                 });
+            }).catch(err => {
+                return res.status(400).json("查询数据失败");
             })
         }
     }
@@ -541,8 +478,6 @@ router.post('/', (req, res) => {
                                             res.status(404).json(err);
                                         })
                                     }
-                                    // set properies of relationships
-                                    
                                 }
                             }
                         })
@@ -550,8 +485,6 @@ router.post('/', (req, res) => {
                             res.status(404).json(err);
                         })
                     }
-                    
-                    
                 }
                 }
                 
@@ -562,43 +495,38 @@ router.post('/', (req, res) => {
 
 
 /**
- * @route get /api/networks/v1/:id
+ * @route get /api/networks/user/:id
  * @description find some items whose username property is id
  * @access private
  */
-router.get('/v1/:id', (req, res) => {
+router.get('/user/:id', (req, res) => {
     const id = req.params.id;
     Network.find({username: id})
     .then(networks => {
         res.json({networks: networks})
+    }).catch(err => {
+        return res.status(400).json(err);
     });
     
 })
 
 
 /**
- * @route delete /api/networks/:id
+ * @route post /api/delete
  * @description delete one network assigned by id 
  * @access private
  */
-router.post('/delete/', (req, res) => {
+router.post('/delete/', async (req, res) => {
     const data = req.body;
     const id = data.id;
     const field = data.field;
-    // console.log(req.body);
-    instance.cypher(`MATCH (p1)-[r {field: $field}]-(p2)  DELETE r`, {field: field})
-    .then(result =>{
-        
-    })
+    await instance.cypher(`MATCH (p1)-[r {field: $field}]-(p2)  DELETE r`, {field: field})
     .catch(err => {
-        res.status(404).json(err);
+        res.status(400).json(err);
     })
-    instance.cypher(`MATCH(p {field: $field}) DETACH DELETE p`, {field: field})
-    .then(result =>{
-        
-    })
+    await instance.cypher(`MATCH(p {field: $field}) DETACH DELETE p`, {field: field})
     .catch(err => {
-        res.status(404).json(err);
+        res.status(400).json(err);
     })
     Network.deleteOne({
         _id: id
@@ -607,17 +535,17 @@ router.post('/delete/', (req, res) => {
             message: "success"
         })
     }).catch(err => {
-        console.log(err);
+        res.status(400).json(err);
     })
 })
 
 
 /**
- * @route get /api/networks/nodes/name
- * @description find all nodes' name
+ * @route get /api/networks/nodename/:field
+ * @description find all nodes' name specified by field 
  * @access public
  */
-router.get('/nodes/name/:field', (req, res) => {
+router.get('/nodename/:field', (req, res) => {
     const field = req.params.field;
     instance.cypher(`MATCH (a) WHERE a.field = $field RETURN a.name`, {field: field
     }).then(result => {
@@ -640,7 +568,7 @@ router.get('/nodes/name/:field', (req, res) => {
  * @description upload file
  * @access public
  */
-router.post('/v1/file/', (req, res) => {
+router.post('/file/', (req, res) => {
 	var fi = req.files[0];
 	var originalName = fi.originalname;
     const filename = originalName.split('.')[0];
@@ -804,46 +732,23 @@ router.post('/v1/file/', (req, res) => {
             });
         } else {
             res.json({
-                status: 500,
-                message: '上传失败'
+                status: 400,
+                message: 'Failed to upload'
             })
         }
     });
     
 }),
 
-/**
- * @route get /api/networks/v1/test
- * @description add network
- * @access public
- */
-router.get('/v1/test/test', (req, res) => {
-	User.findOne({identity: 'admin'}).then( user => {
-        console.log('user:', user)
-        // const network = new Network({
-        //     username: user.id,
-        //     field: 'Nursing',
-        //     numOfNodes: 482,
-        //     numOfLinks: 3341,
-        //     time: new Date(),
-        // })
-        Network.find().then(network => res.json(network))
-        // network.save().then(network => res.json(network))
-    })
-    // Network.deleteOne({'_id': '5e8bd977b9a04f5cb8e6ac7b'}).then(network => {
-    //     console.log(network)
-    // })
-}),
 
 /**
- * @route get /api/networks/v1/test/admin-network/
- * @description add network
+ * @route get /api/networks/admin
+ * @description get networks created by admin user
  * @access public
  */
-router.get('/v1/test/admin-network/', (req, res) => {
+router.get('/admin', (req, res) => {
 	User.findOne({identity: 'admin'}).then(user => {
         Network.find({username: user.id}).then(networks => {
-            // console.log(networks)
             let adminNetworks = [];
             for(let network of networks) {
                 adminNetworks.push(network.field);
@@ -856,15 +761,15 @@ router.get('/v1/test/admin-network/', (req, res) => {
 }),
 
 /**
- * @route get /api/networks/v1/test/admin-network/
- * @description add network
+ * @route get /api/networks/export/:field
+ * @description export network data specified by field 
  * @access public
  */
-router.get('/v1/test/export/:field', async (req, res) => {
+router. get('/export/:field', async (req, res) => {
     const field = req.params.field;
     let nodes = [];
     let nodeResult = await instance.cypher('MATCH (p {field: {field}}) RETURN p', {field: field})
-    .catch(error => console.log('获取节点失败', error));
+    .catch(error => res.status(400).json(error));
     for(let item of nodeResult.records){
         const singleRecord = item;
         let node = singleRecord.get(0).properties;
@@ -878,7 +783,7 @@ router.get('/v1/test/export/:field', async (req, res) => {
     } 
     let links = [];
     let linkResult = await instance.cypher('MATCH (n {field:$field})-[r {field:$field}]->(m {field:$field}) RETURN n,r,m', {field: field})
-    .catch(error => console.log('获取关系失败', error));
+    .catch(error => res.status(400).json(error));
     for(let item of linkResult.records){
         let link = {};
         const node1 = item.get(0);
@@ -902,7 +807,6 @@ router.get('/v1/test/export/:field', async (req, res) => {
         }
         links.push(link);
     } 
-    
     let nodeTypes = {};
     let linkTypes = {};
     for(let node of nodes) {
@@ -915,7 +819,6 @@ router.get('/v1/test/export/:field', async (req, res) => {
             linkTypes[link.label] = Object.keys(link);
         }
     }
-    // 数据写入csv文件
     let resultData = {};
     for (let type in nodeTypes) {
         let propertyName = nodeTypes[type].reduce((a, b) => a + ',' + b)+'\n';
@@ -928,7 +831,6 @@ router.get('/v1/test/export/:field', async (req, res) => {
             propertyName += propertyValue+'\n'
         }
         resultData[type+'.csv'] = propertyName;
-        // writeCSV('./export/'+type+'.csv', propertyName)
     }
     for (let type in linkTypes) {
         let propertyName = linkTypes[type].reduce((a, b) => a + ',' + b)+'\n';
@@ -941,7 +843,6 @@ router.get('/v1/test/export/:field', async (req, res) => {
             propertyName += propertyValue+'\n'
         }
         resultData[type+'.csv'] = propertyName;
-        // writeCSV('./export/'+type+'.csv',propertyName)
     }
     res.json({
         data: resultData

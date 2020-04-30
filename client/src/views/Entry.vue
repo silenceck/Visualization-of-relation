@@ -38,31 +38,10 @@ export default {
             ]][2];
             let myChart = this.$echarts.init(document.getElementById('main'));
                 const option = {
-                    // 图表标题
-                    // title: {
-                    //     show: true,//显示策略，默认值true,可选为：true（显示） | false（隐藏）
-                    //     text: '关系图谱',//主标题文本，'\n'指定换行
-                    //     x: 'center',        // 水平安放位置，默认为左对齐，可选为：
-                    //     y: 'bottom',             // 垂直安放位置，默认为全图顶端，可选为：
-                    //     backgroundColor: 'rgba(0,0,0,0)',
-                    //     borderColor: '#ccc',    // 标题边框颜色
-                    //     borderWidth: 0,         // 标题边框线宽，单位px，默认为0（无边框）
-                    //     padding: 5,             // 标题内边距，单位px，默认各方向内边距为5，
-                    //     itemGap: 10,            // 主副标题纵向间隔，单位px，默认为10，
-                    //     textStyle: {
-                    //         fontSize: 18,
-                    //         fontWeight: 'bolder',
-                    //         color: '#333'        // 主标题文字颜色
-                    //     },
-                    //     subtextStyle: {
-                    //         color: '#aaa'        // 副标题文字颜色
-                    //     }
-                    // },
                     backgroundColor: '#fff',
                     tooltip: {},
                     animationDurationUpdate: function(idx) {
-                        // 越往后的数据延迟越大
-                        return idx * 100;
+                        return idx * 50;
                     },
                     animationEasingUpdate: 'bounceIn',
                     color: ['#fff', '#fff', '#fff'],
@@ -92,9 +71,7 @@ export default {
                 const that = this;
                 myChart.on('click', function (params) {
                 if (params.componentType === 'markPoint') {
-                    // 点击到了 markPoint 上
                     if (params.seriesIndex === 5) {
-                        // 点击到了 index 为 5 的 series 的 markPoint 上。
                     }
                 }
                 else if (params.componentType === 'series') {
@@ -108,14 +85,13 @@ export default {
                     }
                 }
             });
-            this.$http.get(`/api/networks/v1/test/admin-network/`).then(res => {
+            this.$api.network.getAdminNetwork().then(res => {
                 const adminNetworks = res.data.adminNetworks;
                 this.$emit('passAdminField', adminNetworks);
                 const size = adminNetworks.length;
                 for(let index in  adminNetworks) {
                     this.graphData.push({
                         "name": adminNetworks[index],
-                        // "value": 2373,
                         "symbolSize": Math.floor((Math.random()*100)+50),
                         "draggable": true,
                         "itemStyle": {
@@ -149,7 +125,6 @@ export default {
 
 <style scoped>
 .chart {
-    /* position: absolute; */
     margin-left: 25%;
     height: 680px;
     width: 800px;

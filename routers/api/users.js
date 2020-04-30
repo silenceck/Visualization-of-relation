@@ -7,17 +7,20 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require('../../models/User');
 const secret = require('../../config/store').secretOrKey;
-  
-// router.get('/test', (req, res) => {
-//     res.json({ msg: 'login works'});
-// })
-
+ 
+/**
+ * params: 
+ * return: 
+ * $route POST /api/users/register
+ * @desc register user
+ * @access Public
+ */
 router.post('/register', (req, res) => {
     const data = req.body;
     User.findOne({email: data.email})
         .then((user) => {
             if(user){
-                res.status(400).json( "邮箱已被占用")
+                res.status(400).json( "The mailbox is occupied")
             }else{
                 const avatar = gravatar.url(data.email, {s: '200', r: 'pg', d: 'mm'});
                 const newUser = new User({
@@ -42,14 +45,19 @@ router.post('/register', (req, res) => {
         })
 })
 
+/**
+ * params: 
+ * return: 
+ * $route POST /api/users/register
+ * @desc Login user
+ * @access Public
+ */
 router.post('/login', (req, res) => {
     const data = req.body;
-    // const email = data.email;  
-    // User.findOne({email}) 
     User.findOne({email: data.email}) 
         .then(user => {
             if(!user){
-                res.status(400).json("用户不存在");
+                res.status(400).json("The user doesn't exist");
             }
             bcrypt.compare(data.password, user.password)
                 .then(isMacth => {
@@ -69,7 +77,7 @@ router.post('/login', (req, res) => {
                             })
                         })
                     }else{
-                        return res.status(400).json("密码错误");
+                        return res.status(400).json("Password is wrong");
                     }
                 });
         })

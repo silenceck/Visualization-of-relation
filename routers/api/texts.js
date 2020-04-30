@@ -1,18 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
 const Text = require('../../models/Text');
 let {PythonShell} = require('python-shell');
-const path = 'C:/Users/会议室/PycharmProjects/relation_extraction/v1.1.py'
-
-
+const path = require('../../config/store').relationExtractionPath;
 
 /**
- * @route post /api/text/
+ * @route post /api/text/extract-relation
  * @description extract relatin of the text 
  * @access public
  */ 
-router.post('/', (req, res) => {
+router.post('/extract-relation', (req, res) => {
     const data = req.body;
     console.log('data:', data);
     let keywords = ''
@@ -21,9 +18,6 @@ router.post('/', (req, res) => {
     }
     keywords[keywords.length-1] = ''
     let result = [];
-    // res.json(result);
-    // console.log()
-    
     let pyshell = new PythonShell(path);
     pyshell.send(JSON.stringify({ keywords: keywords.slice(0, keywords.length-1), text: data.text }));
     pyshell.on('message', function (message) {
@@ -46,7 +40,7 @@ router.post('/', (req, res) => {
  * @description save the text 
  * @access private
  */
-router.post('/v1/', (req, res) => {
+router.post('/', (req, res) => {
     const data = req.body;
     const texts = [];
     for(let item of data.sens){
@@ -59,7 +53,6 @@ router.post('/v1/', (req, res) => {
         });
         texts.push(text);
     }
-
     Text.insertMany(texts)
         .then(result => {
             res.json({
@@ -77,7 +70,7 @@ router.post('/v1/', (req, res) => {
  * @description find texts by specfying name  
  * @access private
  */
-router.get('/v1/:name', (req, res) => {
+router.get('/:name', (req, res) => {
     const name = req.params.name;
     Text.find({username: name}) 
     .then(texts => {

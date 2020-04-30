@@ -17,12 +17,6 @@
                     <el-form-item label="confirm" prop="checkPass">
                         <el-input type="password" v-model="registerUser.checkPass" placeholder="Please confirm your password"></el-input>
                     </el-form-item>
-                    <!-- <el-form-item label="选择身份" prop="identity">
-                        <el-select v-model="registerUser.identity" placeholder="请选择">
-                            <el-option label="管理员" value="manager"> </el-option>
-                            <el-option label="用户" value="employee"> </el-option>
-                        </el-select>
-                    </el-form-item> -->
                     <el-form-item>
                         <el-button type="primary" class="submit_btn" @click="submitForm('registerForm')">Create account</el-button>
                     </el-form-item>
@@ -108,7 +102,7 @@ export default {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
             if (valid) {
-                this.$http.post('/api/users/register', this.registerUser)
+                this.$api.user.register(this.registerUser)
                 .then(res => {
                     this.$message({
                         message: "Account created successfully",
@@ -117,7 +111,6 @@ export default {
                 })
                 this.$router.push('/login')
             } else {
-                console.log('error submit!!');
                 return false;
             }
             }); 

@@ -7,17 +7,10 @@
                         <i  @click="undo" id="undo" class="icon el-icon-refresh-left" >undo</i>
                         <i  @click="redo" id="redo" class="icon el-icon-refresh-right" >redo</i>
                     </span>
-                    <!-- <span  v-bind:style="{cursor:'pointer' }"> </span> -->
-                    <!-- <el-button id="undo" icon="custom-icon el-icon-refresh-left" @click="undo">undo</el-button> -->
                     <div id="main" class="chart"></div> 
                 </el-col>
                 <el-col :span='12' class="col2">
                     &#12288;&#12288;&#12288;&#12288;
-                    <!-- <router-link to="/add"><i class="el-icon-plus"></i></router-link> &#12288; |  &#12288;
-                    <router-link to="/search"><i class="el-icon-search"></i></router-link> -->
-                    <!-- <div class="add_search" >
-                        <router-view :showinfo="showinfo" :updateLable="updateLable" v-on:update="receive" v-on:search="searchData" ref="add" @finish-adding='setShowinfo'></router-view>
-                    </div> -->
                     <div class="rightArea">
                         <el-button type="text" @click="dialogFormVisible = true" class="button">Add Pattern</el-button>
                         <el-button type="text" @click="dialogRelationVisible = true" class="button">Add Relation</el-button>
@@ -74,7 +67,7 @@
                         <el-upload
                             class="upload-demo"
                             ref="upload"
-                            action="http://localhost:8080/api/networks/v1/file"
+                            :action="uploadUrl"
                             :on-success="uploadSuccess"
                             :on-preview="handlePreview"
                             :on-remove="handleRemove"
@@ -85,15 +78,10 @@
                             <el-button style="margin-left: 10px; fontSize: 16px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
                         </el-upload>
                         <el-dialog title="Add Instance" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
-                                <!-- <el-form :model="form"> -->
-                                    <!-- <el-form-item label="概念名称" :label-width="formLabelWidth"> -->
                                         <div class="dialog">Instance Tpye: {{entity.label}}</div> 
-                                        <!-- <el-input class="dialog" v-model="type"></el-input>  -->
                                         <div class="dialog" v-for='i in entityProperty' :key="i.key+`property`">
                                             {{i.name}} <el-input v-model="i.value" class="dialog"></el-input> 
                                         </div>
-                                    <!-- </el-form-item> -->
-                                <!-- </el-form> -->
                             <div slot="footer" class="dialog-footer">
                                 <el-button @click="dialogEntityVisible = false;entityProperty = [];">Cancel</el-button>
                                 <el-button type="primary" @click="addNode">OK</el-button>
@@ -121,8 +109,6 @@
                         </el-dialog>
                         <el-dialog title="Update Element" :visible.sync="dialogUpdateVisible"  width="30%" top="25vh" :before-close="handleUpdateClose"  >
                             <div v-if="showinfo !== null">
-                                <!-- <div class="dialog">label:{{showinfo.label}}</div> -->
-                                <!-- <el-input class="dialog" v-model="showinfo.label"></el-input> -->
                                 <div class="dialog" v-for='i in showinfoDetail' :key="i.name+`showinfo`">
                                     <div v-if=" i.name !== 'field'&& i.name !== 'id'&& i.name !== 'type'">
                                         <span class="dialog">{{i.name}}</span>  <el-input v-model="i.value" class="dialog" :disabled="i.name === 'label'"></el-input>
@@ -189,7 +175,7 @@ export default {
             dialogUpdateVisible: false,
             dialogQueryVisible: false,
             isEdit: false,
-            type: '', // 概念类别
+            type: '', // Pattern type
             relationType: '',
             sourceNodeName: '',
             targetNodeName: '',
@@ -227,27 +213,27 @@ export default {
             // relationProperty: [], 
             targetNodeProperty: [],
             queryNum: 1,
-            queryLabel: false, // 判断当前的数据是否是查询结果
+            queryLabel: false, // Determines whether the current mode is  query mode
             queryNodes: [],
             queryLinks: [],
             fileList: [],
-            graphHistory: [{nodes: [], links: []}], // graph快照
-            graphQueryHistory: [], // 查询模式graph快照
-            currentIndex: 0, // graph快照索引
-            currentQueryIndex: -1, // // 查询模式下的graph快照索引
+            graphHistory: [{nodes: [], links: []}], // graph photo
+            graphQueryHistory: [], // query mode graph photo
+            currentIndex: 0, // graph photo index
+            currentQueryIndex: -1, // // query mode graph photo index
+            uploadUrl: 'http://localhost:8080/api/networks/file'
         }
     },
     mounted: function(){
         const field = this.$route.query.field;
-        const relationData = this.$route.params.RelationData; // 因果关系提取页面传递的数据
+        const relationData = this.$route.params.RelationData; // The causality extracts the data 
         this.$emit('finish-adding', '') // set showinfo to be null
         if(field){
             this.isEdit = true;
-            this.$http.get(`/api/networks/${field}`)
+            this.$api.network.getFieldNetwork(field)
             .then(res => {
                 const newChart = res.data;
                 this.field = field;
-                console.log('edit:', newChart);
                 let min = 0;
                 newChart.nodes.forEach(element => {
                     if(Number(element.id) > min) {
@@ -289,12 +275,9 @@ export default {
                         this.setPaginations();
                     }
                 }
-                // this.$store.dispatch('setNewChart', newChart);
-                // this.$store.dispatch('setField', field);
             })
         }
         this.getChartData();
-        // 
         if(relationData) {
             let node = [];
             for(let relation of relationData) {
@@ -346,14 +329,6 @@ export default {
             }
         }
     },
-    // computed: {
-    //     currentIndex(){
-    //         return this.$store.getters.newChart.nodes
-    //     },
-    //     links(){
-    //         return this.$store.getters.newChart.links
-    //     },
-    // },
     beforeRouteLeave(to, form, next) {
         this.$store.dispatch('setNewChart', {nodes:[], links: []});
         next()
@@ -363,25 +338,20 @@ export default {
             let myChart = this.$echarts.init(document.getElementById('main'));
             const option = {
                 title: {
-                    // text: 'Les Miserables',
-                    // subtext: 'Default layout',
                     top: 'bottom',
                     left: 'right'
                 },
                 tooltip: {},
                 legend: [{
-                    // selectedMode: 'single',
                     data: []
                 }],
                 animation: false,
                 series : [
                     {
-                        // name: 'Les Miserables',
                         type: 'graph',
                         layout: 'force',
                         data: [],
                         links: [],
-                        // categories: categories,
                         label: {
                             normal: {
                                 show: true,
@@ -391,13 +361,13 @@ export default {
                             }
                         },
                         force: {
-                            repulsion: 1000
+                            repulsion: 800
                         },
                         edgeSymbol:'arrow',
                         edgeSymbolSize: [0, 8],
                         edgeLabel: {
                             normal: {
-                                show: true,
+                                show: false,
                                 textStyle: {
                                     fontSize: 15
                                 },
@@ -422,9 +392,7 @@ export default {
             const that = this;
             myChart.on('click', function (params) {
                 if (params.componentType === 'markPoint') {
-                    // 点击到了 markPoint 上
                     if (params.seriesIndex === 5) {
-                        // 点击到了 index 为 5 的 series 的 markPoint 上。
                     }
                 }
                 else if (params.componentType === 'series') {
@@ -499,10 +467,8 @@ export default {
                     const record = {nodes: this.nodes, links: this.links};
                     this.putRecord(this.graphHistory, record, false)
                 }
-                // this.$store.dispatch('deleteNode', showinfo);
                 this.showinfo = null;
             }else{
-                // this.$store.dispatch('deleteLink', showinfo);
                 this.links = this.links.filter(link => {
                     return link.id !== showinfo.id;
                 });
@@ -518,75 +484,6 @@ export default {
                 }
                 this.showinfo = null;
             }
-        },
-        receive: function(elements, showinfo){
-            if(showinfo.type === 'node'){
-                this.showinfo = showinfo;
-                this.updateLable = false; 
-            }else {
-                this.showinfo = showinfo;
-                this.updateLable = false;
-            }
-            let myChart = this.$echarts.init(document.getElementById('main'));
-            const chartData = this.$store.getters.newChart;
-            const option = {
-                series : [
-                    {
-                        data: chartData.nodes,
-                        links: chartData.links,
-                    }
-                ]
-            };
-            myChart.setOption(option);
-        },
-        searchData: function(data){
-            if(this.showinfo !== null){
-                this.showinfo = null;
-            }
-            if(data === '') {
-                data = this.$store.getters.newChart;
-            }
-            let myChart = this.$echarts.init(document.getElementById('main'));
-            var types = [];
-            var categories = [];
-            data.nodes.map(node => {
-                if(!types.includes(node.label)){
-                    types.push(node.label);
-                }
-            })
-            for (var i = 0; i < types.length; i++) {
-                categories[i] = {
-                    name: types[i],
-                };
-            }
-            data.nodes.forEach(function (node) {
-                // node.itemStyle = null;
-                // node.symbolSize = Math.random()*40 + 1;
-                // node.label = {
-                //     normal: {
-                //         // show: node.name.length > 10
-                //         show: false
-                //     }
-                // };
-                node.draggable = true,
-                node.category = types.findIndex((element) => element === node.label);
-            });
-            const option = {
-                legend: [{
-                    // selectedMode: 'single',
-                    data: categories.map(function (a) {
-                        return a.name;
-                    })
-                }],
-                series : [
-                    {
-                        categories: categories,
-                        data: data.nodes,
-                        links: data.links,
-                    }
-                ]
-            };
-            myChart.setOption(option);
         },
         setShowinfo: function(data) {
             this.showinfo = null;
@@ -633,8 +530,6 @@ export default {
             ],
             this.iter_num = 1;
             this.type = '';
-            // this.allTableData = this.conceptTabelData;
-            // this.filterTableData = this.conceptTabelData;
             this.setPaginations();
         },
         addEntity:function (index, row) {
@@ -818,14 +713,12 @@ export default {
                     links: newLinks,
                     isEdit: this.isEdit,
                 }
-                console.log('add_network:', data);
-                this.$http.post('/api/networks/', data)
+                this.$api.network.addNetwork(data)
                 .then(res => {
                     this.$message({
-                        message: "网络生成成功",
+                        message: "graph created successfully",
                         type: "success"
                     })
-                    // this.$store.dispatch('setNewChart', {nodes:[], links: []});
                     this.nodes = [];
                     this.links = [];
                     this.isEdit = false;
@@ -840,7 +733,7 @@ export default {
                 
             }else{
                 this.$message({
-                    message: '用户未登录！！！',
+                    message: 'User not logged in！！！',
                     type: 'warning'
                 });
                 this.$router.push('/login');
@@ -889,7 +782,6 @@ export default {
                         const record = {nodes: this.nodes, links: this.links};
                         this.putRecord(this.graphHistory, record, false)
                     }
-                    // this.showinfoDetail = [];                               
                 }else{
                     for(let item of this.links){
                         if(item.id === this.showinfo.id){
@@ -930,18 +822,16 @@ export default {
                         const record = {nodes: this.nodes, links: this.links};
                         this.graphHistory.push(record);
                     }
-                    // this.showinfoDetail = [];
                 }
             }
         },
         updateCancel: function() {
             this.dialogUpdateVisible = false;
-            // this.showinfoDetail = [];
         },
         handleUpdateClose: function() {
             this.updateCancel();
         },
-        // 查询
+        // query
         addQueryProperty: function() {
             if (this.queryNum < 3) {
                 this.queryNum += 1;
@@ -970,7 +860,6 @@ export default {
             this.targetNodeProperty = [];
         },
         query: function() {
-            
             this.dialogQueryVisible = false;
             const field = this.field;
             if(this.queryRelationLabel !== '' || this.querySourceLabel !== '' || this.queryTargetLabel !== ''){
@@ -987,10 +876,6 @@ export default {
                         node2Propery[item.name] = item.value;
 
                 }
-                // for(let item of this.relation){
-                //     if(item.name !== '')
-                //         relationPropery[item.name] = item.value;
-                // }
                 const data = {
                     label: {
                         node1: this.querySourceLabel,
@@ -1004,13 +889,12 @@ export default {
                     }
                 }
                 const str = JSON.stringify(data);
-                this.$http.get(`/api/networks/v1/query/?data=${str}`)
+                this.$api.network.queryNetwork(str)
                 .then(res => {
                     const data = {
                         nodes: res.data.data.nodes,
                         links: res.data.data.links,
                     }
-                    console.log('searchData:', data); // Javert Babet Joly Valjean
                     this.queryNodes = data.nodes;
                     this.queryLinks = data.links;
                     const record = {nodes: this.queryNodes, links: this.queryLinks};
@@ -1050,7 +934,6 @@ export default {
             this.putRecord(this.graphHistory, record, false)
             const option = {
                 legend: [{
-                        // selectedMode: 'single',
                         data: categories.map(function (a) {
                             return a.name;
                         })
@@ -1072,21 +955,13 @@ export default {
             var testmsg=file.name.substring(file.name.lastIndexOf('.')+1)
             const extension = testmsg === 'csv'
             const extension2 = testmsg === 'xlsx'
-            // const isLt2M = file.size / 1024 / 1024 < 10
             if(!extension && !extension2) {
                 this.$message({
-                    message: '上传文件只能是 csv、xlsx格式!',
+                    message: 'Uploaded file can only be CSV, XLSX format!!',
                     type: 'warning'
                 });
                 return false;
             }
-            // if(!isLt2M) {
-            //     this.$message({
-            //         message: '上传文件大小不能超过 10MB!',
-            //         type: 'warning'
-            //     });
-            // }
-            // return (extension || extension2) && isLt2M
         },
         handleRemove(file, fileList) {
             console.log(file, fileList);
@@ -1150,7 +1025,7 @@ export default {
             // this.filterTableData = this.conceptTabelData;
             // this.setPaginations();
         },
-        // 分页
+        // Pagination
         setPaginations () {
             this.paginations.total = this.allTableData.length
             this.paginations.page_index = 1
@@ -1160,16 +1035,16 @@ export default {
                 return index < this.paginations.page_size
             })
         },
-        handleSizeChange (page_size) { // 控制一页显示的数据量
+        // Control the amount of data displayed on a page
+        handleSizeChange (page_size) { 
             this.paginations.page_index = 1
             this.paginations.page_size = page_size
             this.conceptTabelData = this.allTableData.filter((item, index) => {
                 return index < page_size
             })
         },
-        handleCurrentChange (page) { // 分页跳转
+        handleCurrentChange (page) { 
             let tables = []
-            // 当前页前面有多少数据
             let index = this.paginations.page_size * (page - 1)
             let nums = this.paginations.page_size * page
             for (let i = index; i < nums; i++) {
@@ -1179,10 +1054,6 @@ export default {
             }
             this.conceptTabelData = tables
         },
-        // undo
-        // putRecord(graphData) {
-        //     this.graphHistory.push(graphData);
-        // },
         putRecord(history, record, queryModel) {
             if (queryModel) {
                 if (this.currentQueryIndex < history.length - 1) {
@@ -1190,86 +1061,49 @@ export default {
                 }
                 this.currentQueryIndex += 1;
             } else {
-                // console.log(this.currentIndex, this.graphHistory.length - 1)
                 if (this.currentIndex < history.length - 1) {
                     history.splice(this.currentIndex+1, history.length-this.currentIndex-1);
                 }
                 this.currentIndex += 1;
             }
             history.push(this.deepClone(record));
-            console.log('history:', history);
         },
         undo() {
-            console.log('this.graphHistory:', this.graphHistory)
             if (this.queryLabel === true && this.currentQueryIndex > 0) {
-                // this.graphQueryHistory.pop();
-                // if (this.graphQueryHistory.length === 0) {
-                //     return;
-                // }
                 this.queryNodes = this.deepClone(this.graphQueryHistory[this.currentQueryIndex-1].nodes);
                 this.queryLinks = this.deepClone(this.graphQueryHistory[this.currentQueryIndex-1].links);
                 this.currentQueryIndex -= 1;
-                // const record = {nodes: this.queryNodes, links: this.queryLinks};
-                // this.putRecord(this.graphQueryHistory, record, true)
                 this.showinfo = null;
             } else if (this.queryLabel === false && this.currentIndex > 0) {
-                // this.graphHistory.pop();
-                // if (this.graphHistory.length === 1) {
-                //     var element = document.getElementById('undo');
-                //     element.style.color = '#dcdde1'
-                //     return;
-                // }
                 this.nodes = this.deepClone(this.graphHistory[this.currentIndex-1].nodes);
                 this.links = this.deepClone(this.graphHistory[this.currentIndex-1].links);
-                // const record = {nodes: this.nodes, links: this.links};
-                // this.putRecord(this.graphHistory, record, false)
                 this.currentIndex -= 1;
                 this.showinfo = null;
             }
         },
         redo() {
             if (this.queryLabel === true && this.currentQueryIndex < this.graphQueryHistory.length-1) {
-                // this.graphQueryHistory.pop();
-                // if (this.graphQueryHistory.length === 0) {
-                //     return;
-                // }
                 this.queryNodes = this.deepClone(this.graphQueryHistory[this.currentQueryIndex+1].nodes);
                 this.queryLinks = this.deepClone(this.graphQueryHistory[this.currentQueryIndex+1].links);
                 this.currentQueryIndex += 1;
-                // const record = {nodes: this.queryNodes, links: this.queryLinks};
-                // this.putRecord(this.graphQueryHistory, record, true)
                 this.showinfo = null;
             } else if (this.queryLabel === false && this.currentIndex < this.graphHistory.length-1) {
-                // this.graphHistory.pop();
-                // if (this.graphHistory.length === 1) {
-                //     var element = document.getElementById('undo');
-                //     element.style.color = '#dcdde1'
-                //     return;
-                // }
                 this.nodes = this.deepClone(this.graphHistory[this.currentIndex+1].nodes);
                 this.links = this.deepClone(this.graphHistory[this.currentIndex+1].links);
-                // const record = {nodes: this.nodes, links: this.links};
-                // this.putRecord(this.graphHistory, record, false)
                 this.currentIndex += 1;
                 this.showinfo = null;
             }
         },
         deepClone (obj) {
-            let _tmp = JSON.stringify(obj);//将对象转换为json字符串形式
-            let result = JSON.parse(_tmp);//将转换而来的字符串转换为原生js对象
+            let _tmp = JSON.stringify(obj); // Converts the object to json string form
+            let result = JSON.parse(_tmp); // Converts json string to the object
             return result;
         },
-    },
-    watch: {
-        nodes: {
-            handler: function(val, oldVal){
-                if (this.queryLabel === true) {
-                    return;
-                }
-                let myChart = this.$echarts.init(document.getElementById('main'));
+        setChartNodeData(nodes) {
+            let myChart = this.$echarts.init(document.getElementById('main'));
                 var types = [];
                 var categories = [];
-                this.nodes.map(node => {
+                nodes.map(node => {
                     if(!types.includes(node.label)){
                         types.push(node.label);
                     }
@@ -1279,13 +1113,12 @@ export default {
                         name: types[i],
                     };
                 }
-                this.nodes.forEach(function (node) {
+                nodes.forEach(function (node) {
                     node.draggable = true,
                     node.category = types.findIndex((element) => element === node.label);
                 });
                 const option = {
                     legend: [{
-                            // selectedMode: 'single',
                             data: categories.map(function (a) {
                                 return a.name;
                             })
@@ -1293,10 +1126,34 @@ export default {
                     series: {
                         type: 'graph',
                         categories: categories,
-                        data: this.nodes,
+                        data: nodes,
                     }
                 }
                 myChart.setOption(option);
+        },
+        setChartLinkData(links) {
+            let myChart = this.$echarts.init(document.getElementById('main'));
+            let length = links.length;
+            links.forEach(function (link) {
+                link.value = link.label;
+            })
+            const option = {
+                series: {
+                    type: 'graph',
+                    links: links,
+                }
+            }
+            myChart.setOption(option);
+        }
+
+    },
+    watch: {
+        nodes: {
+            handler: function(val, oldVal){
+                if (this.queryLabel === true) {
+                    return;
+                }
+                this.setChartNodeData(this.nodes);
             },
             deep: true,
         },
@@ -1305,76 +1162,19 @@ export default {
                 if (this.queryLabel === true) {
                     return;
                 }
-                let myChart = this.$echarts.init(document.getElementById('main'));
-                this.links.forEach(function (link) {
-                    if (link.label === 'causes') {
-                        link.value = ''
-                    } else {
-                        link.value = link.label;
-                    }
-                    
-                    
-                })
-                const option = {
-                    series: {
-                        type: 'graph',
-                        links: this.links,
-                    }
-                }
-                myChart.setOption(option);
+                this.setChartLinkData(this.links);
             },
             deep: true,
         },
         queryNodes: {
             handler: function(val, oldVal){
-                let myChart = this.$echarts.init(document.getElementById('main'));
-                var types = [];
-                var categories = [];
-                this.queryNodes.map(node => {
-                    if(!types.includes(node.label)){
-                        types.push(node.label);
-                    }
-                })
-                for (var i = 0; i < types.length; i++) {
-                    categories[i] = {
-                        name: types[i],
-                    };
-                }
-                this.queryNodes.forEach(function (node) {
-                    node.draggable = true,
-                    node.category = types.findIndex((element) => element === node.label);
-                });
-                const option = {
-                    legend: [{
-                            // selectedMode: 'single',
-                            data: categories.map(function (a) {
-                                return a.name;
-                            })
-                        }],
-                    series: {
-                        type: 'graph',
-                        categories: categories,
-                        data: this.queryNodes,
-                    }
-                }
-                myChart.setOption(option);
+                this.setChartNodeData(this.queryNodes);
             },
             deep: true,
         },
         queryLinks: {
             handler: function(val, oldVal){
-                let myChart = this.$echarts.init(document.getElementById('main'));
-                this.queryLinks.forEach(function (link) {
-                    link.value = link.type;
-                    
-                });
-                const option = {
-                    series: {
-                        type: 'graph',
-                        links: this.queryLinks,
-                    }
-                }
-                myChart.setOption(option);
+                this.setChartLinkData(this.queryLinks);
             },
             deep: true,
         },
@@ -1442,7 +1242,6 @@ export default {
     padding-left: 10%;
 }
 .chart {
-    /* position: absolute; */
     margin-left: 144px;
     height: 680px;
     width: 800px;
@@ -1477,7 +1276,6 @@ export default {
     margin-top: 50px;
     margin-left: 144px;
     padding-top: 1px;
-    /* padding-left: 1px; */
     width: 800px;
     height: 40px;
     border: 2px solid #a6282f;
@@ -1504,7 +1302,6 @@ export default {
 }
 .el-icon-refresh-right{
     color: #dcdde1;
-    /* margin-left: 890px; */
 }
 .slide-fade-enter-active {
   transition: all .8s ease;

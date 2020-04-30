@@ -6,21 +6,15 @@ const obj= multer({dest: 'upload/'});
 let {PythonShell} = require('python-shell');
 const path = require('./config/store').relationExtractionPath;
 const passport = require('passport');
-const neo4j_driver = require('neo4j-driver');
 const users = require('./routers/api/users');
 const texts = require('./routers/api/texts');
 const networks = require('./routers/api/networks');
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
-// expressWs(app);
-// DB config
 const db = require('./config/store').mongooseURL;
-const uri = require('./config/store').neo4j.URL;
-const username = require('./config/store').neo4j.USER;
-const password = require('./config/store').neo4j.PASSWORD;
+const port = process.env.PORT || 5000;
 
-// connect to db 
 mongoose.connect(db)
     .then(() => console.log('mongoDB connected'))
     .catch(err => console.log(err))
@@ -31,12 +25,11 @@ app.use(obj.any());
 app.use(passport.initialize());
 require('./config/passport')(passport);
 
-const port = process.env.PORT || 5000;
-
 app.use('/api/users', users);
 app.use('/api/texts', texts);
 app.use('/api/networks', networks);
 
+// websocket
 io.on('connection', function(socket){
     console.log('a user connected');
     socket.on('disconnect', function(){

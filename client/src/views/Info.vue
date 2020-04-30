@@ -12,10 +12,7 @@
                             <el-row>
                                 <el-col :span=12><el-input v-model="user.name" placeholder="name" @input="change($event)"></el-input></el-col>
                                 <el-col :span=12><button class="saveBtn" @click="saveFunc('name', 'isNameClicked')">save</button> <button class="cancelBtn" @click="cancelFunc('isNameClicked')">cancel</button></el-col>
-
                             </el-row>
-                          
-                          
                         </div>
                     </div>
             </el-col>
@@ -26,7 +23,6 @@
                         <div class="title">email </div>
                         <div class="action" v-if="isEmailClicked">
                           <div class="info">{{user.email}}</div> &#12288;
-                          <!-- <div class="edit"  @click="editFunc('isEmailClicked')">edit</div> -->
                         </div>
                         <div v-else>
                           <el-input v-model="user.email" placeholder="email"></el-input>
@@ -35,21 +31,6 @@
                     </div>
             </el-col>
         </el-row>
-        <!-- <el-row class="row" type="flex" justify="center">
-              <el-col span=24>
-                <div class="user-item">  
-                    <div class="title">password </div>
-                    <div class="action" v-if="isPasswordClicked">
-                      <div class="info">{{user.password}}</div> &#12288;
-                      <div class="edit"  @click="editFunc('isPasswordClicked')">edit</div>
-                    </div>
-                    <div v-else>
-                      <el-input v-model="user.password" placeholder="node_label"></el-input>
-                      <button class="saveBtn">save</button> <button class="cancelBtn">cancel</button>
-                    </div>
-                </div>
-            </el-col>
-        </el-row> -->
     </div>
 </template>
 
@@ -67,11 +48,6 @@ export default {
         isPasswordClicked: true,
       }
     },
-    computed: {
-        // user(){
-        //     return this.$store.getters.user;
-        // }
-    },
     methods: {
         editFunc: function(clicked){
             this[clicked] = !this[clicked];
@@ -79,7 +55,7 @@ export default {
         saveFunc: function(propery, clicked){
             const id = this.$store.getters.user.id;
             const that = this;
-            this.$http.post(`/api/users/edit/${id}`, {
+            this.$api.user.editUserInfo(id, {
                 name: propery,
                 value: this.user[propery],
             }).then(res => {
@@ -88,7 +64,6 @@ export default {
                 user[propery] = data;
                 this.$store.dispatch('setUser', user);
                 that[clicked] = !that[clicked];
-                console.log(that[clicked]);
             })
         },
         cancelFunc: function(clicked) {
@@ -104,7 +79,6 @@ export default {
 <style scoped>
 .row {
 	font-size: 14px;
-    /* padding: 12px 0; */
     padding-left: 12px;
     padding-right: 12px;
 	border-bottom: 1px solid #eeeeee;
@@ -114,7 +88,6 @@ export default {
     height: 100%;
     font-size: 14px;
     box-sizing: border-box;
-  /* padding: 16px; */
 }
 .row-bg {
     width: 100%;

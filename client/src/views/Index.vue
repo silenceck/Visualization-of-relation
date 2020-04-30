@@ -1,21 +1,38 @@
 <template>
     <div class="index">
-        <HeaderNav></HeaderNav>
-        <SideBar></SideBar>
-        <div class="rightContainer">
-          <router-view></router-view>
-        </div>
+        <el-scrollbar style="height:100%;" wrapStyle="overflow-x:hidden;">
+          <HeaderNav @passKeyword='getKeyword' :field='field' :adminField='adminField'></HeaderNav>
+            <div class="rightContainer">
+              <router-view :keyword="keyword" @passField='getField' @passAdminField='getAdminField'></router-view>
+            </div>
+        </el-scrollbar>
     </div>
 </template>
 
 <script>
-import HeaderNav from '../components/HeaderNav'
-import SideBar from '../components/SideBar'
+import HeaderNav from '../components/HeaderNav.vue'
 export default {
-    name: 'index',
+    name: 'index1',
+    data() {
+      return {
+        keyword: '', //search content
+        field: '',
+        adminField: [],
+      }
+    },
     components: { 
         HeaderNav,
-        SideBar,
+    },
+    methods: {
+      getKeyword(keyword){
+        this.keyword = keyword;
+      },
+      getField(field){
+        this.field = field;
+      },
+      getAdminField(fields) {
+        this.adminField = fields;
+      }
     }
 }
 </script>
@@ -26,13 +43,14 @@ export default {
   height: 100%;
   overflow: hidden;
 }
-.rightContainer{
+
+/* .rightContainer{
   position: relative;
   top:0;
   left: 180px;
   width: calc(100% - 180px);
   height: calc(100% - 71px);
   overflow: auto;
-}
+} */
 </style>
 

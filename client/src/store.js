@@ -13,12 +13,6 @@ const types = {
   SET_FIELD: "SET_FIELD",
   SET_INDEX: 'SET_INDEX',
   SET_RELATIONDATA: 'SET_RELATIONDATA',
-  ADD_NODE: "ADD_NDOE",
-  ADD_EDGE: "ADD_EDGE",
-  DELETE_NODE: "DELETE_NODE",
-  DELETE_EDGE: "DELETE_EDGE",
-  UPDATE_NODE: "UPDATE_NODE",
-  UPDATE_EDGE: "UPDATE_EDGE",
 }
 const state = {
   isAuthenticated: false,
@@ -79,51 +73,6 @@ const mutations = {
     if (relationData) state.relationData = relationData;
     else state.relationData = []
   },
-  [types.ADD_NODE](state, node) {
-    if (node) state.newChart.nodes.push(node);
-    else state.nodes = []
-  },
-  [types.ADD_EDGE](state, link) {
-    if (link) state.newChart.links.push(link);
-    else state.links = []
-  },
-  [types.DELETE_NODE](state, info) {
-    if (info) {
-      state.newChart.nodes = state.newChart.nodes.filter(node => {
-        return node.id !== info.id;
-      });
-      state.newChart.links = state.newChart.links.filter(link => {
-        return link.source !== info.id && link.target !== info.id;
-      });
-    }
-    else state.nodes = []
-  },
-  [types.DELETE_EDGE](state, info) {
-    if (info) state.newChart.links = state.newChart.links.filter(link => {
-      return link.id !== info.id;
-    });
-    else state.links = [];
-  },
-  [types.UPDATE_NODE](state, info) {
-    if (info) {
-      for(let i in state.newChart.nodes){
-        if(state.newChart.nodes[i].id === info.id){
-          state.newChart.nodes[i] = info;          
-        }
-      }
-    }
-    else state.nodes = []
-  },
-  [types.UPDATE_EDGE](state, info) {
-    if (info) {
-      for(let i in state.newChart.links){
-        if(state.newChart.links[i].id === info.id){
-          state.newChart.links[i] = info;          
-        }
-      }
-    }
-    else state.links = []
-  },
   // 
   TOGGLE_SIDEBAR: state => {
     state.sidebar.opened = !state.sidebar.opened
@@ -170,24 +119,6 @@ const actions = {
   },
   setRelationData: ({commit}, relationData) => {
     commit(types.SET_RELATIONDATA, relationData)
-  },
-  addNode: ({commit}, node) => {
-    commit(types.ADD_NODE, node)
-  },
-  addLink: ({commit}, link) => {
-    commit(types.ADD_EDGE, link)
-  },
-  deleteNode: ({commit}, info) => {
-    commit(types.DELETE_NODE, info)
-  },
-  deleteLink: ({commit}, info) => {
-    commit(types.DELETE_EDGE, info)
-  },
-  updateNode: ({commit}, info) => {
-    commit(types.UPDATE_NODE, info)
-  },
-  updateLink: ({commit}, info) => {
-    commit(types.UPDATE_EDGE, info)
   },
   toggleSideBar({ commit }) {
     commit('TOGGLE_SIDEBAR')

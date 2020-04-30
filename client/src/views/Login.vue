@@ -56,7 +56,6 @@ export default {
                         trigger: "blur"
                     }
                 ],
-
             }
         }
     },
@@ -64,15 +63,15 @@ export default {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
             if (valid) {
-                this.$http.post('/api/users/login', this.loginUser)
+                this.$api.user.login(this.loginUser)
                 .then(res => {
-                    // token 存储到 localstorage
+                    // store token in localstorage
                     const { token } = res.data;
                     localStorage.setItem('eleToken', token);
-                    // 解析token 
+                    // parse token 
                     const decode = jwt_decode(token)
 
-                    // 将token存储到vuex中
+                    // store token in vuex
                     this.$store.dispatch('setAuthenticated', !this.isEmpty(decode))
                     this.$store.dispatch('setUser', decode)
 
@@ -81,7 +80,6 @@ export default {
                 })
                 
             } else {
-                console.log('error submit!!');
                 return false;
             }
             }); 

@@ -85,13 +85,12 @@ export default {
         }
     },
     mounted: function(){
-        // this.setPaginations();
         this.getNetwork();
     },
     methods: {
         getNetwork: function(){
             const id = this.$store.getters.user.id;
-            this.$http.get(`/api/networks/v1/${id}`)
+            this.$api.network.getNetworkByUser(id)
             .then(res => {
                 const networks = res.data.networks;
                 for(let network of networks) {
@@ -110,19 +109,18 @@ export default {
             this.paginations.total = this.allTableData.length
             this.paginations.page_index = 1
             this.paginations.page_size = 10
-            // 设置默认分页数据
             this.tableData = this.allTableData.filter((item, index) => {
                 return index < this.paginations.page_size
             })
         },
-        handleSizeChange (page_size) { // 控制一页显示的数据量
+        handleSizeChange (page_size) { 
             this.paginations.page_index = 1
             this.paginations.page_size = page_size
             this.tableData = this.allTableData.filter((item, index) => {
                 return index < page_size
             })
         },
-        handleCurrentChange (page) { // 分页跳转
+        handleCurrentChange (page) { 
             let tables = []
             // 当前页前面有多少数据
             let index = this.paginations.page_size * (page - 1)
@@ -144,7 +142,7 @@ export default {
         },
         handleDelete(index, row){
             const id = row._id;
-            this.$http.post(`/api/networks/delete`, {field: row.field, id: id})
+            this.$api.network.deleteNetwork({field: row.field, id: id})
             .then(res => {
                 this.allTableData = this.allTableData.filter(item => {
                     return item._id !== id
@@ -157,19 +155,15 @@ export default {
         },
         handleExport(index, row){
             const field = row.field;
-            this.$http.get(`/api/networks/v1/test/export/${field}`)
+            this.$api.network.exportNetwork(field)
             .then(res => {
                 const fileData = res.data.data;
-                console.log(fileData);
                 for(let fileName in fileData) {
-                    // 创建Blob对象 传入一个合适的MIME类型
-                    const blob = new Blob(['\ufeff' + fileData[fileName]], {type: 'text/csv,charset=UTF-8'}); // 参考链接 https://developer.mozilla.org/zh-CN/docs/Web/API/Blob
-                    // 使用 Blob 创建一个指向类型化数组的URL
-                    const csvUrl = URL.createObjectURL(blob); // 参考链接 https://developer.mozilla.org/zh-CN/docs/Web/API/URL/createObjectURL
+                    const blob = new Blob(['\ufeff' + fileData[fileName]], {type: 'text/csv,charset=UTF-8'}); 
+                    const csvUrl = URL.createObjectURL(blob); 
                     let link = document.createElement('a'); 
-                    link.download = fileName; //文件名字 
+                    link.download = fileName; 
                     link.href = csvUrl;
-                    // 触发下载
                     link.click();
                 }
             })
