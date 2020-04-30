@@ -45,6 +45,8 @@
             <div class="text">
                 <el-table
                     :data="tableData"
+                    :header-cell-style="headerStyle"
+                    :cell-style='headerStyle'
                     style="width: 100%">
                         <el-table-column
                             prop="num"
@@ -124,6 +126,7 @@ export default {
             },
             socket: null,
             serverAddress: 'http://localhost:5000',
+            headerStyle: {textAlign: 'center'},
         }
     },
     mounted: function(){ 
