@@ -29,7 +29,7 @@
                         </el-dialog>
                         <el-table
                             :data="conceptTabelData"
-                            style="width: 600px;fontSize: 15px;">
+                            style="width: 600px;fontSize: 18px;">
                             <el-table-column
                                 prop="number"
                                 label="ID"
@@ -45,8 +45,8 @@
                             width="240">
                                 <template slot-scope="scope">
                                     <el-button
-                                    size="mini"
-                                    @click="addEntity(scope.$index, scope.row)" type='primary' icon="el-icon-plus">Add entity</el-button>
+                                    size="medium"
+                                    @click="addEntity(scope.$index, scope.row)" type='primary' class="button" icon="el-icon-plus">Add entity</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -58,7 +58,8 @@
                             :page-sizes="paginations.page_sizes"
                             :page-size="paginations.page_size"
                             :layout="paginations.layout"
-                            :total="paginations.total">
+                            :total="paginations.total"
+                            >
                         </el-pagination>
                         </div>
                         <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">Query&#12288;</el-button> 
@@ -75,7 +76,7 @@
                             :before-upload="beforeUpload"
                             :auto-upload=false>
                             <el-button slot="trigger" size="small" type="primary" class="button" icon="el-icon-folder-opened">Select File</el-button>
-                            <el-button style="margin-left: 10px; fontSize: 16px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
+                            <el-button style="margin-left: 10px; fontSize: 18px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
                         </el-upload>
                         <el-dialog title="Add Instance" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
                                         <div class="dialog">Instance Tpye: {{entity.label}}</div> 
@@ -153,7 +154,7 @@
             <el-row :gutter="20">
                 <el-col :span="12">
                     <transition name="slide-fade">
-                        <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:</span>{{val}} </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">Update</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">Delete</el-button></span></div>
+                        <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:{{val}}</span> </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">Update</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">Delete</el-button></span></div>
                     </transition>
                 </el-col>
             </el-row>
@@ -343,7 +344,11 @@ export default {
                 },
                 tooltip: {},
                 legend: [{
-                    data: []
+                    data: [],
+                    textStyle: { 
+                        fontSize: 18
+                    }
+
                 }],
                 animation: false,
                 series : [
@@ -356,7 +361,7 @@ export default {
                             normal: {
                                 show: true,
                                 textStyle: {
-                                    fontSize: 16
+                                    fontSize: 18
                                 },
                             }
                         },
@@ -1266,7 +1271,7 @@ export default {
     text-align: right;
 }
 .button {
-    font-size: 16px;
+    font-size: 18px;
 }
 .btn {
     display: inline-block;
@@ -1308,5 +1313,8 @@ export default {
 }
 .slide-fade-leave-active {
   transition: all .8s ease;
+}
+.pagination {
+    font-size: 24px;
 }
 </style>

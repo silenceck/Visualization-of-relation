@@ -3,7 +3,7 @@
         <div class="container">
             <el-row :gutter="20">
                 <el-col :span="6" class="tree">
-                    <el-scrollbar style="height:800px;" wrapStyle="overflow-x:hidden;">
+                    <el-scrollbar style="height:800px;fontSize: 24px;" wrapStyle="overflow-x:hidden;">
                         <el-tree 
                             :data="data"
                             node-key="id"
@@ -21,7 +21,7 @@
                     <div id="main" class="chart"></div>
                 </el-col>
                 <el-col :span="9" class="card">
-                    <el-scrollbar style="height:800px;" wrapStyle="overflow-x:hidden;">
+                    <el-scrollbar style="height:800px;fontSize:20px;" wrapStyle="overflow-x:hidden;">
                         <el-card class="box-card" shadow="never">
                         <div slot="header" class="clearfix">
                             <span>{{click_node.name}}</span>
@@ -581,7 +581,10 @@ export default {
                     legend: [{
                         data: categories.map(function (a) {
                             return a.name;
-                        })
+                        }),
+                        textStyle: { 
+                            fontSize: 24
+                        }
                     }],
                     tooltip: {},
                     animationDurationUpdate: 1500,

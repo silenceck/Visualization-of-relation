@@ -2,7 +2,7 @@
     <div class="myNetworks">
         <el-table
             :data="tableData"
-            style="width: 100%"
+            style="width: 100%; fontSize: 18px;"
             :header-cell-style="headerStyle"
             :cell-style='headerStyle'>
                 <el-table-column
@@ -27,21 +27,21 @@
                 </el-table-column>
                 <el-table-column
                 label="Operation"
-                width="320">
+                width="360">
                     <template slot-scope="scope">
                         <el-button
                         size="mini"
-                        @click="handleLook(scope.$index, scope.row)" type='primary'>View</el-button>
+                        @click="handleLook(scope.$index, scope.row)" type='primary' class="button">View</el-button>
                         <el-button
                         size="mini"
-                        @click="handleEdit(scope.$index, scope.row)" type='success'>Edit</el-button>
+                        @click="handleEdit(scope.$index, scope.row)" type='success' class="button">Edit</el-button>
                         <el-button
                         size="mini"
-                        @click="handleExport(scope.$index, scope.row)" type='info'>Export</el-button>
+                        @click="handleExport(scope.$index, scope.row)" type='info' class="button">Export</el-button>
                         <el-button
                         size="mini"
                         type="danger"
-                        @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
+                        @click="handleDelete(scope.$index, scope.row)" class="button">Delete</el-button>
                     </template>
                 </el-table-column>
         </el-table>
@@ -175,6 +175,9 @@ export default {
 <style scoped>
 .pagination {
     margin-left: 5px;
+}
+.button {
+    font-size: 18px;
 }
 </style>
 

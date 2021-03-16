@@ -10,7 +10,7 @@
                             <router-link  :to="item.path" :key="item.path">
                                 <el-menu-item :index="item.path">
                                     <i :class="'fa fa-margin ' + item.icon" ></i>
-                                    <span slot="title" > {{item.name}}</span>
+                                    <span slot="title" style="fontSize: 18px;"> {{item.name}}</span>
                                 </el-menu-item>
                             </router-link>
                     </template>

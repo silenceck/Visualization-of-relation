@@ -21,7 +21,7 @@
                 <el-col :span="18">
                     <el-input
                         type="textarea"
-                        :rows="12"
+                        :rows="10"
                         placeholder=""
                         v-model="textarea" 
                         class="textarea">
@@ -47,7 +47,7 @@
                     :data="tableData"
                     :header-cell-style="headerStyle"
                     :cell-style='headerStyle'
-                    style="width: 100%">
+                    style="width: 100%;fontSize: 18px;">
                         <el-table-column
                             prop="num"
                             label="#"
@@ -65,7 +65,7 @@
                         </el-table-column>
                         <el-table-column
                             prop="relation"
-                            label="Type(1:cause relation, 2:caused relation, 3: related relation, 0: no relation)"
+                            label="Relation type(1:cause 2:caused, 3: related, 0: no relation)"
                             width="560">
                         </el-table-column>
                     </el-table>
@@ -361,7 +361,7 @@ export default {
     margin-top: 20px;
     margin-left: 25%;
     margin-bottom: 40px;
-    font-size: 16px;
+    font-size: 18px;
 }
 .pagination {
     margin-left: 5%;
@@ -374,10 +374,12 @@ export default {
 .keyBtn {
     margin-left: 10px;
     margin-top: 85px;
+    font-size: 20px;
 }
 .keyBtn1 {
     margin-left: 10px;
     margin-top: 260px;
+    font-size: 20px;
 }
 .keywords {
     width: 1000px;
@@ -397,7 +399,7 @@ export default {
     color: #495060;
     background: #fff;
     padding: 0 8px;
-    font-size: 16px;
+    font-size: 20px;
     margin-left: 5px;
     margin-top: 4px;
 }

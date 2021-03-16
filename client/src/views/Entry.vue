@@ -31,7 +31,7 @@ export default {
                 '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'
                 ],
                 [
-                '#55efc4', '#d63031', '#74b9ff', '#a29bfe', '#ffeaa7',
+                '#55efc4', '#d63031', '#74b9ff', '#a29bfe', '#2439b1',
                 '#fab1a0', '#ff7675', '#fd79a8', '#81ecec', '#f7f1e3', 
                 '#485460', '#765005', '#e75840', '#26ccd8', '#3685fe', 
                 '#9977ef', '#f5616f', '#f7b13f', '#f9e264', '#50c48f'
@@ -56,7 +56,7 @@ export default {
                             normal: {
                                 show: true,
                                 textStyle: {
-                                    fontSize: 16
+                                    fontSize: 18
                                 },
                             }
                         },

@@ -194,16 +194,16 @@ export default {
     height: 80px;
 }
 .inline-input {
-    font-size: 18px;
+    font-size: 24px;
 }
 .search_container {   
     height: 80px;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
 }
 .search_container .el-button {
     margin-left: 4px;
-    font-size: 18px;
+    font-size: 24px;
     background: #a6282f;
     border: 1px solid #a6282f;
 }
@@ -213,23 +213,23 @@ export default {
 .index1.el-menu-item {
     height: 80px;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
 }
 .index.el-menu-item {
     height: 80px;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
 }
 .el-menu--horizontal>.el-submenu .el-submenu__title {
     height: 80px;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
 
 }
 .index2.el-menu-item {
     border-color: #ffffff;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
 }
 .logo-container {
     line-height: 60px;
@@ -246,7 +246,7 @@ export default {
 .login {
     height: 80px;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
     text-align: right;
     margin-right: 5px;
     color: #a6282f;
@@ -254,7 +254,7 @@ export default {
 .username {
     height: 80px;
     line-height: 80px;
-    font-size: 18px;
+    font-size: 24px;
     text-align: center;
 }
 .right-menu {
@@ -270,7 +270,7 @@ export default {
       display: inline-block;
       padding: 0 8px;
       height: 100%;
-      font-size: 18px;
+      font-size: 24px;
       color: #5a5e66;
       vertical-align: text-bottom;
 
@@ -286,7 +286,7 @@ export default {
 }
 
 .avatar-wrapper {
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
 }
 </style>
