@@ -5,15 +5,14 @@
                 <el-col :span='12' class="col1">  
                     <span v-bind:style="{cursor:'pointer'}"> 
                         <i  @click="undo" id="undo" class="icon el-icon-refresh-left" >undo</i>
-                        <i  @click="redo" id="redo" class="icon el-icon-refresh-right" >redo</i>
+                        <i  style="marginLeft: 40px;" @click="redo" id="redo" class="icon el-icon-refresh-right" >redo</i>
                     </span>
                     <div id="main" class="chart"></div> 
                 </el-col>
                 <el-col :span='12' class="col2">
                     &#12288;&#12288;&#12288;&#12288;
                     <div class="rightArea">
-                        <el-button type="text" @click="dialogFormVisible = true" class="button">Add Pattern</el-button>
-                        <el-button type="text" @click="dialogRelationVisible = true" class="button">Add Relation</el-button>
+                        
                         <el-dialog title="Add Model" :visible.sync="dialogFormVisible"  width="30%" top="25vh" :before-close="handleFormClose">
                                     <div class="dialog">Pattern Name</div> 
                                     <el-input class="dialog" v-model="type"></el-input> 
@@ -29,16 +28,16 @@
                         </el-dialog>
                         <el-table
                             :data="conceptTabelData"
-                            style="width: 600px;fontSize: 18px;">
+                            style="width: 780px;fontSize: 18px;">
                             <el-table-column
                                 prop="number"
                                 label="ID"
-                                width="180">
+                                width="240">
                             </el-table-column>
                             <el-table-column
                                 prop="concept"
                                 label="Pattern"
-                                width="180">
+                                width="240">
                             </el-table-column>
                             <el-table-column
                             label="Operation"
@@ -46,7 +45,7 @@
                                 <template slot-scope="scope">
                                     <el-button
                                     size="medium"
-                                    @click="addEntity(scope.$index, scope.row)" type='primary' class="button" icon="el-icon-plus">Add entity</el-button>
+                                    @click="addEntity(scope.$index, scope.row)" class="button" icon="el-icon-plus">Add entity</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -62,22 +61,28 @@
                             >
                         </el-pagination>
                         </div>
-                        <el-button type="text" class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false">Query&#12288;</el-button> 
-                        <el-button type="text" class="button" @click="quitQuery" v-if="queryLabel === true">Exit Query</el-button>
-                        <el-button type="text" class="button" @click="dialogNetworkVisible = true">Save</el-button>
-                        <el-upload
-                            class="upload-demo"
-                            ref="upload"
-                            :action="uploadUrl"
-                            :on-success="uploadSuccess"
-                            :on-preview="handlePreview"
-                            :on-remove="handleRemove"
-                            :file-list="fileList"
-                            :before-upload="beforeUpload"
-                            :auto-upload=false>
-                            <el-button slot="trigger" size="small" type="primary" class="button" icon="el-icon-folder-opened">Select File</el-button>
-                            <el-button style="margin-left: 10px; fontSize: 18px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
-                        </el-upload>
+                        <div>
+                            <el-button  @click="dialogFormVisible = true" class="button" icon="el-icon-plus">Add Pattern</el-button>
+                            <el-button  @click="dialogRelationVisible = true" class="button" icon="el-icon-plus">Add Relation</el-button>
+                            <el-upload
+                                class="upload-demo"
+                                ref="upload"
+                                :action="uploadUrl"
+                                :on-success="uploadSuccess"
+                                :on-preview="handlePreview"
+                                :on-remove="handleRemove"
+                                :file-list="fileList"
+                                :before-upload="beforeUpload"
+                                :auto-upload=false>
+                                <el-button slot="trigger"  class="button" icon="el-icon-folder-opened">Select File</el-button>
+                                <el-button style="margin-left: 10px; fontSize: 18px;"   @click="submitUpload" icon="el-icon-upload">Upload</el-button>
+                            </el-upload>
+                        </div>
+                        
+                        <el-divider></el-divider>
+                        <el-button  class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false" icon="el-icon-search">Query&#12288;</el-button> 
+                        <el-button  class="button" @click="quitQuery" v-if="queryLabel === true" icon="el-icon-close">Exit Query</el-button>
+                        <el-button  class="button" @click="dialogNetworkVisible = true" icon="el-icon-check">Save</el-button>
                         <el-dialog title="Add Instance" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
                                         <div class="dialog">Instance Tpye: {{entity.label}}</div> 
                                         <div class="dialog" v-for='i in entityProperty' :key="i.key+`property`">
@@ -90,11 +95,25 @@
                         </el-dialog>
                         <el-dialog title="Add Relation" :visible.sync="dialogRelationVisible"  width="30%" top="25vh" :before-close="handleRelationClose">
                             <div class="dialog">Relation Name</div> 
-                            <el-input class="dialog" v-model="relationType"></el-input> 
-                            <div class="dialog">Node1 Name</div> 
-                            <el-input class="dialog" v-model="sourceNodeName"></el-input> 
-                            <div class="dialog">Node2 Name</div> 
-                            <el-input class="dialog" v-model="targetNodeName"></el-input> 
+                            <el-input style="width:202px" v-model="relationType"></el-input> 
+                            <div class="dialog">Source Name</div> 
+                            <!-- <el-input class="dialog" v-model="sourceNodeName"></el-input>  -->
+                            <el-autocomplete
+                                class="dialog"
+                                v-model="sourceNodeName"
+                                :fetch-suggestions="querySearchNode"
+                                :trigger-on-focus="false"
+                                >
+                            </el-autocomplete>
+                            <div class="dialog">Target Name</div> 
+                            <!-- <el-input class="dialog" v-model="targetNodeName"></el-input>  -->
+                            <el-autocomplete
+                                class="dialog"
+                                v-model="targetNodeName"
+                                :fetch-suggestions="querySearchNode"
+                                :trigger-on-focus="false"
+                                >
+                            </el-autocomplete>
                             <div slot="footer" class="dialog-footer">
                                 <el-button @click="RelationCancel">Cancel</el-button>
                                 <el-button type="primary" @click="addRelation">Save</el-button>
@@ -112,7 +131,8 @@
                             <div v-if="showinfo !== null">
                                 <div class="dialog" v-for='i in showinfoDetail' :key="i.name+`showinfo`">
                                     <div v-if=" i.name !== 'field'&& i.name !== 'id'&& i.name !== 'type'">
-                                        <span class="dialog">{{i.name}}</span>  <el-input v-model="i.value" class="dialog" :disabled="i.name === 'label'"></el-input>
+                                        <span class="dialog">{{i.name}}</span>  <el-input v-model="i.value" class="dialog" ></el-input> 
+                                        <!-- :disabled="i.name === 'label' && i.value !== 'undefined'" -->
                                     </div>
                                 </div> 
                             </div>
@@ -125,16 +145,32 @@
                             <div>
                                 <el-row :gutter="20">
                                     <el-col :span='8'>
-                                        <el-input v-model="querySourceLabel" class="query" placeholder="source_label"></el-input>
+                                        <el-autocomplete
+                                            class="query"
+                                            v-model="querySourceLabel"
+                                            :fetch-suggestions="querySearch"
+                                            placeholder="source_label"
+                                            :trigger-on-focus="false"
+                                            >
+                                        </el-autocomplete>
+                                        <!-- <el-input v-model="querySourceLabel" class="query" placeholder="source_label"></el-input> -->
                                         <span class="n1_pro" v-for='i in sourceNodeProperty' :key="i.key+`node1`">
                                             <div ><el-input class="n1_pro" v-model="i.name" placeholder="name" ></el-input> : <el-input class="n1_pro" v-model="i.value" placeholder="value" ></el-input>  &#12288;</div>
                                         </span>
                                     </el-col>
                                     <el-col :span='8'>
-                                        <el-input v-model="queryRelationLabel" class="query" placeholder="relation_label"></el-input>
+                                        <el-input v-model="queryRelationLabel" placeholder="relation_label"></el-input>
                                     </el-col>
                                     <el-col :span='8'>
-                                        <el-input v-model="queryTargetLabel" class="query" placeholder="target_label"></el-input>
+                                        <el-autocomplete
+                                            class="query"
+                                            v-model="queryTargetLabel"
+                                            :fetch-suggestions="querySearch"
+                                            placeholder="target_label"
+                                            :trigger-on-focus="false"
+                                            >
+                                        </el-autocomplete>
+                                        <!-- <el-input v-model="queryTargetLabel" class="query" placeholder="target_label"></el-input> -->
                                         <span class="n1_pro" v-for='i in targetNodeProperty' :key="i.key+`node1`">
                                             <div><el-input class="n1_pro" v-model="i.name" placeholder="name"></el-input> : <el-input class="n1_pro" v-model="i.value" placeholder="value"></el-input>  &#12288;</div>
                                         </span>
@@ -154,7 +190,21 @@
             <el-row :gutter="20">
                 <el-col :span="12">
                     <transition name="slide-fade">
-                        <div class="showinfo"><span v-for=" (val, key) in showinfo" :key="key"> &#12288;<span v-bind:style="{ fontWeight:'bold' }">{{key}}:{{val}}</span> </span> <span class="btn" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">Update</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">Delete</el-button></span></div>
+                        <div class="showinfo">
+                            <el-row>
+                                <el-col :span="17">
+                                    <el-scrollbar style="width:560px;height:40px" wrapStyle="overflow-x:hidden;">
+                                        <span style="width:100px" v-for=" (val, key) in showinfo" :key="key"><span  v-bind:style="{ fontWeight:'bold', lineHeight:'40px' }">{{key}}:{{val}}</span> &#12288; </span> 
+                                    </el-scrollbar>
+                                </el-col>
+                                <el-col :span="7">
+                                    <span class="updateAndDelete" v-if="showinfo !== null"> <el-button class="update" @click="dialogUpdateVisible = true" icon="el-icon-edit">Update</el-button><el-button class="delete" @click="delete_element(showinfo)" icon="el-icon-delete">Delete</el-button></span>
+                                </el-col>
+                            </el-row>
+                            
+                            
+                            
+                        </div>
                     </transition>
                 </el-col>
             </el-row>
@@ -222,7 +272,8 @@ export default {
             graphQueryHistory: [], // query mode graph photo
             currentIndex: 0, // graph photo index
             currentQueryIndex: -1, // // query mode graph photo index
-            uploadUrl: 'http://localhost:8080/api/networks/file'
+            uploadUrl: 'http://localhost:8080/api/networks/file',
+            isDisabled: false,
         }
     },
     mounted: function(){
@@ -289,8 +340,8 @@ export default {
                     this.nodes.push({
                         name: relation.keyword1,
                         id: String(this.nodeId),
-                        label: 'factor',
-                        type: 'factor',
+                        label: 'undefined',
+                        type: 'undefined',
                     })
                     sourceId = String(this.nodeId);
                     this.nodeId += 1;
@@ -302,30 +353,29 @@ export default {
                     this.nodes.push({
                         name: relation.keyword2,
                         id: String(this.nodeId),
-                        label: 'factor',
-                        type: 'factor',
+                        label: 'undefined',
+                        type: 'undefined',
                     })
                     targetId = String(this.nodeId);
                     this.nodeId += 1;
                 } else  {
                     targetId = this.nodes.find(element => element.name === relation.keyword2).id;
                 }
-                let relationType = null;
                 if (relation.relation === 1) {
-                    relationType = 'casues';
+                    this.links.push({
+                        source: sourceId,
+                        target: targetId,
+                        id: String(this.linkId),
+                        label: 'casues',
+                    })
                 } else if (relation.relation === 2) {
-                    relationType = 'is_caused_by';
-                } else if (relation.relation === 3) {
-                    relationType = 'is_related_with';
-                } else if (relation.relation === 0) {
-                    continue;
-                }
-                this.links.push({
-                    source: sourceId,
-                    target: targetId,
-                    id: String(this.linkId),
-                    label: relationType,
-                })
+                    this.links.push({
+                        source: targetId,
+                        target: sourceId,
+                        id: String(this.linkId),
+                        label: 'casues',
+                    })
+                } 
                 this.linkId += 1;
             }
         }
@@ -724,15 +774,15 @@ export default {
                         message: "graph created successfully",
                         type: "success"
                     })
-                    this.nodes = [];
-                    this.links = [];
-                    this.isEdit = false;
-                    this.field = '';
-                    this.concepts = [];
-                    this.showinfo = null;
-                    this.nodeId = 0;
-                    this.linkId = 0;
-                    this.conceptTabelData = [];
+                    // this.nodes = [];
+                    // this.links = [];
+                    // this.isEdit = false;
+                    // this.field = '';
+                    // this.concepts = [];
+                    // this.showinfo = null;
+                    // this.nodeId = 0;
+                    // this.linkId = 0;
+                    // this.conceptTabelData = [];
                     this.$emit('finish-adding', '') // set showinfo to be ''
                     });
                 
@@ -750,9 +800,37 @@ export default {
                 if(this.showinfo.type === "node"){    
                     for(let item of this.nodes){
                         if(item.id === this.showinfo.id){
+                            const label1 = item.label;
                             let info = {};
                             for(let info of this.showinfoDetail) {
                                 item[info.name] = info.value;
+                            }
+                            const label2 = item.label;
+                            if (label1 !== label2) {
+                                let concept = {};
+                                concept.type = label2;
+                                concept.property = ['name'];
+                                if(this.concepts.find(item => item.type === label2)) {
+                                    
+                                } else {
+                                    this.concepts.push(concept);
+                                    this.allTableData.push({
+                                        number: this.conceptNum,
+                                        concept: label2,
+                                    }) 
+                                    this.conceptNum += 1;
+                                    this.property = [
+                                        {
+                                            name: "name",
+                                            value: '',
+                                            key: 1,
+                                        }
+                                    ],
+                                    this.iter_num = 1;
+                                    this.type = '';
+                                    this.setPaginations();
+                                }
+                            
                             }
                             for(let name in item){
                                 info[name] = item[name];
@@ -975,10 +1053,10 @@ export default {
             console.log(file);
         },
         handleExceed(files, fileList) {
-            this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+            this.$message.warning(`The current limit is 3 files, this time it is selected ${files.length} files，chose ${files.length + fileList.length} files`);
         },
         beforeRemove(file, fileList) {
-            return this.$confirm(`确定移除 ${ file.name }？`);
+            return this.$confirm(`Sure to remove ${ file.name }？`);
         },
         uploadSuccess(response, file, fileList) {
             this.fileList = [];
@@ -1149,7 +1227,30 @@ export default {
                 }
             }
             myChart.setOption(option);
-        }
+        },
+        returnType(x){
+            x.value = x.type
+            return x; 
+        },
+        returnName(x){
+            x.value = x.name
+            return x; 
+        },
+        querySearch(queryString, cb) {
+            var concepts = this.concepts.map(this.returnType);
+            var results = queryString ? concepts.filter(this.createFilter(queryString)) : concepts;
+            cb(results);
+        },
+        querySearchNode(queryString, cb) {
+            var nodes = this.nodes.map(this.returnName);
+            var results = queryString ? nodes.filter(this.createFilter(queryString)) : nodes;
+            cb(results);
+        },
+        createFilter(queryString) {
+            return (concepts) => {
+            return (concepts.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+            };
+        },
 
     },
     watch: {
@@ -1267,11 +1368,9 @@ export default {
     width: 70px;
     margin-top: 10px;
 }
-.update {
-    text-align: right;
-}
 .button {
     font-size: 18px;
+    margin-top: 20px;
 }
 .btn {
     display: inline-block;
@@ -1316,5 +1415,9 @@ export default {
 }
 .pagination {
     font-size: 24px;
+}
+.updateAndDelete .el-button {
+    height: 38px;
+    
 }
 </style>

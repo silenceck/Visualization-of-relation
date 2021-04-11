@@ -158,7 +158,7 @@ export default {
         },
         createFilter(queryString) {
             return (keywordData) => {
-            return (keywordData.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                return (keywordData.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
             };
         },
         login() {

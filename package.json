@@ -41,8 +41,9 @@
     "nodemon": "^1.19.4",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "python-shell": "^1.0.8",
+    "python-shell": "^2.0.3",
     "socket.io": "^2.3.0",
+    "socketio-file-upload": "^0.7.3",
     "superagent": "^5.2.2"
   },
   "devDependencies": {

@@ -3,6 +3,7 @@ const router = express.Router();
 const Text = require('../../models/Text');
 let {PythonShell} = require('python-shell');
 const path = require('../../config/store').relationExtractionPath;
+const spawn = require("child_process").spawn;
 
 /**
  * @route post /api/text/extract-relation
@@ -17,7 +18,17 @@ router.post('/extract-relation', (req, res) => {
     }
     keywords[keywords.length-1] = ''
     let result = [];
-    let pyshell = new PythonShell(path);
+    // const pythonProcess = spawn('python',[path, keywords.slice(0, keywords.length-1), data.text]);
+    // pythonProcess.stdout.on('data', (data) => {
+    //     // Do something with the data returned from python script
+    //     res.json({
+    //         data: data
+    //     });
+    // });
+    var options = {
+            pythonPath: 'C:\Users\会议室\AppData\Local\Programs\Python\Python36',   
+    };
+    let pyshell = new PythonShell(path, options);
     pyshell.send(JSON.stringify({ keywords: keywords.slice(0, keywords.length-1), text: data.text }));
     pyshell.on('message', function (message) {
       result.push(message);
@@ -25,6 +36,7 @@ router.post('/extract-relation', (req, res) => {
     pyshell.end(function (err,code,signal) {
       if (err) return res.status(500).json(err);
       console.log('The exit code was: ' + code);
+      console.log('sdfas')
       console.log('The exit signal was: ' + signal);
       console.log('finished');
       res.json({

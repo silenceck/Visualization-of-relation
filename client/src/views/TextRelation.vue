@@ -2,7 +2,10 @@
     <div class="pubmedCreeper"> 
         <div class="keyword"> 
             <el-row :gutter='20' class="row1">
-                <el-col :span="18">
+                <el-col :span="4" class="keyBtn">
+                    <div class="text_intro">Keyword &nbsp; <i class="el-icon-right"></i></div>
+                </el-col>
+                <el-col :span="14">
                     <div class="keywords">
                         <el-scrollbar style="height:100%;" wrapStyle="overflow-x:hidden;">
                             <span v-for="keyword in keywords" :key="keyword" >
@@ -13,23 +16,37 @@
                         </el-scrollbar>
                     </div>
                 </el-col>
-                <el-col :span="6">
-                    <el-button class="keyBtn" @click="dialogKeywordVisible = true" >Add Keyword</el-button>
+                <el-col :span="6" class="keyBtn">
+                    <el-button  @click="dialogKeywordVisible = true" >Add keyword</el-button>
                 </el-col>
             </el-row>
-            <el-row :gutter='20'>
-                <el-col :span="18">
-                    <el-input
-                        type="textarea"
-                        :rows="10"
-                        placeholder=""
-                        v-model="textarea" 
-                        class="textarea">
-                    </el-input>
+            <el-row :gutter='20' >
+                <el-col :span="4" class="keyBtn">
+                    <div class="text_intro1">Text &nbsp; <i class="el-icon-right"></i></div>
                 </el-col>
-                <el-col :span="6">
-                    <el-button @click="submit" class="keyBtn1">Extract causality </el-button>
-                </el-col>
+                <el-tabs class="delete-border" :style="selfstyle" v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane label="Input text" name="first" >
+                        
+                        <el-col :span="18">
+                            <el-input
+                                type="textarea"
+                                :rows="8"
+                                placeholder=""
+                                v-model="textarea" 
+                                class="textarea">
+                            </el-input>
+                        </el-col>
+                        <el-col :span="6" class="keyBtn1">
+                            <el-button  @click="submit" >Extract causality </el-button>
+                        </el-col>
+                    </el-tab-pane>
+                    <el-tab-pane label="Upload file" name="second" class="textInput">
+                        <el-input type=file name=file1 id="file_input"  v-model='filename' style="display:none"  v-on:change="changeValue"></el-input>
+                        <el-input type="text" readonly="readonly" name="abc" v-model='textname' > </el-input>
+                        <el-button  @click="clickInput" size="small" type="primary" style="margin-left: 10px; margin-top: 10px; fontSize: 18px;" icon="el-icon-folder-opened">Select File</el-button>
+                        <el-button id="my_button" style="margin-top: 10px;margin-left: 10px; fontSize: 18px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
+                    </el-tab-pane>
+                </el-tabs>
             </el-row>
             <el-dialog title="Confirm Keyword" :visible.sync="dialogKeywordVisible"  width="30%" top="25vh" >
                 <el-input class="dialog" v-model="words" style="width: 100%"></el-input> 
@@ -40,7 +57,10 @@
             </el-dialog>
         </div>
         <el-row :gutter='20'>
-                <el-col :span="18">
+                <el-col :span="4" class="keyBtn">
+                    <div class="text_intro">Causality &nbsp; <i class="el-icon-right"></i></div>
+                </el-col>
+                <el-col :span="14">
                     <div class="tabel">
             <div class="text">
                 <el-table
@@ -55,19 +75,19 @@
                         </el-table-column>           
                         <el-table-column
                             prop="keyword1"
-                            label="Keyword1"
-                            width="150">
+                            label="Cause"
+                            width="400">
                         </el-table-column>
                         <el-table-column
                             prop="keyword2"
-                            label="Keyword2"
-                            width="150">
+                            label="Effect"
+                            width="400">
                         </el-table-column>
-                        <el-table-column
+                        <!-- <el-table-column
                             prop="relation"
-                            label="Relation type(1:cause 2:caused, 3: related, 0: no relation)"
-                            width="560">
-                        </el-table-column>
+                            label="1:cause 2:caused"
+                            width="360">
+                        </el-table-column> -->
                     </el-table>
                 </div>
                 <div class="pagination">
@@ -83,8 +103,8 @@
                 </div>
             </div>
             </el-col>
-            <el-col :span="6">
-                <el-button @click="edit" class="keyBtn">Edit causal graph</el-button>
+            <el-col :span="6" class="keyBtn2" >
+                <el-button @click="edit" >Edit causal graph</el-button>
             </el-col>
         </el-row>
     </div>
@@ -96,12 +116,18 @@ export default {
     name: "pubmedCreeper",
     data(){
         return{
+            // "alcohol", "depression", "diabetes", "heart disease", "heart rate", "hypertension", "stroke", "cancer", "smoke", "heart attack", "systolic blood pressure", "eyesight", "height"
+            selfstyle: {marginLeft: "19%",marginRight: "15%"},
+            activeName: 'first',
+            filename: '',
+            textname:'',
+            uploader: null,
             relation_label: null,
             ifshow: false,
             ifLeftShow: false,
             ifRightShow: false,
             label: 2,
-            keywords: ["alcohol", "depression", "diabetes", "heart disease", "heart rate", "hypertension", "stroke", "cancer", "smoke", "heart attack", "systolic blood pressure", "eyesight", "height"],
+            keywords: ['alcohol', 'liver disease', 'steatohepatitis'],
             words: '',
             dialogKeywordVisible: false,
             line1Style: {},
@@ -111,7 +137,7 @@ export default {
             key1: '',
             key2: '',
             sentences: [],
-            textarea: "Hazardous users of alcohol and smokers had 3.1 respectively 3.0 times higher risk for depression (p = 0.001 respectively 0.003). Life satisfaction and happiness were associated with a lower risk of depression, while hazardous alcohol drinking and poor sleep quality were related to a higher risk of depression. At 6 weeks after discharge, patients completed standardized measures for 5 risk factors (pain intensity, depression, posttraumatic stress disorder, alcohol abuse, and tobacco use) and 4 protective factors (resilience, social support, self-efficacy for return to usual activity, and self-efficacy for managing the financial demands of recovery). Our data revealed that depression proneness confers vulnerability to alcohol, emulating patterns of alcohol dependence seen in human addicts, and that depression resilience to a large extent protects from the development of AUD-like phenotypes. Increased formaldehyde (FA) and up-regulation of semicarbazide-sensitive amine oxidase, which forms FA from methylamine, have been implicated in disorders such as cerebrovascular disorders, alcohol abuse, diabetes and Alzheimer's disease.  Mortality was significantly increased for all malignant tumours, oesophageal cancer, bowel cancer, liver cancer, lung cancer, alcoholism, ischaemic heart disease, non-malignant respiratory diseases, liver cirrhosis, external causes and suicides. Prominent primary diagnosis subgroups included asphyxia and respiratory failure (15.2%), traumatic brain injury and skull fractures (11.3%), acute myocardial infarction and ischemic heart disease (10.9%), poisonings and drug and alcohol disorders (6.7%), dysrhythmias (6.7%), hemorrhagic and nonhemorrhagic stroke (5.9%), acute heart failure and cardiomyopathies (5.6%), pneumonia and aspiration (4.9%), and sepsis, septicemia, and septic shock (3.2%). A physiological correlate of emotional regulation is autonomic flexibility, emotional dysregulation in men who misuse alcohol being correlated with reduced parasympathetic activation to control heart rate variability during stress and/or conflict situations.  Subjective alcohol craving and heart rate variability were recorded across the task.  The content encompasses heavy alcohol consumption, depression, diabetes, folic acid intake, hypertension, normal weight, recommended physical activity, current smoking, unwanted pregnancy, and use of contraception. In this study, the causal effect of alcohol intake on hypertension in 2,011 men and women from the Ansan-Ansung cohort was estimated using an instrumental variable (IV) approach, with both a phenotypic and genotypic instrument for alcohol intake: alcohol flushing and the rs671 genotype (in the alcohol dehydrogenase 2 [ALDH2] gene), respectively. A significant association was observed between alcoholic intoxication and mesenteric ischemia (aHR, 5.21; 95% CI, 4.36-6.23; P<.0001) after adjustment for age, sex, and comorbidity history of hypertension, hyperlipidemia, diabetes, atrial fibrillation, stroke, heart failure, chronic renal disease, ischemic heart disease, chronic obstructive pulmonary disease, and cirrhosis. VTE prophylaxis was negatively associated with smoking, alcohol, warfarin in the past 30 days, and primary diagnoses of stroke, infectious disease, or inflammatory bowel disease.  Although crude mortality rates of the most important causes of death (such as cardiovascular diseases or cancer) have declined between 2010 and 2014, crude mortality rates of drug- and alcohol-induced causes of death have increased. To assess changes in metabolic risk factors and cancer-related growth factors associated with short-term abstinence from alcohol. The purpose of this study was to examine relationships among menopausal symptoms, depression, and quality of life and to identify the factors affecting the quality of life in premenopausal women with breast cancer. In HF patients the symptom burden is similar to cancer patients, but patients with advanced HF, in comparison to advanced cancer patients, have a greater number of physical symptoms, worse depression status and lower spiritual well-being. In the decade since their discovery, the PH domain leucine-rich repeat protein phosphatases (PHLPP) have emerged as critical regulators of cellular homeostasis, and their dysregulation is associated with various pathophysiologies, ranging from cancer to degenerative diseases, such as diabetes and heart disease. By the end of its first 10 years, the agency was funding ten projects in clinical trials, including work in heart disease and cancer, HIV/AIDS and Type 1 diabetes. Several beneﬁcial pharmacological properties of this plant such as anti-oxidant, anti-bacterial, anti-histaminic, anti-hypertensive, hypoglycemic, anti-fungal, anti-inﬂammatory, anti-cancer and immunomodulatory effects were reported and different therapeutic properties such as reliving bronchial asthma, jaundice, hydrophobia, paralysis, conjunctivitis, piles, skin diseases, anorexia, headache, dysentery, infections, obesity, back pain, hypertension and gastrointestinal problems, have been described for the seeds of N. sativa and its oil. The results were controversial with regards to using the QuantiFERON test for the diagnosis of TB according to the study population (ethnic group, bacillus Calmette-Gurin vaccine use) and according to the state of the immune system of the people studied (human immunodeficiency virus immunosuppression in cancer medication, hypertension). We recently showed that nonsteroidal anti-inflammatory drugs (NSAIDs) are able to inhibit the lung tumors induced by cigarette smoke, either mainstream (MCS) or environmental (ECS), in female mice. We reviewed 87 epidemiological studies relating environmental tobacco smoke (ETS) exposure to risk of cancer other than lung or breast in never smoking adults. This community-based cohort included 12554 participants in the Kailun study, who were free of myocardial infarction, stroke, arrhythmia, and cancer. 16 studies that provided estimates for mortality due to all cause, all cancer, upper aerodigestive tract (UADT) cancer, stomach cancer, cervical cancer, ischaemic heart disease (IHD) and stroke were included.",
+            textarea: "",
             tableData: [
             ],
             num: 1,
@@ -126,10 +152,16 @@ export default {
             },
             socket: null,
             serverAddress: 'http://localhost:5000',
+            uploadUrl: 'http://localhost:8080/api/texts/file',
             headerStyle: {textAlign: 'center'},
         }
     },
     mounted: function(){ 
+        this.socket = io.connect(this.serverAddress);
+        var SocketIOFileUpload = require('socketio-file-upload');
+        this.uploader = new SocketIOFileUpload(this.socket);
+        
+        this.uploader.listenOnSubmit(document.getElementById("my_button"), document.getElementById("file_input"));
         const relationData = this.$store.getters.relationData;
         if (relationData.length === 0) {
             this.tableData = relationData;
@@ -138,17 +170,21 @@ export default {
             this.setPaginations();
             this.$store.dispatch('setRelationData', []);
         }
+        
+    },
+    destroyed() {
+        this.socket.close()
     },
     methods: {
         submit: function(){ 
-            this.socket = io.connect(this.serverAddress);          
-            if(this.keywords.length > 0 && this.textarea !== ''){
+            if(this.textarea !== ''){
                 const keywords = this.keywords;
                 const text = this.textarea;
                 const data = {
                     keywords: keywords,
                     text: text,
                 }
+                
                 this.socket.emit('text data', JSON.stringify(data));
                 const that = this;
                 this.socket.on('res message', function(msg){
@@ -156,8 +192,15 @@ export default {
                     const data = JSON.parse(msg.pop());
                     let tableData = [];
                     let num = 1;
+                    that.allTableData = [];
+                    that.num = 1;
                     for(let key in data) {
                         let keywordPair = key.split('-');
+                        if (data[key] === 2) {
+                            let tmp = keywordPair[0];
+                            keywordPair[0] = keywordPair[1];
+                            keywordPair[1] = tmp;
+                        }
                         if (that.tableData) {
                             that.tableData.push({
                                 num: that.num,
@@ -184,7 +227,6 @@ export default {
                     } else {
                         that.$store.dispatch('setRelationData', tableData);
                     }
-                    that.socket.close();
                 });
             }else{
                 this.$message.error('The input box cannot be empty！！！');
@@ -281,11 +323,15 @@ export default {
                     this.keywords.push(item);
                 }
             }
+            const that = this
+            this.uploader.addEventListener("start", function(event){
+                event.file.meta.keyword = that.keywords.join("-");
+            });
             this.words = ''
         },
         edit() {
             this.$store.dispatch('setIndex', 'create_chart');
-            this.$router.push({name:'create_chart', params: {RelationData: this.tableData}});
+            this.$router.push({name:'create_chart', params: {RelationData: this.allTableData}});
         },
         notify() {
             this.$notify({
@@ -294,11 +340,146 @@ export default {
                 type: 'success'
             });
         },
+        // upload
+        submitUpload() {
+            // this.$refs.upload.submit();
+            const that = this;
+            this.socket.on('file message', function(msg){
+                that.notify();
+                const data = JSON.parse(msg.pop());
+                let tableData = [];
+                let num = 1;
+                that.tableData = [];
+                that.num = 1;
+                for(let key in data) {
+                    let keywordPair = key.split('-');
+                    if (data[key] === 2) {
+                        let tmp = keywordPair[0];
+                        keywordPair[0] = keywordPair[1];
+                        keywordPair[1] = tmp;
+                    }
+                    if (that.tableData) {
+                        that.tableData.push({
+                            num: that.num,
+                            keyword1: keywordPair[0],
+                            keyword2: keywordPair[1],
+                            relation: data[key],
+                        })
+                        that.num += 1;
+                    } else {
+                        tableData.push({
+                            num: that.num,
+                            keyword1: keywordPair[0],
+                            keyword2: keywordPair[1],
+                            relation: data[key],
+                        })
+                        num += 1;
+                    }
+                }
+                if (that.tableData) {
+                    that.$store.dispatch('setRelationData', that.tableData);
+                    that.allTableData = that.tableData;
+                    that.filterTableData = that.tableData;
+                    that.setPaginations();
+                } else {
+                    that.$store.dispatch('setRelationData', tableData);
+                }
+                that.textname = '';
+            });
+        },
+        beforeUpload(file) {
+            var testmsg = file.name.substring(file.name.lastIndexOf('.')+1)
+            const extension = testmsg === 'txt'
+            if(!extension) {
+                this.$message({
+                    message: 'Uploaded file can only be txt format!!',
+                    type: 'warning'
+                });
+                return false;
+            }
+        },
+        handleRemove(file, fileList) {
+            console.log(file, fileList);
+        },
+        handlePreview(file) {
+            console.log(file);
+        },
+        handleExceed(files, fileList) {
+            this.$message.warning(`The current limit is 3 files, this time it is selected ${files.length} files，chose ${files.length + fileList.length} files`);
+        },
+        beforeRemove(file, fileList) {
+            return this.$confirm(`Sure to remove ${ file.name }？`);
+        },
+        uploadSuccess(response, file, fileList) {
+            this.fileList = [];
+            if (response.type === 'node' ) {
+                const nodes = response.data;
+                for( let node of nodes) {
+                    node.id = String(this.nodeId);
+                    node.type = node.label;
+                    this.nodes.push(node);
+                    this.nodeId += 1;
+                }
+                let node = nodes[0];
+                let concept = {};
+                if(!this.conceptTabelData.find(item => item.concept === node.label)) {
+                    concept.type = node.label;
+                    let propertyName = [];
+                    for(let property in node) {
+                        if(property !== 'draggable' && property !== 'field' && property !== 'id' && property !== 'category' && property !== 'type' && property !== 'label') {
+                            propertyName.push(property);
+                        }
+                    }
+                    concept.property = propertyName;
+                    this.concepts.push(concept);
+                    this.allTableData.push({
+                        number: this.conceptNum,
+                        concept: concept.type,
+                    }) 
+                    this.conceptNum += 1;
+                    this.setPaginations();
+                }
+            } else {
+                const links = response.data;
+                const labels = response.label;
+                for( let link of links) {
+                    const source_node = this.nodes.find(element => element.name === link.sourceName);
+                    const target_node = this.nodes.find(element => element.name === link.targetName);
+                    if (source_node && target_node) {
+                        delete link.sourceName;
+                        delete link.targetName;
+                        link.id = String(this.linkId);
+                        link.source = source_node.id;
+                        link.target = target_node.id;
+                        this.links.push(link);
+                        this.linkId += 1;
+                    }
+                }
+            }
+            // this.allTableData = this.conceptTabelData;
+            // this.filterTableData = this.conceptTabelData;
+            // this.setPaginations();
+        },
+        clickInput() {
+            document.getElementById('file_input').click()
+        },
+        changeValue() {
+            const filename = this.filename.split('\\')
+            this.textname =filename[filename.length - 1]
+        },
+        handleClick(tab, event) {
+            console.log(tab, event);
+        }
     }
 }
-</script>script
+</script>
 
-<style scoped>
+<style>
+.textInput .el-input {
+    margin-left: 10px;
+    margin-top: 100px;
+    width: 250px;
+}
 .line1{
     z-index: 80;
     position:absolute;
@@ -341,9 +522,6 @@ export default {
     margin-left: 10px;
     margin-top: 10px;
 }
-.text {
-    margin-left: 5%;
-}
 .slide-fade-enter-active {
   transition: all .8s ease;
 }
@@ -357,35 +535,30 @@ export default {
 }
 .textarea {
     width: 1000px;
-    height: 200px;
+    height: 80px;
     margin-top: 20px;
-    margin-left: 25%;
-    margin-bottom: 40px;
     font-size: 18px;
 }
 .pagination {
     margin-left: 5%;
 }
-.chart {
-    margin-left: 5%;
-    width: 800px;
-    height: 600px;
-}
-.keyBtn {
-    margin-left: 10px;
-    margin-top: 85px;
+.keyBtn .el-button {
+    margin-top: 90px;
     font-size: 20px;
 }
-.keyBtn1 {
-    margin-left: 10px;
-    margin-top: 260px;
+.keyBtn1 .el-button  {
+    margin-left: 122px;
+    margin-top: 170px;
+    font-size: 20px;
+}
+.keyBtn2 .el-button {
+    margin-top: 10px;
     font-size: 20px;
 }
 .keywords {
     width: 1000px;
     height: 100px;
     margin-top: 20px;
-    margin-left: 25%;
     border: 1px solid #d8dce5;
 }
 .keyword-view-item {
@@ -418,11 +591,35 @@ export default {
     background-color: rgb(223, 214, 214);
 }
 .tabel {
-    margin-top: 50px;
-    margin-left: 25%;
+    /* margin-left: 20%; */
     width: 1000px;
 }
 .keyword {
     margin-top: 30px;
 }
+.el-tab-pane {
+    height: 300px;
+    
+}
+.delete-border .el-tabs__nav-wrap::after{
+    height: 0;
+}
+.delete-border .el-tabs__item {
+    font-size: 20px;
+}
+.text_intro {
+    margin-top: 50px;
+    text-align:center;
+    font-size: 30px;
+    color: rgb(166, 40, 47);
+}
+
+.text_intro1 {
+    margin-top: 150px;
+    text-align:center;
+    font-size: 30px;
+    color: rgb(166, 40, 47);
+}
+
+
 </style>

@@ -1,6 +1,7 @@
 <template>
     <div class="entry">
         <div id="main" class="chart"></div>
+        <div id='introduction' class="intro">Causal Graph for Health Field</div>
     </div>
 </template>
 
@@ -56,7 +57,11 @@ export default {
                             normal: {
                                 show: true,
                                 textStyle: {
-                                    fontSize: 18
+                                    fontSize: 24,
+                                    fontStyle: 'normal',
+                                    fontFamily: 'Arial',
+                                    
+
                                 },
                             }
                         },
@@ -123,11 +128,15 @@ export default {
 
 <style scoped>
 .chart {
-    margin-left: 25%;
+    margin:0 auto;
     height: 680px;
     width: 800px;
 }
-
+.intro {
+    text-align:center;
+    font-size: 40px;
+    color: rgb(166, 40, 47);
+}
 </style>
 
 

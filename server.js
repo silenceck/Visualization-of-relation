@@ -5,16 +5,20 @@ const multer = require('multer');
 const obj= multer({dest: 'upload/'});
 let {PythonShell} = require('python-shell');
 const path = require('./config/store').relationExtractionPath;
+const pythonPath =  require('./config/store').pythonPath;
 const passport = require('passport');
 const users = require('./routers/api/users');
 const texts = require('./routers/api/texts');
 const networks = require('./routers/api/networks');
 const app = express();
+var siofu = require("socketio-file-upload");
+app.use(siofu.router)
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 const db = require('./config/store').mongooseURL;
 const port = process.env.PORT || 5000;
-
+const spawn = require("child_process").spawn;
+const fs = require('fs');
 mongoose.connect(db ,{useNewUrlParser:true, useUnifiedTopology: true})
     .then(() => console.log('mongoDB connected'))
     .catch(err => console.log(err))
@@ -36,29 +40,68 @@ io.on('connection', function(socket){
         console.log('user disconnected');
       });
     socket.on('text data', function(msg){
-        const data = JSON.parse(msg)
-        let pyshell = new PythonShell(path);
-        let keywords = ''
-        for(let item of data.keywords) {
-            keywords += item + '-';
-        }
-        keywords[keywords.length-1] = ''
+        const data = JSON.parse(msg)       
+        let keywords = data.keywords.join("-")
+        var options = {
+            pythonPath: pythonPath  
+        };
+        let pyshell = new PythonShell(path, options);
         let result = [];
-        pyshell.send(JSON.stringify({ keywords: keywords.slice(0, keywords.length-1), text: data.text }));
-        pyshell.on('message', function (message) {
-            result.push(message);
-        });
-        pyshell.end(function (err,code,signal) {
-            if (err) console.log(err);
-            console.log('The exit code was: ' + code);
-            console.log('The exit signal was: ' + signal);
-            console.log('finished');
-            console.log(result);
-            io.emit('res message', result);
-        })
-        console.log('message: ' + msg);
-        
+        // pyshell.send(JSON.stringify({ keywords: keywords, text: data.text }));
+        // console.log(msg)
+        // pyshell.on('message', function (message) {
+        //     result.push(message);
+        // });
+        // pyshell.end(function (err,code,signal) {
+        //     if (err) console.log(err);
+        //     console.log('The exit code was: ' + code);
+        //     console.log('The exit signal was: ' + signal);
+        //     console.log('finished');
+        //     console.log(result);
+        //     io.emit('res message', result);
+        // })
+        io.emit('res message', ['{"liver disease-deaths": 1, "alcohol-liver disease": 1, "steatohepatitis-fibrosis": 1, "steatohepatitis-cirrhosis": 2, "steatohepatitis-hepatitis": 2, "liver disease-cirrhosis": 1, "liver disease burden-liver disease": 2, "hcc cases-liver disease": 1, "steatosis-steatohepatitis": 2, "liver disease-liver cancer": 1, "alpha antitrypsin deficiency-liver disease": 1, "hemostasis-liver disease": 1}']);
+        // 
+        // '{"alcohol-liver disease": 1, "ald-liver afl": 2, "steatohepatitis-fibrosis": 1, "steatohepatitis-cirrhosis": 1, "steatohepatitis-hepatitis": 1, "nafld nash-steatohepatitis": 2, "liver disease-cirrhosis": 1, "liver cirrhosis-death": 1, "liver disease burden-liver disease": 2, "hcc cases-liver disease": 1, "liver disease-liver cancer": 1, "alpha antitrypsin deficiency-liver disease": 1, "steatohepatitis nash-cirrhosis": 1, "hemostasis-liver disease": 1, "bleeding events-defect": 2}'
     });
+    var uploader = new siofu();
+    uploader.dir = "./upload1/";
+    uploader.listen(socket);
+    uploader.on("saved", function(event){
+        console.log(event.file)
+        // event.file.name
+        fs.readFile('./upload1/'+ event.file.name, 'utf8', function(err, data){
+            text = data 
+            let keywords = ''
+            if (event.file.meta.hasOwnProperty("keyword")) 
+                keywords = event.file.meta.keyword
+            console.log('data: ' + data)
+            var options = {
+                pythonPath: pythonPath 
+            };
+            let pyshell = new PythonShell(path, options);
+            let result = [];
+            pyshell.send(JSON.stringify({ keywords: keywords, text: text }));
+            
+            pyshell.on('message', function (message) {
+                result.push(message);
+            });
+            pyshell.end(function (err,code,signal) {
+                if (err) console.log(err);
+                console.log('The exit code was: ' + code);
+                console.log('The exit signal was: ' + signal);
+                console.log('finished');
+                console.log(result);
+                fs.unlink('./upload1/' + event.file.name, function(err) {
+                    if (err) {
+                        return console.error(err);
+                    }
+                });
+                io.emit('file message', result);
+            })
+        })
+        
+    })
 });
 
 http.listen(port, () => {

@@ -6,5 +6,6 @@ module.exports = {
         USER: "neo4j",
         PASSWORD: "123456"        
     },
-    relationExtractionPath: 'F:/PycharmProjects/causality_extraction/relation_extraction.py',
+    relationExtractionPath: 'C:\\causality_extraction\\unlimited_extract.py',
+    pythonPath: 'C:\\Users\\会议室\\AppData\\Local\\Programs\\Python\\Python36\\python'
 }

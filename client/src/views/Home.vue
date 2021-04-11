@@ -16,7 +16,7 @@
                         </el-tree>
                     </el-scrollbar>
                 </el-col>
-                <el-col :span="9">
+                <el-col :span="9" >
                     <div class="title" @click="resetData" v-bind:style="{cursor:'pointer' }">{{field}} Field</div>
                     <div id="main" class="chart"></div>
                 </el-col>
@@ -26,7 +26,7 @@
                         <div slot="header" class="clearfix">
                             <span>{{click_node.name}}</span>
                         </div>
-                        <div v-for="(value, name, index) in click_node" :key="index" class="text item">
+                        <div v-for="(value, name, index) in click_node" :key="index" >
                             <div v-if="name !== 'name' && name !== 'id' && name !== 'num' && name !== 'itemStyle' && name !== 'symbolSize' && name !== 'label' && name !== 'lable' && name !== 'source' && name !== 'target' && name !== 'field' && name !=='draggable' && name !=='category' && name !=='type' && name !=='value'" >
                                 <span v-bind:style="{ fontWeight:'bold' }">{{name + ':' }}</span> {{value }} 
                             </div>                         
@@ -547,11 +547,13 @@ export default {
                 }
                 this.nodes.forEach(function (node) {
                     node.itemStyle = null;
-                    node.symbolSize = Math.random()*40 + 1;
+                    node.symbolSize = 25;
                     node.type = node.label;
                     node.label = {
                         normal: {
-                            show: false
+                            show: true,
+                            width: 100,
+                            overflow: "truncate"   
                         }
                     };
                     node.category = types.findIndex((element) => element === node.type);
@@ -584,7 +586,10 @@ export default {
                         }),
                         textStyle: { 
                             fontSize: 24
-                        }
+                        },
+                        type: 'scroll',
+                        left:'left',
+                        orient: 'vertical'
                     }],
                     tooltip: {},
                     animationDurationUpdate: 1500,
@@ -596,6 +601,8 @@ export default {
                             circular: {
                                 rotateLabel: true
                             },
+                            edgeSymbol:'arrow',
+                            edgeSymbolSize: [0, 8],
                             data: this.partNodes,
                             links: this.partLinks,
                             categories: categories,
