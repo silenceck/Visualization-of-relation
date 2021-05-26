@@ -1,5 +1,5 @@
 import axios from '../http.js'
-const baseUrl = '/api/networks'
+const baseUrl = '/api/graphs'
 export default {
     getFieldNetwork(field) {
         return axios.get(`${baseUrl}/field/${field}`);
@@ -17,13 +17,13 @@ export default {
         return axios.get(`${baseUrl}/user/${id}`);
     },
     deleteNetwork(params) {
-        return axios.post(`${baseUrl}/delete`, params);
+        return axios.delete(`${baseUrl}/`, {params});
     },
     exportNetwork(field) {
         return axios.get(`${baseUrl}/export/${field}`);
     },
     getAdminNetwork() {
-        return axios.get(`${baseUrl}/admin`);
+        return axios.get(`${baseUrl}/allCausalGraphName`);
     }
 
 }

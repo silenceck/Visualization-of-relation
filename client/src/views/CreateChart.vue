@@ -45,7 +45,7 @@
                                 <template slot-scope="scope">
                                     <el-button
                                     size="medium"
-                                    @click="addEntity(scope.$index, scope.row)" class="button" icon="el-icon-plus">Add entity</el-button>
+                                    @click="addEntity(scope.$index, scope.row)" class="button1" icon="el-icon-plus">Add entity</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -61,6 +61,11 @@
                             >
                         </el-pagination>
                         </div>
+                        
+                        <el-button  class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false" icon="el-icon-search">Query&#12288;</el-button> 
+                        <el-button  class="button" @click="quitQuery" v-if="queryLabel === true" icon="el-icon-close">Exit Query</el-button>
+                        <el-button  class="button" @click="dialogNetworkVisible = true" icon="el-icon-check">Save</el-button>
+                        <el-divider></el-divider>
                         <div>
                             <el-button  @click="dialogFormVisible = true" class="button" icon="el-icon-plus">Add Pattern</el-button>
                             <el-button  @click="dialogRelationVisible = true" class="button" icon="el-icon-plus">Add Relation</el-button>
@@ -78,11 +83,6 @@
                                 <el-button style="margin-left: 10px; fontSize: 18px;"   @click="submitUpload" icon="el-icon-upload">Upload</el-button>
                             </el-upload>
                         </div>
-                        
-                        <el-divider></el-divider>
-                        <el-button  class="button" @click="dialogQueryVisible = true" v-if="queryLabel === false" icon="el-icon-search">Query&#12288;</el-button> 
-                        <el-button  class="button" @click="quitQuery" v-if="queryLabel === true" icon="el-icon-close">Exit Query</el-button>
-                        <el-button  class="button" @click="dialogNetworkVisible = true" icon="el-icon-check">Save</el-button>
                         <el-dialog title="Add Instance" :visible.sync="dialogEntityVisible"  width="30%" top="25vh" :before-close="handleClose">
                                         <div class="dialog">Instance Tpye: {{entity.label}}</div> 
                                         <div class="dialog" v-for='i in entityProperty' :key="i.key+`property`">
@@ -144,7 +144,7 @@
                         <el-dialog title="Query Element" :visible.sync="dialogQueryVisible"  width="30%" top="25vh" :before-close="handleQueryClose"  >
                             <div>
                                 <el-row :gutter="20">
-                                    <el-col :span='8'>
+                                    <el-col :span='12'>
                                         <el-autocomplete
                                             class="query"
                                             v-model="querySourceLabel"
@@ -158,10 +158,10 @@
                                             <div ><el-input class="n1_pro" v-model="i.name" placeholder="name" ></el-input> : <el-input class="n1_pro" v-model="i.value" placeholder="value" ></el-input>  &#12288;</div>
                                         </span>
                                     </el-col>
-                                    <el-col :span='8'>
-                                        <el-input v-model="queryRelationLabel" placeholder="relation_label"></el-input>
-                                    </el-col>
-                                    <el-col :span='8'>
+                                    <!-- <el-col :span='8'>
+                                        <el-input v-model="queryRelationLabel" placeholder="relation_label" type="hidden"></el-input>
+                                    </el-col> -->
+                                    <el-col :span='12'>
                                         <el-autocomplete
                                             class="query"
                                             v-model="queryTargetLabel"
@@ -227,7 +227,7 @@ export default {
             dialogQueryVisible: false,
             isEdit: false,
             type: '', // Pattern type
-            relationType: '',
+            relationType: 'causes',
             sourceNodeName: '',
             targetNodeName: '',
             concepts: [],
@@ -1370,7 +1370,10 @@ export default {
 }
 .button {
     font-size: 18px;
-    margin-top: 20px;
+    margin-top: 15px;
+}
+.button1 {
+    font-size: 18px;
 }
 .btn {
     display: inline-block;

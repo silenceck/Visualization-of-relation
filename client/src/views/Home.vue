@@ -17,7 +17,7 @@
                     </el-scrollbar>
                 </el-col>
                 <el-col :span="9" >
-                    <div class="title" @click="resetData" v-bind:style="{cursor:'pointer' }">{{field}} Field</div>
+                    <div class="title" @click="resetData" v-bind:style="{cursor:'pointer' }">{{field}}</div>
                     <div id="main" class="chart"></div>
                 </el-col>
                 <el-col :span="9" class="card">
@@ -581,11 +581,11 @@ export default {
                         left: 'right'
                     },
                     legend: [{
-                        data: categories.map(function (a) {
+                        data: categories.sort(function(a,b){return a - b}).map(function (a) {
                             return a.name;
                         }),
                         textStyle: { 
-                            fontSize: 24
+                            fontSize: 20
                         },
                         type: 'scroll',
                         left:'left',

@@ -142,7 +142,7 @@ export default {
         },
         handleDelete(index, row){
             const id = row._id;
-            this.$api.network.deleteNetwork({field: row.field, id: id})
+            this.$api.network.deleteNetwork({field:row.field,id: id})
             .then(res => {
                 this.allTableData = this.allTableData.filter(item => {
                     return item._id !== id

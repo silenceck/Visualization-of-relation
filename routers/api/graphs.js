@@ -88,7 +88,7 @@ function parseRecordRelationMode(nodes, links, records) {
     return paths
 }
 /**
- * @route get /api/networks/field/:field
+ * @route get /api/graphs/field/:field
  * @description get networks specified by field 
  * @access public
  */
@@ -146,7 +146,7 @@ router.get('/field/:field', async (req, res) =>{
 
 
 /**
- * @route get /api/networks/query
+ * @route get /api/graphs/query
  * @description according to different query conditions to search nodes and links 
  * @access public
  */
@@ -279,7 +279,7 @@ router.get('/query', (req, res) => {
 
 
 /**
- * @route post /api/networks/
+ * @route post /api/graphs/
  * @description add new network
  * @access private
  */
@@ -492,7 +492,7 @@ router.post('/', (req, res) => {
 
 
 /**
- * @route get /api/networks/user/:id
+ * @route get /api/graphs/user/:id
  * @description find some items whose username property is id
  * @access private
  */
@@ -509,14 +509,13 @@ router.get('/user/:id', (req, res) => {
 
 
 /**
- * @route post /api/delete
+ * @route delete /api/graphs/
  * @description delete one network assigned by id 
  * @access private
  */
-router.post('/delete/', async (req, res) => {
-    const data = req.body;
-    const id = data.id;
-    const field = data.field;
+ router.delete('/', async (req, res) => {
+    const field = req.query.field;
+    const id = req.query.id;
     await instance.cypher(`MATCH (p1)-[r {field: $field}]-(p2)  DELETE r`, {field: field})
     .catch(err => {
         res.status(400).json(err);
@@ -536,9 +535,8 @@ router.post('/delete/', async (req, res) => {
     })
 })
 
-
 /**
- * @route get /api/networks/nodename/:field
+ * @route get /api/graphs/nodename/:field
  * @description find all nodes' name specified by field 
  * @access public
  */
@@ -561,7 +559,7 @@ router.get('/nodename/:field', (req, res) => {
 })
 
 /**
- * @route get /api/networks/v1/file
+ * @route get /api/graphs/v1/file
  * @description upload file
  * @access public
  */
@@ -712,11 +710,11 @@ router.post('/file/', (req, res) => {
 
 
 /**
- * @route get /api/networks/admin
+ * @route get /api/graphs/admin
  * @description get networks created by admin user
  * @access public
  */
-router.get('/admin', (req, res) => {
+router.get('/allCausalGraphName', (req, res) => {
 	User.findOne({identity: 'admin'}).then(user => {
         Network.find({username: user.id}).then(networks => {
             let adminNetworks = [];
@@ -731,7 +729,7 @@ router.get('/admin', (req, res) => {
 }),
 
 /**
- * @route get /api/networks/export/:field
+ * @route get /api/graphs/export/:field
  * @description export network data specified by field 
  * @access public
  */

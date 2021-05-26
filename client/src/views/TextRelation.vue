@@ -22,7 +22,7 @@
             </el-row>
             <el-row :gutter='20' >
                 <el-col :span="4" class="keyBtn">
-                    <div class="text_intro1">Text &nbsp; <i class="el-icon-right"></i></div>
+                    <div class="text_intro1">Text &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <i class="el-icon-right"></i></div>
                 </el-col>
                 <el-tabs class="delete-border" :style="selfstyle" v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="Input text" name="first" >
@@ -42,7 +42,7 @@
                     </el-tab-pane>
                     <el-tab-pane label="Upload file" name="second" class="textInput">
                         <el-input type=file name=file1 id="file_input"  v-model='filename' style="display:none"  v-on:change="changeValue"></el-input>
-                        <el-input type="text" readonly="readonly" name="abc" v-model='textname' > </el-input>
+                        <el-input type="text" class="filename" readonly="readonly" name="abc" v-model='textname' > </el-input>
                         <el-button  @click="clickInput" size="small" type="primary" style="margin-left: 10px; margin-top: 10px; fontSize: 18px;" icon="el-icon-folder-opened">Select File</el-button>
                         <el-button id="my_button" style="margin-top: 10px;margin-left: 10px; fontSize: 18px;" size="small" type="success" @click="submitUpload" icon="el-icon-upload">Upload</el-button>
                     </el-tab-pane>
@@ -116,8 +116,7 @@ export default {
     name: "pubmedCreeper",
     data(){
         return{
-            // "alcohol", "depression", "diabetes", "heart disease", "heart rate", "hypertension", "stroke", "cancer", "smoke", "heart attack", "systolic blood pressure", "eyesight", "height"
-            selfstyle: {marginLeft: "19%",marginRight: "15%"},
+            selfstyle: {marginLeft: "2%",marginRight: "15%"},
             activeName: 'first',
             filename: '',
             textname:'',
@@ -127,7 +126,7 @@ export default {
             ifLeftShow: false,
             ifRightShow: false,
             label: 2,
-            keywords: ['alcohol', 'liver disease', 'steatohepatitis'],
+            keywords: [],
             words: '',
             dialogKeywordVisible: false,
             line1Style: {},
@@ -533,11 +532,11 @@ export default {
   /* transform: translateX(10px); */
   opacity: 0;
 }
-.textarea {
+.textarea .el-textarea__inner {
+    font-size: 20px;
     width: 1000px;
-    height: 80px;
+    height: 200px;
     margin-top: 20px;
-    font-size: 18px;
 }
 .pagination {
     margin-left: 5%;
@@ -547,7 +546,7 @@ export default {
     font-size: 20px;
 }
 .keyBtn1 .el-button  {
-    margin-left: 122px;
+    margin-left: 138px;
     margin-top: 170px;
     font-size: 20px;
 }
@@ -620,6 +619,8 @@ export default {
     font-size: 30px;
     color: rgb(166, 40, 47);
 }
-
+.filename .el-input__inner {
+    font-size: 18px;
+}
 
 </style>

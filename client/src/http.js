@@ -19,7 +19,7 @@ function endLoading() {
 // 请求拦截
 axios.interceptors.request.use(config => {
     // 加载动画
-    startLoading();
+    // startLoading();
 
     if (localStorage.eleToken) {
         // 设置请求头
@@ -33,7 +33,7 @@ axios.interceptors.request.use(config => {
 // 响应拦截
 axios.interceptors.response.use(response => {
     // 结束加载动画
-    endLoading();
+    // endLoading();
     return response;
 }, error => {
     // 错误提醒

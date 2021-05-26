@@ -9,7 +9,7 @@ const pythonPath =  require('./config/store').pythonPath;
 const passport = require('passport');
 const users = require('./routers/api/users');
 const texts = require('./routers/api/texts');
-const networks = require('./routers/api/networks');
+const graphs = require('./routers/api/graphs');
 const app = express();
 var siofu = require("socketio-file-upload");
 app.use(siofu.router)
@@ -31,7 +31,7 @@ require('./config/passport')(passport);
 
 app.use('/api/users', users);
 app.use('/api/texts', texts);
-app.use('/api/networks', networks);
+app.use('/api/graphs', graphs);
 
 // websocket
 io.on('connection', function(socket){
@@ -47,22 +47,20 @@ io.on('connection', function(socket){
         };
         let pyshell = new PythonShell(path, options);
         let result = [];
-        // pyshell.send(JSON.stringify({ keywords: keywords, text: data.text }));
-        // console.log(msg)
-        // pyshell.on('message', function (message) {
-        //     result.push(message);
-        // });
-        // pyshell.end(function (err,code,signal) {
-        //     if (err) console.log(err);
-        //     console.log('The exit code was: ' + code);
-        //     console.log('The exit signal was: ' + signal);
-        //     console.log('finished');
-        //     console.log(result);
-        //     io.emit('res message', result);
-        // })
-        io.emit('res message', ['{"liver disease-deaths": 1, "alcohol-liver disease": 1, "steatohepatitis-fibrosis": 1, "steatohepatitis-cirrhosis": 2, "steatohepatitis-hepatitis": 2, "liver disease-cirrhosis": 1, "liver disease burden-liver disease": 2, "hcc cases-liver disease": 1, "steatosis-steatohepatitis": 2, "liver disease-liver cancer": 1, "alpha antitrypsin deficiency-liver disease": 1, "hemostasis-liver disease": 1}']);
-        // 
-        // '{"alcohol-liver disease": 1, "ald-liver afl": 2, "steatohepatitis-fibrosis": 1, "steatohepatitis-cirrhosis": 1, "steatohepatitis-hepatitis": 1, "nafld nash-steatohepatitis": 2, "liver disease-cirrhosis": 1, "liver cirrhosis-death": 1, "liver disease burden-liver disease": 2, "hcc cases-liver disease": 1, "liver disease-liver cancer": 1, "alpha antitrypsin deficiency-liver disease": 1, "steatohepatitis nash-cirrhosis": 1, "hemostasis-liver disease": 1, "bleeding events-defect": 2}'
+        pyshell.send(JSON.stringify({ keywords: keywords, text: data.text }));
+        console.log(msg)
+        pyshell.on('message', function (message) {
+            result.push(message);
+        });
+        pyshell.end(function (err,code,signal) {
+            if (err) console.log(err);
+            console.log('The exit code was: ' + code);
+            console.log('The exit signal was: ' + signal);
+            console.log('finished');
+            console.log(result);
+            io.emit('res message', result);
+        })
+        
     });
     var uploader = new siofu();
     uploader.dir = "./upload1/";
@@ -99,6 +97,8 @@ io.on('connection', function(socket){
                 });
                 io.emit('file message', result);
             })
+           
+            
         })
         
     })
