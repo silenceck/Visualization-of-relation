@@ -66,8 +66,6 @@ io.on('connection', function(socket){
     uploader.dir = "./upload1/";
     uploader.listen(socket);
     uploader.on("saved", function(event){
-        console.log(event.file)
-        // event.file.name
         fs.readFile('./upload1/'+ event.file.name, 'utf8', function(err, data){
             text = data 
             let keywords = ''

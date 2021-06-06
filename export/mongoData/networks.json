@@ -1,0 +1,11 @@
+{"_id":{"$oid":"5df735adc5fd283fd826bd23"},"username":"5de7132c2b52145de76b864e","field":"test","numOfNodes":77,"numOfLinks":254,"time":{"$date":"2019-12-16T07:43:41.239Z"},"__v":0}
+{"_id":{"$oid":"5e7b5a2d72fc022ab068440c"},"username":"5de7132c2b52145de76b864e","time":{"$date":"2020-03-25T13:18:37.228Z"},"field":"T3","numOfNodes":3,"numOfLinks":3,"__v":0}
+{"_id":{"$oid":"5e7e1322a3553e0bb462e303"},"username":"5de7132c2b52145de76b864e","time":{"$date":"2020-03-27T14:52:18.994Z"},"field":"T1","numOfNodes":3,"numOfLinks":3,"__v":0}
+{"_id":{"$oid":"5e85b373970ddd128080b344"},"username":"5de7132c2b52145de76b864e","time":{"$date":"2020-04-02T09:42:11.003Z"},"field":"T4","numOfNodes":3,"numOfLinks":2,"__v":0}
+{"_id":{"$oid":"5e8bd80568c3192b4c3bf09f"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2020-04-07T01:31:49.728Z"},"field":"Nursing","numOfNodes":482,"numOfLinks":3341,"__v":0}
+{"_id":{"$oid":"5e8c0378d3689c5238ade590"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2020-04-07T04:37:12.027Z"},"field":"Alzheimer","numOfNodes":13,"numOfLinks":27,"__v":0}
+{"_id":{"$oid":"5e8d414bd8fa4c307c058dcb"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2020-04-08T03:13:15.988Z"},"field":"Cancer","numOfNodes":5,"numOfLinks":4,"__v":0}
+{"_id":{"$oid":"5e9f9db49718dc13e81c17ee"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2020-04-22T01:28:20.884Z"},"field":"Heart_disease","numOfNodes":8,"numOfLinks":7,"__v":0}
+{"_id":{"$oid":"60613ce1e381996aa4eaf45c"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2021-03-29T02:35:13.001Z"},"field":"Pressure_injuries","numOfNodes":11,"numOfLinks":12,"__v":0}
+{"_id":{"$oid":"60914c1868f6912e182faea4"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2021-05-04T13:28:56.745Z"},"field":"Cardiovascular_disease","numOfNodes":11,"numOfLinks":14,"__v":0}
+{"_id":{"$oid":"609201315706e11c7c778ed1"},"username":"5e86e94456b4294778a1312f","time":{"$date":"2021-05-05T02:21:37.203Z"},"field":"Liver_disease","numOfNodes":13,"numOfLinks":12,"__v":0}
